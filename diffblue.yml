@@ -1,0 +1,182 @@
+# Tested on Deeptest release 1.12.0
+cbmcArguments:
+  java-generate-no-comments: true
+units:
+  - target:
+    - dir: target/classes
+      file: org/apache/ibatis/io/DefaultVFS.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/io/DefaultVFS.java
+    # Child of DefaultVFS.class
+    - dir: target/classes
+      file: org/apache/ibatis/logging/Log.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/logging/Log.java
+    # Child of DefaultVFS.class
+    - dir: target/classes
+      file: org/apache/ibatis/logging/LogFactory.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/logging/LogFactory.java
+  - target:
+    - dir: target/classes
+      file: org/apache/ibatis/datasource/pooled/PooledDataSource.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/datasource/pooled/PooledDataSource.java
+    # Child of PooledDataSource.class
+    - dir: target/classes
+      file: org/apache/ibatis/datasource/unpooled/UnpooledDataSource.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/datasource/unpooled/UnpooledDataSource.java
+  - target:
+    - dir: target/classes
+      file: org/apache/ibatis/executor/loader/ResultLoaderMap.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/executor/loader/ResultLoaderMap.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/cursor/Cursor.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/cursor/Cursor.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/executor/BaseExecutor.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/executor/BaseExecutor.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/executor/BatchResult.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/executor/BatchResult.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/mapping/BoundSql.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/mapping/BoundSql.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/mapping/MappedStatement.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/mapping/MappedStatement.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/reflection/MetaObject.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/reflection/MetaObject.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/session/Configuration.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/session/Configuration.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/session/ResultHandler.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/session/ResultHandler.java
+    # Child of ResultLoaderMap.class
+    - dir: target/classes
+      file: org/apache/ibatis/session/RowBounds.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/session/RowBounds.java
+  - target:
+    - dir: target/classes
+      file: org/apache/ibatis/annotations/ResultMap.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/annotations/ResultMap.java
+  - target:
+    - dir: target/classes
+      file: org/apache/ibatis/parsing/XNode.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/parsing/XNode.java
+  - target:
+    - dir: target/classes
+      file: org/apache/ibatis/io/JBoss6VFS.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/io/JBoss6VFS.java
+    # Child of JBoss6VFS.class
+    - dir: target/classes
+      file: org/apache/ibatis/logging/Log.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/logging/Log.java
+    # Child of JBoss6VFS.class
+    - dir: target/classes
+      file: org/apache/ibatis/logging/LogFactory.class
+      sourceDir: src/main/java
+      sourceFile: org/apache/ibatis/logging/LogFactory.java
+phases:
+-
+  timeout: 60
+  cbmcArguments:
+    max-nondet-array-length: 10
+    unwind: 1
+    string-non-empty: true
+    java-assume-inputs-non-null: true
+-
+  timeout: 60
+  cbmcArguments:
+    classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 10
+    unwind: 1
+-
+  timeout: 60
+  cbmcArguments:
+    classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 20
+    unwind: 2
+    string-non-empty: true
+    java-assume-inputs-non-null: true
+-
+  timeout: 60
+  cbmcArguments:
+    classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 20
+    unwind: 2
+-
+  timeout: 60
+  cbmcArguments:
+    classpath: '/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 30
+    max-nondet-string-length: 10
+    unwind: 3
+    string-non-empty: true
+    java-assume-inputs-non-null: true
+-
+  timeout: 60
+  cbmcArguments:
+    classpath: '/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 30
+    max-nondet-string-length: 10
+    unwind: 3
+-
+  timeout: 120
+  cbmcArguments:
+    classpath: '/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 30
+    max-nondet-string-length: 10
+    unwind: 4
+    load-containing-class-only: true
+    string-non-empty: true
+    java-assume-inputs-non-null: true
+-
+  timeout: 120
+  cbmcArguments:
+    classpath: '/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 50
+    max-nondet-string-length: 50
+    unwind: 4
+    load-containing-class-only: true
+-
+  timeout: 120
+  cbmcArguments:
+    classpath: '/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 130
+    max-nondet-string-length: 110
+    unwind: 10
+    string-non-empty: true
+    java-assume-inputs-non-null: true
+-
+  timeout: 120
+  cbmcArguments:
+    classpath: '/tools/cbmc/models.jar:.'
+    max-nondet-array-length: 300
+    max-nondet-string-length: 100
+    unwind: 10
