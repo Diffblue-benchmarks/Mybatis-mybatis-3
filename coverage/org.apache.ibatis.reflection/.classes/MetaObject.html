@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MetaObject</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.reflection</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MetaObject (org.apache.ibatis.reflection)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MetaObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (19/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.4%
+  </span>
+  <span class="absValue">
+    (53/ 55)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$00wQAHEz</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$038qzeSa</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$b1yJRke2</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$c0RhDe8J</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$D35WshRB</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$dwHpPwjG</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$gGYboj6M</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$HlVER844</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$jBUsPUDW</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$Jg0NOiqV</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$LvkjGq7Y</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$nkmFRFCY</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$O5vGzas5</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$PbHr0EfV</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$s29ERzrU</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$UEZwFhZW</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$UN82LFIu</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$Vp5Hqwnt</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$wOvwmBjl</td>
+  </tr>
+  <tr>
+    <td class="name">MetaObject$MockitoMock$1078779900$auxiliary$yiydDNvu</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (19/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.4%
+  </span>
+  <span class="absValue">
+    (53/ 55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.reflection;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.Collection;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;import java.util.Map;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;import org.apache.ibatis.reflection.factory.ObjectFactory;
+<i>23</i>&nbsp;import org.apache.ibatis.reflection.property.PropertyTokenizer;
+<i>24</i>&nbsp;import org.apache.ibatis.reflection.wrapper.BeanWrapper;
+<i>25</i>&nbsp;import org.apache.ibatis.reflection.wrapper.CollectionWrapper;
+<i>26</i>&nbsp;import org.apache.ibatis.reflection.wrapper.MapWrapper;
+<i>27</i>&nbsp;import org.apache.ibatis.reflection.wrapper.ObjectWrapper;
+<i>28</i>&nbsp;import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;/**
+<i>31</i>&nbsp; * @author Clinton Begin
+<i>32</i>&nbsp; */
+<i>33</i>&nbsp;public class MetaObject {
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;  private final Object originalObject;
+<i>36</i>&nbsp;  private final ObjectWrapper objectWrapper;
+<i>37</i>&nbsp;  private final ObjectFactory objectFactory;
+<i>38</i>&nbsp;  private final ObjectWrapperFactory objectWrapperFactory;
+<i>39</i>&nbsp;  private final ReflectorFactory reflectorFactory;
+<i>40</i>&nbsp;
+<b class="fc"><i>41</i>&nbsp;  private MetaObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {</b>
+<b class="fc"><i>42</i>&nbsp;    this.originalObject = object;</b>
+<b class="fc"><i>43</i>&nbsp;    this.objectFactory = objectFactory;</b>
+<b class="fc"><i>44</i>&nbsp;    this.objectWrapperFactory = objectWrapperFactory;</b>
+<b class="fc"><i>45</i>&nbsp;    this.reflectorFactory = reflectorFactory;</b>
+<i>46</i>&nbsp;
+<b class="fc"><i>47</i>&nbsp;    if (object instanceof ObjectWrapper) {</b>
+<b class="nc"><i>48</i>&nbsp;      this.objectWrapper = (ObjectWrapper) object;</b>
+<b class="fc"><i>49</i>&nbsp;    } else if (objectWrapperFactory.hasWrapperFor(object)) {</b>
+<b class="fc"><i>50</i>&nbsp;      this.objectWrapper = objectWrapperFactory.getWrapperFor(this, object);</b>
+<b class="fc"><i>51</i>&nbsp;    } else if (object instanceof Map) {</b>
+<b class="fc"><i>52</i>&nbsp;      this.objectWrapper = new MapWrapper(this, (Map) object);</b>
+<b class="fc"><i>53</i>&nbsp;    } else if (object instanceof Collection) {</b>
+<b class="fc"><i>54</i>&nbsp;      this.objectWrapper = new CollectionWrapper(this, (Collection) object);</b>
+<i>55</i>&nbsp;    } else {
+<b class="fc"><i>56</i>&nbsp;      this.objectWrapper = new BeanWrapper(this, object);</b>
+<i>57</i>&nbsp;    }
+<b class="fc"><i>58</i>&nbsp;  }</b>
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  public static MetaObject forObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
+<b class="fc"><i>61</i>&nbsp;    if (object == null) {</b>
+<b class="fc"><i>62</i>&nbsp;      return SystemMetaObject.NULL_META_OBJECT;</b>
+<i>63</i>&nbsp;    } else {
+<b class="fc"><i>64</i>&nbsp;      return new MetaObject(object, objectFactory, objectWrapperFactory, reflectorFactory);</b>
+<i>65</i>&nbsp;    }
+<i>66</i>&nbsp;  }
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;  public ObjectFactory getObjectFactory() {
+<b class="fc"><i>69</i>&nbsp;    return objectFactory;</b>
+<i>70</i>&nbsp;  }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  public ObjectWrapperFactory getObjectWrapperFactory() {
+<b class="fc"><i>73</i>&nbsp;    return objectWrapperFactory;</b>
+<i>74</i>&nbsp;  }
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;  public ReflectorFactory getReflectorFactory() {
+<b class="fc"><i>77</i>&nbsp;    return reflectorFactory;</b>
+<i>78</i>&nbsp;  }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;  public Object getOriginalObject() {
+<b class="fc"><i>81</i>&nbsp;    return originalObject;</b>
+<i>82</i>&nbsp;  }
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;  public String findProperty(String propName, boolean useCamelCaseMapping) {
+<b class="fc"><i>85</i>&nbsp;    return objectWrapper.findProperty(propName, useCamelCaseMapping);</b>
+<i>86</i>&nbsp;  }
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;  public String[] getGetterNames() {
+<b class="fc"><i>89</i>&nbsp;    return objectWrapper.getGetterNames();</b>
+<i>90</i>&nbsp;  }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;  public String[] getSetterNames() {
+<b class="fc"><i>93</i>&nbsp;    return objectWrapper.getSetterNames();</b>
+<i>94</i>&nbsp;  }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;  public Class&lt;?&gt; getSetterType(String name) {
+<b class="fc"><i>97</i>&nbsp;    return objectWrapper.getSetterType(name);</b>
+<i>98</i>&nbsp;  }
+<i>99</i>&nbsp;
+<i>100</i>&nbsp;  public Class&lt;?&gt; getGetterType(String name) {
+<b class="fc"><i>101</i>&nbsp;    return objectWrapper.getGetterType(name);</b>
+<i>102</i>&nbsp;  }
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;  public boolean hasSetter(String name) {
+<b class="fc"><i>105</i>&nbsp;    return objectWrapper.hasSetter(name);</b>
+<i>106</i>&nbsp;  }
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;  public boolean hasGetter(String name) {
+<b class="fc"><i>109</i>&nbsp;    return objectWrapper.hasGetter(name);</b>
+<i>110</i>&nbsp;  }
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;  public Object getValue(String name) {
+<b class="fc"><i>113</i>&nbsp;    PropertyTokenizer prop = new PropertyTokenizer(name);</b>
+<b class="fc"><i>114</i>&nbsp;    if (prop.hasNext()) {</b>
+<b class="fc"><i>115</i>&nbsp;      MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());</b>
+<b class="fc"><i>116</i>&nbsp;      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {</b>
+<b class="fc"><i>117</i>&nbsp;        return null;</b>
+<i>118</i>&nbsp;      } else {
+<b class="fc"><i>119</i>&nbsp;        return metaValue.getValue(prop.getChildren());</b>
+<i>120</i>&nbsp;      }
+<i>121</i>&nbsp;    } else {
+<b class="fc"><i>122</i>&nbsp;      return objectWrapper.get(prop);</b>
+<i>123</i>&nbsp;    }
+<i>124</i>&nbsp;  }
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;  public void setValue(String name, Object value) {
+<b class="fc"><i>127</i>&nbsp;    PropertyTokenizer prop = new PropertyTokenizer(name);</b>
+<b class="fc"><i>128</i>&nbsp;    if (prop.hasNext()) {</b>
+<b class="fc"><i>129</i>&nbsp;      MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());</b>
+<b class="fc"><i>130</i>&nbsp;      if (metaValue == SystemMetaObject.NULL_META_OBJECT) {</b>
+<b class="fc"><i>131</i>&nbsp;        if (value == null) {</b>
+<i>132</i>&nbsp;          // don&#39;t instantiate child path if value is null
+<b class="fc"><i>133</i>&nbsp;          return;</b>
+<i>134</i>&nbsp;        } else {
+<b class="fc"><i>135</i>&nbsp;          metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);</b>
+<i>136</i>&nbsp;        }
+<i>137</i>&nbsp;      }
+<b class="fc"><i>138</i>&nbsp;      metaValue.setValue(prop.getChildren(), value);</b>
+<b class="fc"><i>139</i>&nbsp;    } else {</b>
+<b class="fc"><i>140</i>&nbsp;      objectWrapper.set(prop, value);</b>
+<i>141</i>&nbsp;    }
+<b class="fc"><i>142</i>&nbsp;  }</b>
+<i>143</i>&nbsp;
+<i>144</i>&nbsp;  public MetaObject metaObjectForProperty(String name) {
+<b class="fc"><i>145</i>&nbsp;    Object value = getValue(name);</b>
+<b class="fc"><i>146</i>&nbsp;    return MetaObject.forObject(value, objectFactory, objectWrapperFactory, reflectorFactory);</b>
+<i>147</i>&nbsp;  }
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;  public ObjectWrapper getObjectWrapper() {
+<b class="fc"><i>150</i>&nbsp;    return objectWrapper;</b>
+<i>151</i>&nbsp;  }
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;  public boolean isCollection() {
+<b class="nc"><i>154</i>&nbsp;    return objectWrapper.isCollection();</b>
+<i>155</i>&nbsp;  }
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;  public void add(Object element) {
+<b class="fc"><i>158</i>&nbsp;    objectWrapper.add(element);</b>
+<b class="fc"><i>159</i>&nbsp;  }</b>
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;  public &lt;E&gt; void addAll(List&lt;E&gt; list) {
+<b class="fc"><i>162</i>&nbsp;    objectWrapper.addAll(list);</b>
+<b class="fc"><i>163</i>&nbsp;  }</b>
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

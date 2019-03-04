@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: VendorDatabaseIdProvider</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.mapping</a> ]
+</div>
+
+<h1>Coverage Summary for Class: VendorDatabaseIdProvider (org.apache.ibatis.mapping)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VendorDatabaseIdProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.1%
+  </span>
+  <span class="absValue">
+    (19/ 26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">VendorDatabaseIdProvider$LogHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.9%
+  </span>
+  <span class="absValue">
+    (19/ 28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.mapping;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.Connection;
+<i>19</i>&nbsp;import java.sql.DatabaseMetaData;
+<i>20</i>&nbsp;import java.sql.SQLException;
+<i>21</i>&nbsp;import java.util.Map;
+<i>22</i>&nbsp;import java.util.Properties;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import javax.sql.DataSource;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;import org.apache.ibatis.logging.Log;
+<i>27</i>&nbsp;import org.apache.ibatis.logging.LogFactory;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;/**
+<i>30</i>&nbsp; * Vendor DatabaseId provider.
+<i>31</i>&nbsp; *
+<i>32</i>&nbsp; * It returns database product name as a databaseId.
+<i>33</i>&nbsp; * If the user provides a properties it uses it to translate database product name
+<i>34</i>&nbsp; * key=&quot;Microsoft SQL Server&quot;, value=&quot;ms&quot; will return &quot;ms&quot;.
+<i>35</i>&nbsp; * It can return null, if no database product name or
+<i>36</i>&nbsp; * a properties was specified and no translation was found.
+<i>37</i>&nbsp; *
+<i>38</i>&nbsp; * @author Eduardo Macarron
+<i>39</i>&nbsp; */
+<b class="fc"><i>40</i>&nbsp;public class VendorDatabaseIdProvider implements DatabaseIdProvider {</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;  private Properties properties;
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  @Override
+<i>45</i>&nbsp;  public String getDatabaseId(DataSource dataSource) {
+<b class="fc"><i>46</i>&nbsp;    if (dataSource == null) {</b>
+<b class="nc"><i>47</i>&nbsp;      throw new NullPointerException(&quot;dataSource cannot be null&quot;);</b>
+<i>48</i>&nbsp;    }
+<i>49</i>&nbsp;    try {
+<b class="fc"><i>50</i>&nbsp;      return getDatabaseName(dataSource);</b>
+<b class="nc"><i>51</i>&nbsp;    } catch (Exception e) {</b>
+<b class="nc"><i>52</i>&nbsp;      LogHolder.log.error(&quot;Could not get a databaseId from dataSource&quot;, e);</b>
+<i>53</i>&nbsp;    }
+<b class="nc"><i>54</i>&nbsp;    return null;</b>
+<i>55</i>&nbsp;  }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;  @Override
+<i>58</i>&nbsp;  public void setProperties(Properties p) {
+<b class="fc"><i>59</i>&nbsp;    this.properties = p;</b>
+<b class="fc"><i>60</i>&nbsp;  }</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;  private String getDatabaseName(DataSource dataSource) throws SQLException {
+<b class="fc"><i>63</i>&nbsp;    String productName = getDatabaseProductName(dataSource);</b>
+<b class="fc"><i>64</i>&nbsp;    if (this.properties != null) {</b>
+<b class="fc"><i>65</i>&nbsp;      for (Map.Entry&lt;Object, Object&gt; property : properties.entrySet()) {</b>
+<b class="fc"><i>66</i>&nbsp;        if (productName.contains((String) property.getKey())) {</b>
+<b class="fc"><i>67</i>&nbsp;          return (String) property.getValue();</b>
+<i>68</i>&nbsp;        }
+<b class="fc"><i>69</i>&nbsp;      }</b>
+<i>70</i>&nbsp;      // no match, return null
+<b class="fc"><i>71</i>&nbsp;      return null;</b>
+<i>72</i>&nbsp;    }
+<b class="nc"><i>73</i>&nbsp;    return productName;</b>
+<i>74</i>&nbsp;  }
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;  private String getDatabaseProductName(DataSource dataSource) throws SQLException {
+<b class="fc"><i>77</i>&nbsp;    Connection con = null;</b>
+<i>78</i>&nbsp;    try {
+<b class="fc"><i>79</i>&nbsp;      con = dataSource.getConnection();</b>
+<b class="fc"><i>80</i>&nbsp;      DatabaseMetaData metaData = con.getMetaData();</b>
+<b class="fc"><i>81</i>&nbsp;      return metaData.getDatabaseProductName();</b>
+<i>82</i>&nbsp;    } finally {
+<b class="fc"><i>83</i>&nbsp;      if (con != null) {</b>
+<i>84</i>&nbsp;        try {
+<b class="fc"><i>85</i>&nbsp;          con.close();</b>
+<b class="nc"><i>86</i>&nbsp;        } catch (SQLException e) {</b>
+<i>87</i>&nbsp;          // ignored
+<b class="fc"><i>88</i>&nbsp;        }</b>
+<i>89</i>&nbsp;      }
+<b class="nc"><i>90</i>&nbsp;    }</b>
+<i>91</i>&nbsp;  }
+<i>92</i>&nbsp;
+<b class="nc"><i>93</i>&nbsp;  private static class LogHolder {</b>
+<b class="nc"><i>94</i>&nbsp;    private static final Log log = LogFactory.getLog(VendorDatabaseIdProvider.class);</b>
+<i>95</i>&nbsp;  }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

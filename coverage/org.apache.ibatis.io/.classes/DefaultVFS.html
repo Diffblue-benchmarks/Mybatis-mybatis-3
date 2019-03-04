@@ -1,0 +1,431 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DefaultVFS</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.io</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DefaultVFS (org.apache.ibatis.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultVFS</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    39.3%
+  </span>
+  <span class="absValue">
+    (53/ 135)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.io;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.io.BufferedReader;
+<i>19</i>&nbsp;import java.io.File;
+<i>20</i>&nbsp;import java.io.FileNotFoundException;
+<i>21</i>&nbsp;import java.io.IOException;
+<i>22</i>&nbsp;import java.io.InputStream;
+<i>23</i>&nbsp;import java.io.InputStreamReader;
+<i>24</i>&nbsp;import java.io.UnsupportedEncodingException;
+<i>25</i>&nbsp;import java.net.MalformedURLException;
+<i>26</i>&nbsp;import java.net.URL;
+<i>27</i>&nbsp;import java.net.URLEncoder;
+<i>28</i>&nbsp;import java.util.ArrayList;
+<i>29</i>&nbsp;import java.util.Arrays;
+<i>30</i>&nbsp;import java.util.List;
+<i>31</i>&nbsp;import java.util.jar.JarEntry;
+<i>32</i>&nbsp;import java.util.jar.JarInputStream;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;import org.apache.ibatis.logging.Log;
+<i>35</i>&nbsp;import org.apache.ibatis.logging.LogFactory;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;/**
+<i>38</i>&nbsp; * A default implementation of {@link VFS} that works for most application servers.
+<i>39</i>&nbsp; *
+<i>40</i>&nbsp; * @author Ben Gunter
+<i>41</i>&nbsp; */
+<b class="fc"><i>42</i>&nbsp;public class DefaultVFS extends VFS {</b>
+<b class="fc"><i>43</i>&nbsp;  private static final Log log = LogFactory.getLog(DefaultVFS.class);</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;  /** The magic header that indicates a JAR (ZIP) file. */
+<b class="fc"><i>46</i>&nbsp;  private static final byte[] JAR_MAGIC = { &#39;P&#39;, &#39;K&#39;, 3, 4 };</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;  @Override
+<i>49</i>&nbsp;  public boolean isValid() {
+<b class="fc"><i>50</i>&nbsp;    return true;</b>
+<i>51</i>&nbsp;  }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  @Override
+<i>54</i>&nbsp;  public List&lt;String&gt; list(URL url, String path) throws IOException {
+<b class="fc"><i>55</i>&nbsp;    InputStream is = null;</b>
+<i>56</i>&nbsp;    try {
+<b class="fc"><i>57</i>&nbsp;      List&lt;String&gt; resources = new ArrayList&lt;&gt;();</b>
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;      // First, try to find the URL of a JAR file containing the requested resource. If a JAR
+<i>60</i>&nbsp;      // file is found, then we&#39;ll list child resources by reading the JAR.
+<b class="fc"><i>61</i>&nbsp;      URL jarUrl = findJarForResource(url);</b>
+<b class="fc"><i>62</i>&nbsp;      if (jarUrl != null) {</b>
+<b class="nc"><i>63</i>&nbsp;        is = jarUrl.openStream();</b>
+<b class="nc"><i>64</i>&nbsp;        if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>65</i>&nbsp;          log.debug(&quot;Listing &quot; + url);</b>
+<i>66</i>&nbsp;        }
+<b class="nc"><i>67</i>&nbsp;        resources = listResources(new JarInputStream(is), path);</b>
+<i>68</i>&nbsp;      }
+<i>69</i>&nbsp;      else {
+<b class="fc"><i>70</i>&nbsp;        List&lt;String&gt; children = new ArrayList&lt;&gt;();</b>
+<i>71</i>&nbsp;        try {
+<b class="fc"><i>72</i>&nbsp;          if (isJar(url)) {</b>
+<i>73</i>&nbsp;            // Some versions of JBoss VFS might give a JAR stream even if the resource
+<i>74</i>&nbsp;            // referenced by the URL isn&#39;t actually a JAR
+<b class="nc"><i>75</i>&nbsp;            is = url.openStream();</b>
+<b class="nc"><i>76</i>&nbsp;            try (JarInputStream jarInput = new JarInputStream(is)) {</b>
+<b class="nc"><i>77</i>&nbsp;              if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>78</i>&nbsp;                log.debug(&quot;Listing &quot; + url);</b>
+<i>79</i>&nbsp;              }
+<b class="nc"><i>80</i>&nbsp;              for (JarEntry entry; (entry = jarInput.getNextJarEntry()) != null; ) {</b>
+<b class="nc"><i>81</i>&nbsp;                if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>82</i>&nbsp;                  log.debug(&quot;Jar entry: &quot; + entry.getName());</b>
+<i>83</i>&nbsp;                }
+<b class="nc"><i>84</i>&nbsp;                children.add(entry.getName());</b>
+<i>85</i>&nbsp;              }
+<b class="nc"><i>86</i>&nbsp;            }</b>
+<i>87</i>&nbsp;          }
+<i>88</i>&nbsp;          else {
+<i>89</i>&nbsp;            /*
+<i>90</i>&nbsp;             * Some servlet containers allow reading from directory resources like a
+<i>91</i>&nbsp;             * text file, listing the child resources one per line. However, there is no
+<i>92</i>&nbsp;             * way to differentiate between directory and file resources just by reading
+<i>93</i>&nbsp;             * them. To work around that, as each line is read, try to look it up via
+<i>94</i>&nbsp;             * the class loader as a child of the current resource. If any line fails
+<i>95</i>&nbsp;             * then we assume the current resource is not a directory.
+<i>96</i>&nbsp;             */
+<b class="fc"><i>97</i>&nbsp;            is = url.openStream();</b>
+<b class="fc"><i>98</i>&nbsp;            BufferedReader reader = new BufferedReader(new InputStreamReader(is));</b>
+<b class="fc"><i>99</i>&nbsp;            List&lt;String&gt; lines = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>100</i>&nbsp;            for (String line; (line = reader.readLine()) != null;) {</b>
+<b class="fc"><i>101</i>&nbsp;              if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>102</i>&nbsp;                log.debug(&quot;Reader entry: &quot; + line);</b>
+<i>103</i>&nbsp;              }
+<b class="fc"><i>104</i>&nbsp;              lines.add(line);</b>
+<b class="fc"><i>105</i>&nbsp;              if (getResources(path + &quot;/&quot; + line).isEmpty()) {</b>
+<b class="fc"><i>106</i>&nbsp;                lines.clear();</b>
+<b class="fc"><i>107</i>&nbsp;                break;</b>
+<i>108</i>&nbsp;              }
+<i>109</i>&nbsp;            }
+<i>110</i>&nbsp;
+<b class="fc"><i>111</i>&nbsp;            if (!lines.isEmpty()) {</b>
+<b class="fc"><i>112</i>&nbsp;              if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>113</i>&nbsp;                log.debug(&quot;Listing &quot; + url);</b>
+<i>114</i>&nbsp;              }
+<b class="fc"><i>115</i>&nbsp;              children.addAll(lines);</b>
+<i>116</i>&nbsp;            }
+<i>117</i>&nbsp;          }
+<b class="nc"><i>118</i>&nbsp;        } catch (FileNotFoundException e) {</b>
+<i>119</i>&nbsp;          /*
+<i>120</i>&nbsp;           * For file URLs the openStream() call might fail, depending on the servlet
+<i>121</i>&nbsp;           * container, because directories can&#39;t be opened for reading. If that happens,
+<i>122</i>&nbsp;           * then list the directory directly instead.
+<i>123</i>&nbsp;           */
+<b class="nc"><i>124</i>&nbsp;          if (&quot;file&quot;.equals(url.getProtocol())) {</b>
+<b class="nc"><i>125</i>&nbsp;            File file = new File(url.getFile());</b>
+<b class="nc"><i>126</i>&nbsp;            if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>127</i>&nbsp;                log.debug(&quot;Listing directory &quot; + file.getAbsolutePath());</b>
+<i>128</i>&nbsp;            }
+<b class="nc"><i>129</i>&nbsp;            if (file.isDirectory()) {</b>
+<b class="nc"><i>130</i>&nbsp;              if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>131</i>&nbsp;                  log.debug(&quot;Listing &quot; + url);</b>
+<i>132</i>&nbsp;              }
+<b class="nc"><i>133</i>&nbsp;              children = Arrays.asList(file.list());</b>
+<i>134</i>&nbsp;            }
+<b class="nc"><i>135</i>&nbsp;          }</b>
+<i>136</i>&nbsp;          else {
+<i>137</i>&nbsp;            // No idea where the exception came from so rethrow it
+<b class="nc"><i>138</i>&nbsp;            throw e;</b>
+<i>139</i>&nbsp;          }
+<b class="fc"><i>140</i>&nbsp;        }</b>
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;        // The URL prefix to use when recursively listing child resources
+<b class="fc"><i>143</i>&nbsp;        String prefix = url.toExternalForm();</b>
+<b class="fc"><i>144</i>&nbsp;        if (!prefix.endsWith(&quot;/&quot;)) {</b>
+<b class="fc"><i>145</i>&nbsp;          prefix = prefix + &quot;/&quot;;</b>
+<i>146</i>&nbsp;        }
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;        // Iterate over immediate children, adding files and recursing into directories
+<b class="fc"><i>149</i>&nbsp;        for (String child : children) {</b>
+<b class="fc"><i>150</i>&nbsp;          String resourcePath = path + &quot;/&quot; + child;</b>
+<b class="fc"><i>151</i>&nbsp;          resources.add(resourcePath);</b>
+<b class="fc"><i>152</i>&nbsp;          URL childUrl = new URL(prefix + child);</b>
+<b class="fc"><i>153</i>&nbsp;          resources.addAll(list(childUrl, resourcePath));</b>
+<b class="fc"><i>154</i>&nbsp;        }</b>
+<i>155</i>&nbsp;      }
+<i>156</i>&nbsp;
+<b class="fc"><i>157</i>&nbsp;      return resources;</b>
+<i>158</i>&nbsp;    } finally {
+<b class="fc"><i>159</i>&nbsp;      if (is != null) {</b>
+<i>160</i>&nbsp;        try {
+<b class="fc"><i>161</i>&nbsp;          is.close();</b>
+<b class="nc"><i>162</i>&nbsp;        } catch (Exception e) {</b>
+<i>163</i>&nbsp;          // Ignore
+<b class="fc"><i>164</i>&nbsp;        }</b>
+<i>165</i>&nbsp;      }
+<b class="nc"><i>166</i>&nbsp;    }</b>
+<i>167</i>&nbsp;  }
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;  /**
+<i>170</i>&nbsp;   * List the names of the entries in the given {@link JarInputStream} that begin with the
+<i>171</i>&nbsp;   * specified {@code path}. Entries will match with or without a leading slash.
+<i>172</i>&nbsp;   *
+<i>173</i>&nbsp;   * @param jar The JAR input stream
+<i>174</i>&nbsp;   * @param path The leading path to match
+<i>175</i>&nbsp;   * @return The names of all the matching entries
+<i>176</i>&nbsp;   * @throws IOException If I/O errors occur
+<i>177</i>&nbsp;   */
+<i>178</i>&nbsp;  protected List&lt;String&gt; listResources(JarInputStream jar, String path) throws IOException {
+<i>179</i>&nbsp;    // Include the leading and trailing slash when matching names
+<b class="nc"><i>180</i>&nbsp;    if (!path.startsWith(&quot;/&quot;)) {</b>
+<b class="nc"><i>181</i>&nbsp;      path = &quot;/&quot; + path;</b>
+<i>182</i>&nbsp;    }
+<b class="nc"><i>183</i>&nbsp;    if (!path.endsWith(&quot;/&quot;)) {</b>
+<b class="nc"><i>184</i>&nbsp;      path = path + &quot;/&quot;;</b>
+<i>185</i>&nbsp;    }
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;    // Iterate over the entries and collect those that begin with the requested path
+<b class="nc"><i>188</i>&nbsp;    List&lt;String&gt; resources = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>189</i>&nbsp;    for (JarEntry entry; (entry = jar.getNextJarEntry()) != null;) {</b>
+<b class="nc"><i>190</i>&nbsp;      if (!entry.isDirectory()) {</b>
+<i>191</i>&nbsp;        // Add leading slash if it&#39;s missing
+<b class="nc"><i>192</i>&nbsp;        StringBuilder name = new StringBuilder(entry.getName());</b>
+<b class="nc"><i>193</i>&nbsp;        if (name.charAt(0) != &#39;/&#39;) {</b>
+<b class="nc"><i>194</i>&nbsp;          name.insert(0, &#39;/&#39;);</b>
+<i>195</i>&nbsp;        }
+<i>196</i>&nbsp;
+<i>197</i>&nbsp;        // Check file name
+<b class="nc"><i>198</i>&nbsp;        if (name.indexOf(path) == 0) {</b>
+<b class="nc"><i>199</i>&nbsp;          if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>200</i>&nbsp;            log.debug(&quot;Found resource: &quot; + name);</b>
+<i>201</i>&nbsp;          }
+<i>202</i>&nbsp;          // Trim leading slash
+<b class="nc"><i>203</i>&nbsp;          resources.add(name.substring(1));</b>
+<i>204</i>&nbsp;        }
+<b class="nc"><i>205</i>&nbsp;      }</b>
+<i>206</i>&nbsp;    }
+<b class="nc"><i>207</i>&nbsp;    return resources;</b>
+<i>208</i>&nbsp;  }
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;  /**
+<i>211</i>&nbsp;   * Attempts to deconstruct the given URL to find a JAR file containing the resource referenced
+<i>212</i>&nbsp;   * by the URL. That is, assuming the URL references a JAR entry, this method will return a URL
+<i>213</i>&nbsp;   * that references the JAR file containing the entry. If the JAR cannot be located, then this
+<i>214</i>&nbsp;   * method returns null.
+<i>215</i>&nbsp;   *
+<i>216</i>&nbsp;   * @param url The URL of the JAR entry.
+<i>217</i>&nbsp;   * @return The URL of the JAR file, if one is found. Null if not.
+<i>218</i>&nbsp;   * @throws MalformedURLException
+<i>219</i>&nbsp;   */
+<i>220</i>&nbsp;  protected URL findJarForResource(URL url) throws MalformedURLException {
+<b class="fc"><i>221</i>&nbsp;    if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>222</i>&nbsp;      log.debug(&quot;Find JAR URL: &quot; + url);</b>
+<i>223</i>&nbsp;    }
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;    // If the file part of the URL is itself a URL, then that URL probably points to the JAR
+<i>226</i>&nbsp;    try {
+<i>227</i>&nbsp;      for (;;) {
+<b class="fc"><i>228</i>&nbsp;        url = new URL(url.getFile());</b>
+<b class="nc"><i>229</i>&nbsp;        if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>230</i>&nbsp;          log.debug(&quot;Inner URL: &quot; + url);</b>
+<i>231</i>&nbsp;        }
+<i>232</i>&nbsp;      }
+<b class="fc"><i>233</i>&nbsp;    } catch (MalformedURLException e) {</b>
+<i>234</i>&nbsp;      // This will happen at some point and serves as a break in the loop
+<i>235</i>&nbsp;    }
+<i>236</i>&nbsp;
+<i>237</i>&nbsp;    // Look for the .jar extension and chop off everything after that
+<b class="fc"><i>238</i>&nbsp;    StringBuilder jarUrl = new StringBuilder(url.toExternalForm());</b>
+<b class="fc"><i>239</i>&nbsp;    int index = jarUrl.lastIndexOf(&quot;.jar&quot;);</b>
+<b class="fc"><i>240</i>&nbsp;    if (index &gt;= 0) {</b>
+<b class="nc"><i>241</i>&nbsp;      jarUrl.setLength(index + 4);</b>
+<b class="nc"><i>242</i>&nbsp;      if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>243</i>&nbsp;        log.debug(&quot;Extracted JAR URL: &quot; + jarUrl);</b>
+<i>244</i>&nbsp;      }
+<i>245</i>&nbsp;    }
+<i>246</i>&nbsp;    else {
+<b class="fc"><i>247</i>&nbsp;      if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>248</i>&nbsp;        log.debug(&quot;Not a JAR: &quot; + jarUrl);</b>
+<i>249</i>&nbsp;      }
+<b class="fc"><i>250</i>&nbsp;      return null;</b>
+<i>251</i>&nbsp;    }
+<i>252</i>&nbsp;
+<i>253</i>&nbsp;    // Try to open and test it
+<i>254</i>&nbsp;    try {
+<b class="nc"><i>255</i>&nbsp;      URL testUrl = new URL(jarUrl.toString());</b>
+<b class="nc"><i>256</i>&nbsp;      if (isJar(testUrl)) {</b>
+<b class="nc"><i>257</i>&nbsp;        return testUrl;</b>
+<i>258</i>&nbsp;      }
+<i>259</i>&nbsp;      else {
+<i>260</i>&nbsp;        // WebLogic fix: check if the URL&#39;s file exists in the filesystem.
+<b class="nc"><i>261</i>&nbsp;        if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>262</i>&nbsp;          log.debug(&quot;Not a JAR: &quot; + jarUrl);</b>
+<i>263</i>&nbsp;        }
+<b class="nc"><i>264</i>&nbsp;        jarUrl.replace(0, jarUrl.length(), testUrl.getFile());</b>
+<b class="nc"><i>265</i>&nbsp;        File file = new File(jarUrl.toString());</b>
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;        // File name might be URL-encoded
+<b class="nc"><i>268</i>&nbsp;        if (!file.exists()) {</b>
+<i>269</i>&nbsp;          try {
+<b class="nc"><i>270</i>&nbsp;            file = new File(URLEncoder.encode(jarUrl.toString(), &quot;UTF-8&quot;));</b>
+<b class="nc"><i>271</i>&nbsp;          } catch (UnsupportedEncodingException e) {</b>
+<b class="nc"><i>272</i>&nbsp;            throw new RuntimeException(&quot;Unsupported encoding?  UTF-8?  That&#39;s unpossible.&quot;);</b>
+<b class="nc"><i>273</i>&nbsp;          }</b>
+<i>274</i>&nbsp;        }
+<i>275</i>&nbsp;
+<b class="nc"><i>276</i>&nbsp;        if (file.exists()) {</b>
+<b class="nc"><i>277</i>&nbsp;          if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>278</i>&nbsp;            log.debug(&quot;Trying real file: &quot; + file.getAbsolutePath());</b>
+<i>279</i>&nbsp;          }
+<b class="nc"><i>280</i>&nbsp;          testUrl = file.toURI().toURL();</b>
+<b class="nc"><i>281</i>&nbsp;          if (isJar(testUrl)) {</b>
+<b class="nc"><i>282</i>&nbsp;            return testUrl;</b>
+<i>283</i>&nbsp;          }
+<i>284</i>&nbsp;        }
+<i>285</i>&nbsp;      }
+<b class="nc"><i>286</i>&nbsp;    } catch (MalformedURLException e) {</b>
+<b class="nc"><i>287</i>&nbsp;      log.warn(&quot;Invalid JAR URL: &quot; + jarUrl);</b>
+<b class="nc"><i>288</i>&nbsp;    }</b>
+<i>289</i>&nbsp;
+<b class="nc"><i>290</i>&nbsp;    if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>291</i>&nbsp;      log.debug(&quot;Not a JAR: &quot; + jarUrl);</b>
+<i>292</i>&nbsp;    }
+<b class="nc"><i>293</i>&nbsp;    return null;</b>
+<i>294</i>&nbsp;  }
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;  /**
+<i>297</i>&nbsp;   * Converts a Java package name to a path that can be looked up with a call to
+<i>298</i>&nbsp;   * {@link ClassLoader#getResources(String)}.
+<i>299</i>&nbsp;   *
+<i>300</i>&nbsp;   * @param packageName The Java package name to convert to a path
+<i>301</i>&nbsp;   */
+<i>302</i>&nbsp;  protected String getPackagePath(String packageName) {
+<b class="nc"><i>303</i>&nbsp;    return packageName == null ? null : packageName.replace(&#39;.&#39;, &#39;/&#39;);</b>
+<i>304</i>&nbsp;  }
+<i>305</i>&nbsp;
+<i>306</i>&nbsp;  /**
+<i>307</i>&nbsp;   * Returns true if the resource located at the given URL is a JAR file.
+<i>308</i>&nbsp;   *
+<i>309</i>&nbsp;   * @param url The URL of the resource to test.
+<i>310</i>&nbsp;   */
+<i>311</i>&nbsp;  protected boolean isJar(URL url) {
+<b class="fc"><i>312</i>&nbsp;    return isJar(url, new byte[JAR_MAGIC.length]);</b>
+<i>313</i>&nbsp;  }
+<i>314</i>&nbsp;
+<i>315</i>&nbsp;  /**
+<i>316</i>&nbsp;   * Returns true if the resource located at the given URL is a JAR file.
+<i>317</i>&nbsp;   *
+<i>318</i>&nbsp;   * @param url The URL of the resource to test.
+<i>319</i>&nbsp;   * @param buffer A buffer into which the first few bytes of the resource are read. The buffer
+<i>320</i>&nbsp;   *            must be at least the size of {@link #JAR_MAGIC}. (The same buffer may be reused
+<i>321</i>&nbsp;   *            for multiple calls as an optimization.)
+<i>322</i>&nbsp;   */
+<i>323</i>&nbsp;  protected boolean isJar(URL url, byte[] buffer) {
+<b class="fc"><i>324</i>&nbsp;    InputStream is = null;</b>
+<i>325</i>&nbsp;    try {
+<b class="fc"><i>326</i>&nbsp;      is = url.openStream();</b>
+<b class="fc"><i>327</i>&nbsp;      is.read(buffer, 0, JAR_MAGIC.length);</b>
+<b class="fc"><i>328</i>&nbsp;      if (Arrays.equals(buffer, JAR_MAGIC)) {</b>
+<b class="nc"><i>329</i>&nbsp;        if (log.isDebugEnabled()) {</b>
+<b class="nc"><i>330</i>&nbsp;          log.debug(&quot;Found JAR: &quot; + url);</b>
+<i>331</i>&nbsp;        }
+<b class="nc"><i>332</i>&nbsp;        return true;</b>
+<i>333</i>&nbsp;      }
+<b class="nc"><i>334</i>&nbsp;    } catch (Exception e) {</b>
+<i>335</i>&nbsp;      // Failure to read the stream means this is not a JAR
+<i>336</i>&nbsp;    } finally {
+<b class="fc"><i>337</i>&nbsp;      if (is != null) {</b>
+<i>338</i>&nbsp;        try {
+<b class="fc"><i>339</i>&nbsp;          is.close();</b>
+<b class="nc"><i>340</i>&nbsp;        } catch (Exception e) {</b>
+<i>341</i>&nbsp;          // Ignore
+<b class="fc"><i>342</i>&nbsp;        }</b>
+<i>343</i>&nbsp;      }
+<b class="nc"><i>344</i>&nbsp;    }</b>
+<i>345</i>&nbsp;
+<b class="fc"><i>346</i>&nbsp;    return false;</b>
+<i>347</i>&nbsp;  }
+<i>348</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

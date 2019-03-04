@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: StatementUtil</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.executor.statement</a> ]
+</div>
+
+<h1>Coverage Summary for Class: StatementUtil (org.apache.ibatis.executor.statement)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StatementUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/ 12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2016 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.executor.statement;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.SQLException;
+<i>19</i>&nbsp;import java.sql.Statement;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;/**
+<i>22</i>&nbsp; * Utility for {@link java.sql.Statement}.
+<i>23</i>&nbsp; *
+<i>24</i>&nbsp; * @since 3.4.0
+<i>25</i>&nbsp; * @author Kazuki Shimizu
+<i>26</i>&nbsp; */
+<i>27</i>&nbsp;public class StatementUtil {
+<i>28</i>&nbsp;
+<b class="nc"><i>29</i>&nbsp;  private StatementUtil() {</b>
+<i>30</i>&nbsp;    // NOP
+<b class="nc"><i>31</i>&nbsp;  }</b>
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;  /**
+<i>34</i>&nbsp;   * Apply a transaction timeout.
+<i>35</i>&nbsp;   * &lt;p&gt;
+<i>36</i>&nbsp;   * Update a query timeout to apply a transaction timeout.
+<i>37</i>&nbsp;   * &lt;/p&gt;
+<i>38</i>&nbsp;   * @param statement a target statement
+<i>39</i>&nbsp;   * @param queryTimeout a query timeout
+<i>40</i>&nbsp;   * @param transactionTimeout a transaction timeout
+<i>41</i>&nbsp;   * @throws SQLException if a database access error occurs, this method is called on a closed &lt;code&gt;Statement&lt;/code&gt;
+<i>42</i>&nbsp;   */
+<i>43</i>&nbsp;  public static void applyTransactionTimeout(Statement statement, Integer queryTimeout, Integer transactionTimeout) throws SQLException {
+<b class="fc"><i>44</i>&nbsp;    if (transactionTimeout == null){</b>
+<b class="fc"><i>45</i>&nbsp;      return;</b>
+<i>46</i>&nbsp;    }
+<b class="fc"><i>47</i>&nbsp;    Integer timeToLiveOfQuery = null;</b>
+<b class="fc"><i>48</i>&nbsp;    if (queryTimeout == null || queryTimeout == 0) {</b>
+<b class="fc"><i>49</i>&nbsp;      timeToLiveOfQuery = transactionTimeout;</b>
+<b class="fc"><i>50</i>&nbsp;    } else if (transactionTimeout &lt; queryTimeout) {</b>
+<b class="fc"><i>51</i>&nbsp;      timeToLiveOfQuery = transactionTimeout;</b>
+<i>52</i>&nbsp;    }
+<b class="fc"><i>53</i>&nbsp;    if (timeToLiveOfQuery != null) {</b>
+<b class="fc"><i>54</i>&nbsp;      statement.setQueryTimeout(timeToLiveOfQuery);</b>
+<i>55</i>&nbsp;    }
+<b class="fc"><i>56</i>&nbsp;  }</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

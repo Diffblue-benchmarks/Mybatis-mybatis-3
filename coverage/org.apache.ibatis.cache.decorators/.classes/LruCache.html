@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LruCache</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.cache.decorators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LruCache (org.apache.ibatis.cache.decorators)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LruCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.8%
+  </span>
+  <span class="absValue">
+    (23/ 24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LruCache$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (12/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.6%
+  </span>
+  <span class="absValue">
+    (28/ 29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.cache.decorators;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.LinkedHashMap;
+<i>19</i>&nbsp;import java.util.Map;
+<i>20</i>&nbsp;import java.util.concurrent.locks.ReadWriteLock;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;import org.apache.ibatis.cache.Cache;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;/**
+<i>25</i>&nbsp; * Lru (least recently used) cache decorator.
+<i>26</i>&nbsp; *
+<i>27</i>&nbsp; * @author Clinton Begin
+<i>28</i>&nbsp; */
+<b class="fc"><i>29</i>&nbsp;public class LruCache implements Cache {</b>
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;  private final Cache delegate;
+<i>32</i>&nbsp;  private Map&lt;Object, Object&gt; keyMap;
+<i>33</i>&nbsp;  private Object eldestKey;
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;  public LruCache(Cache delegate) {</b>
+<b class="fc"><i>36</i>&nbsp;    this.delegate = delegate;</b>
+<b class="fc"><i>37</i>&nbsp;    setSize(1024);</b>
+<b class="fc"><i>38</i>&nbsp;  }</b>
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;  @Override
+<i>41</i>&nbsp;  public String getId() {
+<b class="fc"><i>42</i>&nbsp;    return delegate.getId();</b>
+<i>43</i>&nbsp;  }
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;  @Override
+<i>46</i>&nbsp;  public int getSize() {
+<b class="fc"><i>47</i>&nbsp;    return delegate.getSize();</b>
+<i>48</i>&nbsp;  }
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;  public void setSize(final int size) {
+<b class="fc"><i>51</i>&nbsp;    keyMap = new LinkedHashMap&lt;Object, Object&gt;(size, .75F, true) {</b>
+<i>52</i>&nbsp;      private static final long serialVersionUID = 4267176411845948333L;
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;      @Override
+<i>55</i>&nbsp;      protected boolean removeEldestEntry(Map.Entry&lt;Object, Object&gt; eldest) {
+<b class="fc"><i>56</i>&nbsp;        boolean tooBig = size() &gt; size;</b>
+<b class="fc"><i>57</i>&nbsp;        if (tooBig) {</b>
+<b class="fc"><i>58</i>&nbsp;          eldestKey = eldest.getKey();</b>
+<i>59</i>&nbsp;        }
+<b class="fc"><i>60</i>&nbsp;        return tooBig;</b>
+<i>61</i>&nbsp;      }
+<i>62</i>&nbsp;    };
+<b class="fc"><i>63</i>&nbsp;  }</b>
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;  @Override
+<i>66</i>&nbsp;  public void putObject(Object key, Object value) {
+<b class="fc"><i>67</i>&nbsp;    delegate.putObject(key, value);</b>
+<b class="fc"><i>68</i>&nbsp;    cycleKeyList(key);</b>
+<b class="fc"><i>69</i>&nbsp;  }</b>
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;  @Override
+<i>72</i>&nbsp;  public Object getObject(Object key) {
+<b class="fc"><i>73</i>&nbsp;    keyMap.get(key); //touch</b>
+<b class="fc"><i>74</i>&nbsp;    return delegate.getObject(key);</b>
+<i>75</i>&nbsp;  }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;  @Override
+<i>78</i>&nbsp;  public Object removeObject(Object key) {
+<b class="fc"><i>79</i>&nbsp;    return delegate.removeObject(key);</b>
+<i>80</i>&nbsp;  }
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;  @Override
+<i>83</i>&nbsp;  public void clear() {
+<b class="fc"><i>84</i>&nbsp;    delegate.clear();</b>
+<b class="fc"><i>85</i>&nbsp;    keyMap.clear();</b>
+<b class="fc"><i>86</i>&nbsp;  }</b>
+<i>87</i>&nbsp;
+<i>88</i>&nbsp;  @Override
+<i>89</i>&nbsp;  public ReadWriteLock getReadWriteLock() {
+<b class="nc"><i>90</i>&nbsp;    return null;</b>
+<i>91</i>&nbsp;  }
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;  private void cycleKeyList(Object key) {
+<b class="fc"><i>94</i>&nbsp;    keyMap.put(key, key);</b>
+<b class="fc"><i>95</i>&nbsp;    if (eldestKey != null) {</b>
+<b class="fc"><i>96</i>&nbsp;      delegate.removeObject(eldestKey);</b>
+<b class="fc"><i>97</i>&nbsp;      eldestKey = null;</b>
+<i>98</i>&nbsp;    }
+<b class="fc"><i>99</i>&nbsp;  }</b>
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

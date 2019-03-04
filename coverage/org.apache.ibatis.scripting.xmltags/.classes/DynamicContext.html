@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DynamicContext</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.scripting.xmltags</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DynamicContext (org.apache.ibatis.scripting.xmltags)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DynamicContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/ 20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DynamicContext$ContextAccessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (9/ 14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DynamicContext$ContextMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/ 9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.4%
+  </span>
+  <span class="absValue">
+    (38/ 43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.scripting.xmltags;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.HashMap;
+<i>19</i>&nbsp;import java.util.Map;
+<i>20</i>&nbsp;import java.util.StringJoiner;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;import ognl.OgnlContext;
+<i>23</i>&nbsp;import ognl.OgnlRuntime;
+<i>24</i>&nbsp;import ognl.PropertyAccessor;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;import org.apache.ibatis.reflection.MetaObject;
+<i>27</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;/**
+<i>30</i>&nbsp; * @author Clinton Begin
+<i>31</i>&nbsp; */
+<i>32</i>&nbsp;public class DynamicContext {
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;  public static final String PARAMETER_OBJECT_KEY = &quot;_parameter&quot;;
+<i>35</i>&nbsp;  public static final String DATABASE_ID_KEY = &quot;_databaseId&quot;;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;  static {
+<b class="fc"><i>38</i>&nbsp;    OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());</b>
+<b class="fc"><i>39</i>&nbsp;  }</b>
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;  private final ContextMap bindings;
+<b class="fc"><i>42</i>&nbsp;  private final StringJoiner sqlBuilder = new StringJoiner(&quot; &quot;);</b>
+<b class="fc"><i>43</i>&nbsp;  private int uniqueNumber = 0;</b>
+<i>44</i>&nbsp;
+<b class="fc"><i>45</i>&nbsp;  public DynamicContext(Configuration configuration, Object parameterObject) {</b>
+<b class="fc"><i>46</i>&nbsp;    if (parameterObject != null &amp;&amp; !(parameterObject instanceof Map)) {</b>
+<b class="fc"><i>47</i>&nbsp;      MetaObject metaObject = configuration.newMetaObject(parameterObject);</b>
+<b class="fc"><i>48</i>&nbsp;      bindings = new ContextMap(metaObject);</b>
+<b class="fc"><i>49</i>&nbsp;    } else {</b>
+<b class="fc"><i>50</i>&nbsp;      bindings = new ContextMap(null);</b>
+<i>51</i>&nbsp;    }
+<b class="fc"><i>52</i>&nbsp;    bindings.put(PARAMETER_OBJECT_KEY, parameterObject);</b>
+<b class="fc"><i>53</i>&nbsp;    bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());</b>
+<b class="fc"><i>54</i>&nbsp;  }</b>
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;  public Map&lt;String, Object&gt; getBindings() {
+<b class="fc"><i>57</i>&nbsp;    return bindings;</b>
+<i>58</i>&nbsp;  }
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  public void bind(String name, Object value) {
+<b class="fc"><i>61</i>&nbsp;    bindings.put(name, value);</b>
+<b class="fc"><i>62</i>&nbsp;  }</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;  public void appendSql(String sql) {
+<b class="fc"><i>65</i>&nbsp;    sqlBuilder.add(sql);</b>
+<b class="fc"><i>66</i>&nbsp;  }</b>
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;  public String getSql() {
+<b class="fc"><i>69</i>&nbsp;    return sqlBuilder.toString().trim();</b>
+<i>70</i>&nbsp;  }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  public int getUniqueNumber() {
+<b class="fc"><i>73</i>&nbsp;    return uniqueNumber++;</b>
+<i>74</i>&nbsp;  }
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;  static class ContextMap extends HashMap&lt;String, Object&gt; {
+<i>77</i>&nbsp;    private static final long serialVersionUID = 2977601501966151582L;
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    private MetaObject parameterMetaObject;
+<i>80</i>&nbsp;
+<b class="fc"><i>81</i>&nbsp;    public ContextMap(MetaObject parameterMetaObject) {</b>
+<b class="fc"><i>82</i>&nbsp;      this.parameterMetaObject = parameterMetaObject;</b>
+<b class="fc"><i>83</i>&nbsp;    }</b>
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    @Override
+<i>86</i>&nbsp;    public Object get(Object key) {
+<b class="fc"><i>87</i>&nbsp;      String strKey = (String) key;</b>
+<b class="fc"><i>88</i>&nbsp;      if (super.containsKey(strKey)) {</b>
+<b class="fc"><i>89</i>&nbsp;        return super.get(strKey);</b>
+<i>90</i>&nbsp;      }
+<i>91</i>&nbsp;
+<b class="fc"><i>92</i>&nbsp;      if (parameterMetaObject != null) {</b>
+<i>93</i>&nbsp;        // issue #61 do not modify the context when reading
+<b class="fc"><i>94</i>&nbsp;        return parameterMetaObject.getValue(strKey);</b>
+<i>95</i>&nbsp;      }
+<i>96</i>&nbsp;
+<b class="fc"><i>97</i>&nbsp;      return null;</b>
+<i>98</i>&nbsp;    }
+<i>99</i>&nbsp;  }
+<i>100</i>&nbsp;
+<b class="fc"><i>101</i>&nbsp;  static class ContextAccessor implements PropertyAccessor {</b>
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    @Override
+<i>104</i>&nbsp;    public Object getProperty(Map context, Object target, Object name) {
+<b class="fc"><i>105</i>&nbsp;      Map map = (Map) target;</b>
+<i>106</i>&nbsp;
+<b class="fc"><i>107</i>&nbsp;      Object result = map.get(name);</b>
+<b class="fc"><i>108</i>&nbsp;      if (map.containsKey(name) || result != null) {</b>
+<b class="fc"><i>109</i>&nbsp;        return result;</b>
+<i>110</i>&nbsp;      }
+<i>111</i>&nbsp;
+<b class="fc"><i>112</i>&nbsp;      Object parameterObject = map.get(PARAMETER_OBJECT_KEY);</b>
+<b class="fc"><i>113</i>&nbsp;      if (parameterObject instanceof Map) {</b>
+<b class="fc"><i>114</i>&nbsp;        return ((Map)parameterObject).get(name);</b>
+<i>115</i>&nbsp;      }
+<i>116</i>&nbsp;
+<b class="fc"><i>117</i>&nbsp;      return null;</b>
+<i>118</i>&nbsp;    }
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;    @Override
+<i>121</i>&nbsp;    public void setProperty(Map context, Object target, Object name, Object value) {
+<b class="nc"><i>122</i>&nbsp;      Map&lt;Object, Object&gt; map = (Map&lt;Object, Object&gt;) target;</b>
+<b class="nc"><i>123</i>&nbsp;      map.put(name, value);</b>
+<b class="nc"><i>124</i>&nbsp;    }</b>
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;    @Override
+<i>127</i>&nbsp;    public String getSourceAccessor(OgnlContext arg0, Object arg1, Object arg2) {
+<b class="nc"><i>128</i>&nbsp;      return null;</b>
+<i>129</i>&nbsp;    }
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;    @Override
+<i>132</i>&nbsp;    public String getSourceSetter(OgnlContext arg0, Object arg1, Object arg2) {
+<b class="nc"><i>133</i>&nbsp;      return null;</b>
+<i>134</i>&nbsp;    }
+<i>135</i>&nbsp;  }
+<i>136</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: EnumOrdinalTypeHandler</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.type</a> ]
+</div>
+
+<h1>Coverage Summary for Class: EnumOrdinalTypeHandler (org.apache.ibatis.type)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EnumOrdinalTypeHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (20/ 28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.type;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.CallableStatement;
+<i>19</i>&nbsp;import java.sql.PreparedStatement;
+<i>20</i>&nbsp;import java.sql.ResultSet;
+<i>21</i>&nbsp;import java.sql.SQLException;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;/**
+<i>24</i>&nbsp; * @author Clinton Begin
+<i>25</i>&nbsp; */
+<i>26</i>&nbsp;public class EnumOrdinalTypeHandler&lt;E extends Enum&lt;E&gt;&gt; extends BaseTypeHandler&lt;E&gt; {
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;  private final Class&lt;E&gt; type;
+<i>29</i>&nbsp;  private final E[] enums;
+<i>30</i>&nbsp;
+<b class="fc"><i>31</i>&nbsp;  public EnumOrdinalTypeHandler(Class&lt;E&gt; type) {</b>
+<b class="fc"><i>32</i>&nbsp;    if (type == null) {</b>
+<b class="nc"><i>33</i>&nbsp;      throw new IllegalArgumentException(&quot;Type argument cannot be null&quot;);</b>
+<i>34</i>&nbsp;    }
+<b class="fc"><i>35</i>&nbsp;    this.type = type;</b>
+<b class="fc"><i>36</i>&nbsp;    this.enums = type.getEnumConstants();</b>
+<b class="fc"><i>37</i>&nbsp;    if (this.enums == null) {</b>
+<b class="nc"><i>38</i>&nbsp;      throw new IllegalArgumentException(type.getSimpleName() + &quot; does not represent an enum type.&quot;);</b>
+<i>39</i>&nbsp;    }
+<b class="fc"><i>40</i>&nbsp;  }</b>
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;  @Override
+<i>43</i>&nbsp;  public void setNonNullParameter(PreparedStatement ps, int i, E parameter, JdbcType jdbcType) throws SQLException {
+<b class="fc"><i>44</i>&nbsp;    ps.setInt(i, parameter.ordinal());</b>
+<b class="fc"><i>45</i>&nbsp;  }</b>
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;  @Override
+<i>48</i>&nbsp;  public E getNullableResult(ResultSet rs, String columnName) throws SQLException {
+<b class="fc"><i>49</i>&nbsp;    int i = rs.getInt(columnName);</b>
+<b class="fc"><i>50</i>&nbsp;    if (i == 0 &amp;&amp; rs.wasNull()) {</b>
+<b class="fc"><i>51</i>&nbsp;      return null;</b>
+<i>52</i>&nbsp;    } else {
+<i>53</i>&nbsp;      try {
+<b class="fc"><i>54</i>&nbsp;        return enums[i];</b>
+<b class="nc"><i>55</i>&nbsp;      } catch (Exception ex) {</b>
+<b class="nc"><i>56</i>&nbsp;        throw new IllegalArgumentException(&quot;Cannot convert &quot; + i + &quot; to &quot; + type.getSimpleName() + &quot; by ordinal value.&quot;, ex);</b>
+<i>57</i>&nbsp;      }
+<i>58</i>&nbsp;    }
+<i>59</i>&nbsp;  }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;  @Override
+<i>62</i>&nbsp;  public E getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+<b class="fc"><i>63</i>&nbsp;    int i = rs.getInt(columnIndex);</b>
+<b class="fc"><i>64</i>&nbsp;    if (i == 0 &amp;&amp; rs.wasNull()) {</b>
+<b class="fc"><i>65</i>&nbsp;      return null;</b>
+<i>66</i>&nbsp;    } else {
+<i>67</i>&nbsp;      try {
+<b class="fc"><i>68</i>&nbsp;        return enums[i];</b>
+<b class="nc"><i>69</i>&nbsp;      } catch (Exception ex) {</b>
+<b class="nc"><i>70</i>&nbsp;        throw new IllegalArgumentException(&quot;Cannot convert &quot; + i + &quot; to &quot; + type.getSimpleName() + &quot; by ordinal value.&quot;, ex);</b>
+<i>71</i>&nbsp;      }
+<i>72</i>&nbsp;    }
+<i>73</i>&nbsp;  }
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;  @Override
+<i>76</i>&nbsp;  public E getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+<b class="fc"><i>77</i>&nbsp;    int i = cs.getInt(columnIndex);</b>
+<b class="fc"><i>78</i>&nbsp;    if (i == 0 &amp;&amp; cs.wasNull()) {</b>
+<b class="fc"><i>79</i>&nbsp;      return null;</b>
+<i>80</i>&nbsp;    } else {
+<i>81</i>&nbsp;      try {
+<b class="fc"><i>82</i>&nbsp;        return enums[i];</b>
+<b class="nc"><i>83</i>&nbsp;      } catch (Exception ex) {</b>
+<b class="nc"><i>84</i>&nbsp;        throw new IllegalArgumentException(&quot;Cannot convert &quot; + i + &quot; to &quot; + type.getSimpleName() + &quot; by ordinal value.&quot;, ex);</b>
+<i>85</i>&nbsp;      }
+<i>86</i>&nbsp;    }
+<i>87</i>&nbsp;  }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

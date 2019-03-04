@@ -1,0 +1,145 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Cache</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.cache</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Cache (org.apache.ibatis.cache)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Cache</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.cache;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.concurrent.locks.ReadWriteLock;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;/**
+<i>21</i>&nbsp; * SPI for cache providers.
+<i>22</i>&nbsp; * &lt;p&gt;
+<i>23</i>&nbsp; * One instance of cache will be created for each namespace.
+<i>24</i>&nbsp; * &lt;p&gt;
+<i>25</i>&nbsp; * The cache implementation must have a constructor that receives the cache id as an String parameter.
+<i>26</i>&nbsp; * &lt;p&gt;
+<i>27</i>&nbsp; * MyBatis will pass the namespace as id to the constructor.
+<i>28</i>&nbsp; *
+<i>29</i>&nbsp; * &lt;pre&gt;
+<i>30</i>&nbsp; * public MyCache(final String id) {
+<i>31</i>&nbsp; *  if (id == null) {
+<i>32</i>&nbsp; *    throw new IllegalArgumentException(&quot;Cache instances require an ID&quot;);
+<i>33</i>&nbsp; *  }
+<i>34</i>&nbsp; *  this.id = id;
+<i>35</i>&nbsp; *  initialize();
+<i>36</i>&nbsp; * }
+<i>37</i>&nbsp; * &lt;/pre&gt;
+<i>38</i>&nbsp; *
+<i>39</i>&nbsp; * @author Clinton Begin
+<i>40</i>&nbsp; */
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;public interface Cache {
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  /**
+<i>45</i>&nbsp;   * @return The identifier of this cache
+<i>46</i>&nbsp;   */
+<i>47</i>&nbsp;  String getId();
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;  /**
+<i>50</i>&nbsp;   * @param key Can be any object but usually it is a {@link CacheKey}
+<i>51</i>&nbsp;   * @param value The result of a select.
+<i>52</i>&nbsp;   */
+<i>53</i>&nbsp;  void putObject(Object key, Object value);
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;  /**
+<i>56</i>&nbsp;   * @param key The key
+<i>57</i>&nbsp;   * @return The object stored in the cache.
+<i>58</i>&nbsp;   */
+<i>59</i>&nbsp;  Object getObject(Object key);
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;  /**
+<i>62</i>&nbsp;   * As of 3.3.0 this method is only called during a rollback
+<i>63</i>&nbsp;   * for any previous value that was missing in the cache.
+<i>64</i>&nbsp;   * This lets any blocking cache to release the lock that
+<i>65</i>&nbsp;   * may have previously put on the key.
+<i>66</i>&nbsp;   * A blocking cache puts a lock when a value is null
+<i>67</i>&nbsp;   * and releases it when the value is back again.
+<i>68</i>&nbsp;   * This way other threads will wait for the value to be
+<i>69</i>&nbsp;   * available instead of hitting the database.
+<i>70</i>&nbsp;   *
+<i>71</i>&nbsp;   *
+<i>72</i>&nbsp;   * @param key The key
+<i>73</i>&nbsp;   * @return Not used
+<i>74</i>&nbsp;   */
+<i>75</i>&nbsp;  Object removeObject(Object key);
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;  /**
+<i>78</i>&nbsp;   * Clears this cache instance.
+<i>79</i>&nbsp;   */
+<i>80</i>&nbsp;  void clear();
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;  /**
+<i>83</i>&nbsp;   * Optional. This method is not called by the core.
+<i>84</i>&nbsp;   *
+<i>85</i>&nbsp;   * @return The number of elements stored in the cache (not its capacity).
+<i>86</i>&nbsp;   */
+<i>87</i>&nbsp;  int getSize();
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;  /**
+<i>90</i>&nbsp;   * Optional. As of 3.2.6 this method is no longer called by the core.
+<i>91</i>&nbsp;   * &lt;p&gt;
+<i>92</i>&nbsp;   * Any locking needed by the cache must be provided internally by the cache provider.
+<i>93</i>&nbsp;   *
+<i>94</i>&nbsp;   * @return A ReadWriteLock
+<i>95</i>&nbsp;   */
+<i>96</i>&nbsp;  ReadWriteLock getReadWriteLock();
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

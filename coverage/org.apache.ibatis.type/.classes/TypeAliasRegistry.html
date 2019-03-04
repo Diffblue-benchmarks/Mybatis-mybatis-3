@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TypeAliasRegistry</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.type</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TypeAliasRegistry (org.apache.ibatis.type)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypeAliasRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.6%
+  </span>
+  <span class="absValue">
+    (87/ 91)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.type;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.math.BigDecimal;
+<i>19</i>&nbsp;import java.math.BigInteger;
+<i>20</i>&nbsp;import java.sql.ResultSet;
+<i>21</i>&nbsp;import java.util.ArrayList;
+<i>22</i>&nbsp;import java.util.Collection;
+<i>23</i>&nbsp;import java.util.Collections;
+<i>24</i>&nbsp;import java.util.Date;
+<i>25</i>&nbsp;import java.util.HashMap;
+<i>26</i>&nbsp;import java.util.Iterator;
+<i>27</i>&nbsp;import java.util.List;
+<i>28</i>&nbsp;import java.util.Locale;
+<i>29</i>&nbsp;import java.util.Map;
+<i>30</i>&nbsp;import java.util.Set;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;import org.apache.ibatis.io.ResolverUtil;
+<i>33</i>&nbsp;import org.apache.ibatis.io.Resources;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;/**
+<i>36</i>&nbsp; * @author Clinton Begin
+<i>37</i>&nbsp; */
+<i>38</i>&nbsp;public class TypeAliasRegistry {
+<i>39</i>&nbsp;
+<b class="fc"><i>40</i>&nbsp;  private final Map&lt;String, Class&lt;?&gt;&gt; TYPE_ALIASES = new HashMap&lt;&gt;();</b>
+<i>41</i>&nbsp;
+<b class="fc"><i>42</i>&nbsp;  public TypeAliasRegistry() {</b>
+<b class="fc"><i>43</i>&nbsp;    registerAlias(&quot;string&quot;, String.class);</b>
+<i>44</i>&nbsp;
+<b class="fc"><i>45</i>&nbsp;    registerAlias(&quot;byte&quot;, Byte.class);</b>
+<b class="fc"><i>46</i>&nbsp;    registerAlias(&quot;long&quot;, Long.class);</b>
+<b class="fc"><i>47</i>&nbsp;    registerAlias(&quot;short&quot;, Short.class);</b>
+<b class="fc"><i>48</i>&nbsp;    registerAlias(&quot;int&quot;, Integer.class);</b>
+<b class="fc"><i>49</i>&nbsp;    registerAlias(&quot;integer&quot;, Integer.class);</b>
+<b class="fc"><i>50</i>&nbsp;    registerAlias(&quot;double&quot;, Double.class);</b>
+<b class="fc"><i>51</i>&nbsp;    registerAlias(&quot;float&quot;, Float.class);</b>
+<b class="fc"><i>52</i>&nbsp;    registerAlias(&quot;boolean&quot;, Boolean.class);</b>
+<i>53</i>&nbsp;
+<b class="fc"><i>54</i>&nbsp;    registerAlias(&quot;byte[]&quot;, Byte[].class);</b>
+<b class="fc"><i>55</i>&nbsp;    registerAlias(&quot;long[]&quot;, Long[].class);</b>
+<b class="fc"><i>56</i>&nbsp;    registerAlias(&quot;short[]&quot;, Short[].class);</b>
+<b class="fc"><i>57</i>&nbsp;    registerAlias(&quot;int[]&quot;, Integer[].class);</b>
+<b class="fc"><i>58</i>&nbsp;    registerAlias(&quot;integer[]&quot;, Integer[].class);</b>
+<b class="fc"><i>59</i>&nbsp;    registerAlias(&quot;double[]&quot;, Double[].class);</b>
+<b class="fc"><i>60</i>&nbsp;    registerAlias(&quot;float[]&quot;, Float[].class);</b>
+<b class="fc"><i>61</i>&nbsp;    registerAlias(&quot;boolean[]&quot;, Boolean[].class);</b>
+<i>62</i>&nbsp;
+<b class="fc"><i>63</i>&nbsp;    registerAlias(&quot;_byte&quot;, byte.class);</b>
+<b class="fc"><i>64</i>&nbsp;    registerAlias(&quot;_long&quot;, long.class);</b>
+<b class="fc"><i>65</i>&nbsp;    registerAlias(&quot;_short&quot;, short.class);</b>
+<b class="fc"><i>66</i>&nbsp;    registerAlias(&quot;_int&quot;, int.class);</b>
+<b class="fc"><i>67</i>&nbsp;    registerAlias(&quot;_integer&quot;, int.class);</b>
+<b class="fc"><i>68</i>&nbsp;    registerAlias(&quot;_double&quot;, double.class);</b>
+<b class="fc"><i>69</i>&nbsp;    registerAlias(&quot;_float&quot;, float.class);</b>
+<b class="fc"><i>70</i>&nbsp;    registerAlias(&quot;_boolean&quot;, boolean.class);</b>
+<i>71</i>&nbsp;
+<b class="fc"><i>72</i>&nbsp;    registerAlias(&quot;_byte[]&quot;, byte[].class);</b>
+<b class="fc"><i>73</i>&nbsp;    registerAlias(&quot;_long[]&quot;, long[].class);</b>
+<b class="fc"><i>74</i>&nbsp;    registerAlias(&quot;_short[]&quot;, short[].class);</b>
+<b class="fc"><i>75</i>&nbsp;    registerAlias(&quot;_int[]&quot;, int[].class);</b>
+<b class="fc"><i>76</i>&nbsp;    registerAlias(&quot;_integer[]&quot;, int[].class);</b>
+<b class="fc"><i>77</i>&nbsp;    registerAlias(&quot;_double[]&quot;, double[].class);</b>
+<b class="fc"><i>78</i>&nbsp;    registerAlias(&quot;_float[]&quot;, float[].class);</b>
+<b class="fc"><i>79</i>&nbsp;    registerAlias(&quot;_boolean[]&quot;, boolean[].class);</b>
+<i>80</i>&nbsp;
+<b class="fc"><i>81</i>&nbsp;    registerAlias(&quot;date&quot;, Date.class);</b>
+<b class="fc"><i>82</i>&nbsp;    registerAlias(&quot;decimal&quot;, BigDecimal.class);</b>
+<b class="fc"><i>83</i>&nbsp;    registerAlias(&quot;bigdecimal&quot;, BigDecimal.class);</b>
+<b class="fc"><i>84</i>&nbsp;    registerAlias(&quot;biginteger&quot;, BigInteger.class);</b>
+<b class="fc"><i>85</i>&nbsp;    registerAlias(&quot;object&quot;, Object.class);</b>
+<i>86</i>&nbsp;
+<b class="fc"><i>87</i>&nbsp;    registerAlias(&quot;date[]&quot;, Date[].class);</b>
+<b class="fc"><i>88</i>&nbsp;    registerAlias(&quot;decimal[]&quot;, BigDecimal[].class);</b>
+<b class="fc"><i>89</i>&nbsp;    registerAlias(&quot;bigdecimal[]&quot;, BigDecimal[].class);</b>
+<b class="fc"><i>90</i>&nbsp;    registerAlias(&quot;biginteger[]&quot;, BigInteger[].class);</b>
+<b class="fc"><i>91</i>&nbsp;    registerAlias(&quot;object[]&quot;, Object[].class);</b>
+<i>92</i>&nbsp;
+<b class="fc"><i>93</i>&nbsp;    registerAlias(&quot;map&quot;, Map.class);</b>
+<b class="fc"><i>94</i>&nbsp;    registerAlias(&quot;hashmap&quot;, HashMap.class);</b>
+<b class="fc"><i>95</i>&nbsp;    registerAlias(&quot;list&quot;, List.class);</b>
+<b class="fc"><i>96</i>&nbsp;    registerAlias(&quot;arraylist&quot;, ArrayList.class);</b>
+<b class="fc"><i>97</i>&nbsp;    registerAlias(&quot;collection&quot;, Collection.class);</b>
+<b class="fc"><i>98</i>&nbsp;    registerAlias(&quot;iterator&quot;, Iterator.class);</b>
+<i>99</i>&nbsp;
+<b class="fc"><i>100</i>&nbsp;    registerAlias(&quot;ResultSet&quot;, ResultSet.class);</b>
+<b class="fc"><i>101</i>&nbsp;  }</b>
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;  @SuppressWarnings(&quot;unchecked&quot;)
+<i>104</i>&nbsp;  // throws class cast exception as well if types cannot be assigned
+<i>105</i>&nbsp;  public &lt;T&gt; Class&lt;T&gt; resolveAlias(String string) {
+<i>106</i>&nbsp;    try {
+<b class="fc"><i>107</i>&nbsp;      if (string == null) {</b>
+<b class="nc"><i>108</i>&nbsp;        return null;</b>
+<i>109</i>&nbsp;      }
+<i>110</i>&nbsp;      // issue #748
+<b class="fc"><i>111</i>&nbsp;      String key = string.toLowerCase(Locale.ENGLISH);</b>
+<i>112</i>&nbsp;      Class&lt;T&gt; value;
+<b class="fc"><i>113</i>&nbsp;      if (TYPE_ALIASES.containsKey(key)) {</b>
+<b class="fc"><i>114</i>&nbsp;        value = (Class&lt;T&gt;) TYPE_ALIASES.get(key);</b>
+<i>115</i>&nbsp;      } else {
+<b class="fc"><i>116</i>&nbsp;        value = (Class&lt;T&gt;) Resources.classForName(string);</b>
+<i>117</i>&nbsp;      }
+<b class="fc"><i>118</i>&nbsp;      return value;</b>
+<b class="fc"><i>119</i>&nbsp;    } catch (ClassNotFoundException e) {</b>
+<b class="fc"><i>120</i>&nbsp;      throw new TypeException(&quot;Could not resolve type alias &#39;&quot; + string + &quot;&#39;.  Cause: &quot; + e, e);</b>
+<i>121</i>&nbsp;    }
+<i>122</i>&nbsp;  }
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;  public void registerAliases(String packageName) {
+<b class="fc"><i>125</i>&nbsp;    registerAliases(packageName, Object.class);</b>
+<b class="fc"><i>126</i>&nbsp;  }</b>
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;  public void registerAliases(String packageName, Class&lt;?&gt; superType) {
+<b class="fc"><i>129</i>&nbsp;    ResolverUtil&lt;Class&lt;?&gt;&gt; resolverUtil = new ResolverUtil&lt;&gt;();</b>
+<b class="fc"><i>130</i>&nbsp;    resolverUtil.find(new ResolverUtil.IsA(superType), packageName);</b>
+<b class="fc"><i>131</i>&nbsp;    Set&lt;Class&lt;? extends Class&lt;?&gt;&gt;&gt; typeSet = resolverUtil.getClasses();</b>
+<b class="fc"><i>132</i>&nbsp;    for (Class&lt;?&gt; type : typeSet) {</b>
+<i>133</i>&nbsp;      // Ignore inner classes and interfaces (including package-info.java)
+<i>134</i>&nbsp;      // Skip also inner classes. See issue #6
+<b class="fc"><i>135</i>&nbsp;      if (!type.isAnonymousClass() &amp;&amp; !type.isInterface() &amp;&amp; !type.isMemberClass()) {</b>
+<b class="fc"><i>136</i>&nbsp;        registerAlias(type);</b>
+<i>137</i>&nbsp;      }
+<b class="fc"><i>138</i>&nbsp;    }</b>
+<b class="fc"><i>139</i>&nbsp;  }</b>
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;  public void registerAlias(Class&lt;?&gt; type) {
+<b class="fc"><i>142</i>&nbsp;    String alias = type.getSimpleName();</b>
+<b class="fc"><i>143</i>&nbsp;    Alias aliasAnnotation = type.getAnnotation(Alias.class);</b>
+<b class="fc"><i>144</i>&nbsp;    if (aliasAnnotation != null) {</b>
+<b class="fc"><i>145</i>&nbsp;      alias = aliasAnnotation.value();</b>
+<i>146</i>&nbsp;    }
+<b class="fc"><i>147</i>&nbsp;    registerAlias(alias, type);</b>
+<b class="fc"><i>148</i>&nbsp;  }</b>
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;  public void registerAlias(String alias, Class&lt;?&gt; value) {
+<b class="fc"><i>151</i>&nbsp;    if (alias == null) {</b>
+<b class="nc"><i>152</i>&nbsp;      throw new TypeException(&quot;The parameter alias cannot be null&quot;);</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;    // issue #748
+<b class="fc"><i>155</i>&nbsp;    String key = alias.toLowerCase(Locale.ENGLISH);</b>
+<b class="fc"><i>156</i>&nbsp;    if (TYPE_ALIASES.containsKey(key) &amp;&amp; TYPE_ALIASES.get(key) != null &amp;&amp; !TYPE_ALIASES.get(key).equals(value)) {</b>
+<b class="fc"><i>157</i>&nbsp;      throw new TypeException(&quot;The alias &#39;&quot; + alias + &quot;&#39; is already mapped to the value &#39;&quot; + TYPE_ALIASES.get(key).getName() + &quot;&#39;.&quot;);</b>
+<i>158</i>&nbsp;    }
+<b class="fc"><i>159</i>&nbsp;    TYPE_ALIASES.put(key, value);</b>
+<b class="fc"><i>160</i>&nbsp;  }</b>
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;  public void registerAlias(String alias, String value) {
+<i>163</i>&nbsp;    try {
+<b class="fc"><i>164</i>&nbsp;      registerAlias(alias, Resources.classForName(value));</b>
+<b class="nc"><i>165</i>&nbsp;    } catch (ClassNotFoundException e) {</b>
+<b class="nc"><i>166</i>&nbsp;      throw new TypeException(&quot;Error registering type alias &quot; + alias + &quot; for &quot; + value + &quot;. Cause: &quot; + e, e);</b>
+<b class="fc"><i>167</i>&nbsp;    }</b>
+<b class="fc"><i>168</i>&nbsp;  }</b>
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;  /**
+<i>171</i>&nbsp;   * @since 3.2.2
+<i>172</i>&nbsp;   */
+<i>173</i>&nbsp;  public Map&lt;String, Class&lt;?&gt;&gt; getTypeAliases() {
+<b class="fc"><i>174</i>&nbsp;    return Collections.unmodifiableMap(TYPE_ALIASES);</b>
+<i>175</i>&nbsp;  }
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

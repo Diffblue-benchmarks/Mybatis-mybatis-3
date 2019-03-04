@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: PoolState</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.datasource.pooled</a> ]
+</div>
+
+<h1>Coverage Summary for Class: PoolState (org.apache.ibatis.datasource.pooled)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PoolState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (49/ 49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.datasource.pooled;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.ArrayList;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;/**
+<i>22</i>&nbsp; * @author Clinton Begin
+<i>23</i>&nbsp; */
+<i>24</i>&nbsp;public class PoolState {
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;  protected PooledDataSource dataSource;
+<i>27</i>&nbsp;
+<b class="fc"><i>28</i>&nbsp;  protected final List&lt;PooledConnection&gt; idleConnections = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>29</i>&nbsp;  protected final List&lt;PooledConnection&gt; activeConnections = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>30</i>&nbsp;  protected long requestCount = 0;</b>
+<b class="fc"><i>31</i>&nbsp;  protected long accumulatedRequestTime = 0;</b>
+<b class="fc"><i>32</i>&nbsp;  protected long accumulatedCheckoutTime = 0;</b>
+<b class="fc"><i>33</i>&nbsp;  protected long claimedOverdueConnectionCount = 0;</b>
+<b class="fc"><i>34</i>&nbsp;  protected long accumulatedCheckoutTimeOfOverdueConnections = 0;</b>
+<b class="fc"><i>35</i>&nbsp;  protected long accumulatedWaitTime = 0;</b>
+<b class="fc"><i>36</i>&nbsp;  protected long hadToWaitCount = 0;</b>
+<b class="fc"><i>37</i>&nbsp;  protected long badConnectionCount = 0;</b>
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;  public PoolState(PooledDataSource dataSource) {</b>
+<b class="fc"><i>40</i>&nbsp;    this.dataSource = dataSource;</b>
+<b class="fc"><i>41</i>&nbsp;  }</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;  public synchronized long getRequestCount() {
+<b class="fc"><i>44</i>&nbsp;    return requestCount;</b>
+<i>45</i>&nbsp;  }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;  public synchronized long getAverageRequestTime() {
+<b class="fc"><i>48</i>&nbsp;    return requestCount == 0 ? 0 : accumulatedRequestTime / requestCount;</b>
+<i>49</i>&nbsp;  }
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;  public synchronized long getAverageWaitTime() {
+<b class="fc"><i>52</i>&nbsp;    return hadToWaitCount == 0 ? 0 : accumulatedWaitTime / hadToWaitCount;</b>
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;  }
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;  public synchronized long getHadToWaitCount() {
+<b class="fc"><i>57</i>&nbsp;    return hadToWaitCount;</b>
+<i>58</i>&nbsp;  }
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  public synchronized long getBadConnectionCount() {
+<b class="fc"><i>61</i>&nbsp;    return badConnectionCount;</b>
+<i>62</i>&nbsp;  }
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;  public synchronized long getClaimedOverdueConnectionCount() {
+<b class="fc"><i>65</i>&nbsp;    return claimedOverdueConnectionCount;</b>
+<i>66</i>&nbsp;  }
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;  public synchronized long getAverageOverdueCheckoutTime() {
+<b class="fc"><i>69</i>&nbsp;    return claimedOverdueConnectionCount == 0 ? 0 : accumulatedCheckoutTimeOfOverdueConnections / claimedOverdueConnectionCount;</b>
+<i>70</i>&nbsp;  }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  public synchronized long getAverageCheckoutTime() {
+<b class="fc"><i>73</i>&nbsp;    return requestCount == 0 ? 0 : accumulatedCheckoutTime / requestCount;</b>
+<i>74</i>&nbsp;  }
+<i>75</i>&nbsp;
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;  public synchronized int getIdleConnectionCount() {
+<b class="fc"><i>78</i>&nbsp;    return idleConnections.size();</b>
+<i>79</i>&nbsp;  }
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;  public synchronized int getActiveConnectionCount() {
+<b class="fc"><i>82</i>&nbsp;    return activeConnections.size();</b>
+<i>83</i>&nbsp;  }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;  @Override
+<i>86</i>&nbsp;  public synchronized String toString() {
+<b class="fc"><i>87</i>&nbsp;    StringBuilder builder = new StringBuilder();</b>
+<b class="fc"><i>88</i>&nbsp;    builder.append(&quot;\n===CONFINGURATION==============================================&quot;);</b>
+<b class="fc"><i>89</i>&nbsp;    builder.append(&quot;\n jdbcDriver                     &quot;).append(dataSource.getDriver());</b>
+<b class="fc"><i>90</i>&nbsp;    builder.append(&quot;\n jdbcUrl                        &quot;).append(dataSource.getUrl());</b>
+<b class="fc"><i>91</i>&nbsp;    builder.append(&quot;\n jdbcUsername                   &quot;).append(dataSource.getUsername());</b>
+<b class="fc"><i>92</i>&nbsp;    builder.append(&quot;\n jdbcPassword                   &quot;).append(dataSource.getPassword() == null ? &quot;NULL&quot; : &quot;************&quot;);</b>
+<b class="fc"><i>93</i>&nbsp;    builder.append(&quot;\n poolMaxActiveConnections       &quot;).append(dataSource.poolMaximumActiveConnections);</b>
+<b class="fc"><i>94</i>&nbsp;    builder.append(&quot;\n poolMaxIdleConnections         &quot;).append(dataSource.poolMaximumIdleConnections);</b>
+<b class="fc"><i>95</i>&nbsp;    builder.append(&quot;\n poolMaxCheckoutTime            &quot;).append(dataSource.poolMaximumCheckoutTime);</b>
+<b class="fc"><i>96</i>&nbsp;    builder.append(&quot;\n poolTimeToWait                 &quot;).append(dataSource.poolTimeToWait);</b>
+<b class="fc"><i>97</i>&nbsp;    builder.append(&quot;\n poolPingEnabled                &quot;).append(dataSource.poolPingEnabled);</b>
+<b class="fc"><i>98</i>&nbsp;    builder.append(&quot;\n poolPingQuery                  &quot;).append(dataSource.poolPingQuery);</b>
+<b class="fc"><i>99</i>&nbsp;    builder.append(&quot;\n poolPingConnectionsNotUsedFor  &quot;).append(dataSource.poolPingConnectionsNotUsedFor);</b>
+<b class="fc"><i>100</i>&nbsp;    builder.append(&quot;\n ---STATUS-----------------------------------------------------&quot;);</b>
+<b class="fc"><i>101</i>&nbsp;    builder.append(&quot;\n activeConnections              &quot;).append(getActiveConnectionCount());</b>
+<b class="fc"><i>102</i>&nbsp;    builder.append(&quot;\n idleConnections                &quot;).append(getIdleConnectionCount());</b>
+<b class="fc"><i>103</i>&nbsp;    builder.append(&quot;\n requestCount                   &quot;).append(getRequestCount());</b>
+<b class="fc"><i>104</i>&nbsp;    builder.append(&quot;\n averageRequestTime             &quot;).append(getAverageRequestTime());</b>
+<b class="fc"><i>105</i>&nbsp;    builder.append(&quot;\n averageCheckoutTime            &quot;).append(getAverageCheckoutTime());</b>
+<b class="fc"><i>106</i>&nbsp;    builder.append(&quot;\n claimedOverdue                 &quot;).append(getClaimedOverdueConnectionCount());</b>
+<b class="fc"><i>107</i>&nbsp;    builder.append(&quot;\n averageOverdueCheckoutTime     &quot;).append(getAverageOverdueCheckoutTime());</b>
+<b class="fc"><i>108</i>&nbsp;    builder.append(&quot;\n hadToWait                      &quot;).append(getHadToWaitCount());</b>
+<b class="fc"><i>109</i>&nbsp;    builder.append(&quot;\n averageWaitTime                &quot;).append(getAverageWaitTime());</b>
+<b class="fc"><i>110</i>&nbsp;    builder.append(&quot;\n badConnectionCount             &quot;).append(getBadConnectionCount());</b>
+<b class="fc"><i>111</i>&nbsp;    builder.append(&quot;\n===============================================================&quot;);</b>
+<b class="fc"><i>112</i>&nbsp;    return builder.toString();</b>
+<i>113</i>&nbsp;  }
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

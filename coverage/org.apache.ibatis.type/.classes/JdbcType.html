@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: JdbcType</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.type</a> ]
+</div>
+
+<h1>Coverage Summary for Class: JdbcType (org.apache.ibatis.type)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JdbcType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (50/ 50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.type;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.Types;
+<i>19</i>&nbsp;import java.util.HashMap;
+<i>20</i>&nbsp;import java.util.Map;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;/**
+<i>23</i>&nbsp; * @author Clinton Begin
+<i>24</i>&nbsp; */
+<b class="fc"><i>25</i>&nbsp;public enum JdbcType {</b>
+<i>26</i>&nbsp;  /*
+<i>27</i>&nbsp;   * This is added to enable basic support for the
+<i>28</i>&nbsp;   * ARRAY data type - but a custom type handler is still required
+<i>29</i>&nbsp;   */
+<b class="fc"><i>30</i>&nbsp;  ARRAY(Types.ARRAY),</b>
+<b class="fc"><i>31</i>&nbsp;  BIT(Types.BIT),</b>
+<b class="fc"><i>32</i>&nbsp;  TINYINT(Types.TINYINT),</b>
+<b class="fc"><i>33</i>&nbsp;  SMALLINT(Types.SMALLINT),</b>
+<b class="fc"><i>34</i>&nbsp;  INTEGER(Types.INTEGER),</b>
+<b class="fc"><i>35</i>&nbsp;  BIGINT(Types.BIGINT),</b>
+<b class="fc"><i>36</i>&nbsp;  FLOAT(Types.FLOAT),</b>
+<b class="fc"><i>37</i>&nbsp;  REAL(Types.REAL),</b>
+<b class="fc"><i>38</i>&nbsp;  DOUBLE(Types.DOUBLE),</b>
+<b class="fc"><i>39</i>&nbsp;  NUMERIC(Types.NUMERIC),</b>
+<b class="fc"><i>40</i>&nbsp;  DECIMAL(Types.DECIMAL),</b>
+<b class="fc"><i>41</i>&nbsp;  CHAR(Types.CHAR),</b>
+<b class="fc"><i>42</i>&nbsp;  VARCHAR(Types.VARCHAR),</b>
+<b class="fc"><i>43</i>&nbsp;  LONGVARCHAR(Types.LONGVARCHAR),</b>
+<b class="fc"><i>44</i>&nbsp;  DATE(Types.DATE),</b>
+<b class="fc"><i>45</i>&nbsp;  TIME(Types.TIME),</b>
+<b class="fc"><i>46</i>&nbsp;  TIMESTAMP(Types.TIMESTAMP),</b>
+<b class="fc"><i>47</i>&nbsp;  BINARY(Types.BINARY),</b>
+<b class="fc"><i>48</i>&nbsp;  VARBINARY(Types.VARBINARY),</b>
+<b class="fc"><i>49</i>&nbsp;  LONGVARBINARY(Types.LONGVARBINARY),</b>
+<b class="fc"><i>50</i>&nbsp;  NULL(Types.NULL),</b>
+<b class="fc"><i>51</i>&nbsp;  OTHER(Types.OTHER),</b>
+<b class="fc"><i>52</i>&nbsp;  BLOB(Types.BLOB),</b>
+<b class="fc"><i>53</i>&nbsp;  CLOB(Types.CLOB),</b>
+<b class="fc"><i>54</i>&nbsp;  BOOLEAN(Types.BOOLEAN),</b>
+<b class="fc"><i>55</i>&nbsp;  CURSOR(-10), // Oracle</b>
+<b class="fc"><i>56</i>&nbsp;  UNDEFINED(Integer.MIN_VALUE + 1000),</b>
+<b class="fc"><i>57</i>&nbsp;  NVARCHAR(Types.NVARCHAR), // JDK6</b>
+<b class="fc"><i>58</i>&nbsp;  NCHAR(Types.NCHAR), // JDK6</b>
+<b class="fc"><i>59</i>&nbsp;  NCLOB(Types.NCLOB), // JDK6</b>
+<b class="fc"><i>60</i>&nbsp;  STRUCT(Types.STRUCT),</b>
+<b class="fc"><i>61</i>&nbsp;  JAVA_OBJECT(Types.JAVA_OBJECT),</b>
+<b class="fc"><i>62</i>&nbsp;  DISTINCT(Types.DISTINCT),</b>
+<b class="fc"><i>63</i>&nbsp;  REF(Types.REF),</b>
+<b class="fc"><i>64</i>&nbsp;  DATALINK(Types.DATALINK),</b>
+<b class="fc"><i>65</i>&nbsp;  ROWID(Types.ROWID), // JDK6</b>
+<b class="fc"><i>66</i>&nbsp;  LONGNVARCHAR(Types.LONGNVARCHAR), // JDK6</b>
+<b class="fc"><i>67</i>&nbsp;  SQLXML(Types.SQLXML), // JDK6</b>
+<b class="fc"><i>68</i>&nbsp;  DATETIMEOFFSET(-155), // SQL Server 2008</b>
+<b class="fc"><i>69</i>&nbsp;  TIME_WITH_TIMEZONE(Types.TIME_WITH_TIMEZONE), // JDBC 4.2 JDK8</b>
+<b class="fc"><i>70</i>&nbsp;  TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE); // JDBC 4.2 JDK8</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  public final int TYPE_CODE;
+<b class="fc"><i>73</i>&nbsp;  private static Map&lt;Integer,JdbcType&gt; codeLookup = new HashMap&lt;&gt;();</b>
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;  static {
+<b class="fc"><i>76</i>&nbsp;    for (JdbcType type : JdbcType.values()) {</b>
+<b class="fc"><i>77</i>&nbsp;      codeLookup.put(type.TYPE_CODE, type);</b>
+<i>78</i>&nbsp;    }
+<b class="fc"><i>79</i>&nbsp;  }</b>
+<i>80</i>&nbsp;
+<b class="fc"><i>81</i>&nbsp;  JdbcType(int code) {</b>
+<b class="fc"><i>82</i>&nbsp;    this.TYPE_CODE = code;</b>
+<b class="fc"><i>83</i>&nbsp;  }</b>
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;  public static JdbcType forCode(int code)  {
+<b class="fc"><i>86</i>&nbsp;    return codeLookup.get(code);</b>
+<i>87</i>&nbsp;  }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: XMLIncludeTransformer</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.builder.xml</a> ]
+</div>
+
+<h1>Coverage Summary for Class: XMLIncludeTransformer (org.apache.ibatis.builder.xml)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XMLIncludeTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (56/ 56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.builder.xml;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.HashMap;
+<i>19</i>&nbsp;import java.util.Map;
+<i>20</i>&nbsp;import java.util.Optional;
+<i>21</i>&nbsp;import java.util.Properties;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;import org.apache.ibatis.builder.BuilderException;
+<i>24</i>&nbsp;import org.apache.ibatis.builder.IncompleteElementException;
+<i>25</i>&nbsp;import org.apache.ibatis.builder.MapperBuilderAssistant;
+<i>26</i>&nbsp;import org.apache.ibatis.parsing.PropertyParser;
+<i>27</i>&nbsp;import org.apache.ibatis.parsing.XNode;
+<i>28</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>29</i>&nbsp;import org.w3c.dom.NamedNodeMap;
+<i>30</i>&nbsp;import org.w3c.dom.Node;
+<i>31</i>&nbsp;import org.w3c.dom.NodeList;
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;/**
+<i>34</i>&nbsp; * @author Frank D. Martinez [mnesarco]
+<i>35</i>&nbsp; */
+<i>36</i>&nbsp;public class XMLIncludeTransformer {
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;  private final Configuration configuration;
+<i>39</i>&nbsp;  private final MapperBuilderAssistant builderAssistant;
+<i>40</i>&nbsp;
+<b class="fc"><i>41</i>&nbsp;  public XMLIncludeTransformer(Configuration configuration, MapperBuilderAssistant builderAssistant) {</b>
+<b class="fc"><i>42</i>&nbsp;    this.configuration = configuration;</b>
+<b class="fc"><i>43</i>&nbsp;    this.builderAssistant = builderAssistant;</b>
+<b class="fc"><i>44</i>&nbsp;  }</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;  public void applyIncludes(Node source) {
+<b class="fc"><i>47</i>&nbsp;    Properties variablesContext = new Properties();</b>
+<b class="fc"><i>48</i>&nbsp;    Properties configurationVariables = configuration.getVariables();</b>
+<b class="fc"><i>49</i>&nbsp;    Optional.ofNullable(configurationVariables).ifPresent(variablesContext::putAll);</b>
+<b class="fc"><i>50</i>&nbsp;    applyIncludes(source, variablesContext, false);</b>
+<b class="fc"><i>51</i>&nbsp;  }</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  /**
+<i>54</i>&nbsp;   * Recursively apply includes through all SQL fragments.
+<i>55</i>&nbsp;   * @param source Include node in DOM tree
+<i>56</i>&nbsp;   * @param variablesContext Current context for static variables with values
+<i>57</i>&nbsp;   */
+<i>58</i>&nbsp;  private void applyIncludes(Node source, final Properties variablesContext, boolean included) {
+<b class="fc"><i>59</i>&nbsp;    if (source.getNodeName().equals(&quot;include&quot;)) {</b>
+<b class="fc"><i>60</i>&nbsp;      Node toInclude = findSqlFragment(getStringAttribute(source, &quot;refid&quot;), variablesContext);</b>
+<b class="fc"><i>61</i>&nbsp;      Properties toIncludeContext = getVariablesContext(source, variablesContext);</b>
+<b class="fc"><i>62</i>&nbsp;      applyIncludes(toInclude, toIncludeContext, true);</b>
+<b class="fc"><i>63</i>&nbsp;      if (toInclude.getOwnerDocument() != source.getOwnerDocument()) {</b>
+<b class="fc"><i>64</i>&nbsp;        toInclude = source.getOwnerDocument().importNode(toInclude, true);</b>
+<i>65</i>&nbsp;      }
+<b class="fc"><i>66</i>&nbsp;      source.getParentNode().replaceChild(toInclude, source);</b>
+<b class="fc"><i>67</i>&nbsp;      while (toInclude.hasChildNodes()) {</b>
+<b class="fc"><i>68</i>&nbsp;        toInclude.getParentNode().insertBefore(toInclude.getFirstChild(), toInclude);</b>
+<i>69</i>&nbsp;      }
+<b class="fc"><i>70</i>&nbsp;      toInclude.getParentNode().removeChild(toInclude);</b>
+<b class="fc"><i>71</i>&nbsp;    } else if (source.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="fc"><i>72</i>&nbsp;      if (included &amp;&amp; !variablesContext.isEmpty()) {</b>
+<i>73</i>&nbsp;        // replace variables in attribute values
+<b class="fc"><i>74</i>&nbsp;        NamedNodeMap attributes = source.getAttributes();</b>
+<b class="fc"><i>75</i>&nbsp;        for (int i = 0; i &lt; attributes.getLength(); i++) {</b>
+<b class="fc"><i>76</i>&nbsp;          Node attr = attributes.item(i);</b>
+<b class="fc"><i>77</i>&nbsp;          attr.setNodeValue(PropertyParser.parse(attr.getNodeValue(), variablesContext));</b>
+<i>78</i>&nbsp;        }
+<i>79</i>&nbsp;      }
+<b class="fc"><i>80</i>&nbsp;      NodeList children = source.getChildNodes();</b>
+<b class="fc"><i>81</i>&nbsp;      for (int i = 0; i &lt; children.getLength(); i++) {</b>
+<b class="fc"><i>82</i>&nbsp;        applyIncludes(children.item(i), variablesContext, included);</b>
+<i>83</i>&nbsp;      }
+<b class="fc"><i>84</i>&nbsp;    } else if (included &amp;&amp; source.getNodeType() == Node.TEXT_NODE</b>
+<b class="fc"><i>85</i>&nbsp;        &amp;&amp; !variablesContext.isEmpty()) {</b>
+<i>86</i>&nbsp;      // replace variables in text node
+<b class="fc"><i>87</i>&nbsp;      source.setNodeValue(PropertyParser.parse(source.getNodeValue(), variablesContext));</b>
+<i>88</i>&nbsp;    }
+<b class="fc"><i>89</i>&nbsp;  }</b>
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;  private Node findSqlFragment(String refid, Properties variables) {
+<b class="fc"><i>92</i>&nbsp;    refid = PropertyParser.parse(refid, variables);</b>
+<b class="fc"><i>93</i>&nbsp;    refid = builderAssistant.applyCurrentNamespace(refid, true);</b>
+<i>94</i>&nbsp;    try {
+<b class="fc"><i>95</i>&nbsp;      XNode nodeToInclude = configuration.getSqlFragments().get(refid);</b>
+<b class="fc"><i>96</i>&nbsp;      return nodeToInclude.getNode().cloneNode(true);</b>
+<b class="fc"><i>97</i>&nbsp;    } catch (IllegalArgumentException e) {</b>
+<b class="fc"><i>98</i>&nbsp;      throw new IncompleteElementException(&quot;Could not find SQL statement to include with refid &#39;&quot; + refid + &quot;&#39;&quot;, e);</b>
+<i>99</i>&nbsp;    }
+<i>100</i>&nbsp;  }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;  private String getStringAttribute(Node node, String name) {
+<b class="fc"><i>103</i>&nbsp;    return node.getAttributes().getNamedItem(name).getNodeValue();</b>
+<i>104</i>&nbsp;  }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;  /**
+<i>107</i>&nbsp;   * Read placeholders and their values from include node definition.
+<i>108</i>&nbsp;   * @param node Include node instance
+<i>109</i>&nbsp;   * @param inheritedVariablesContext Current context used for replace variables in new variables values
+<i>110</i>&nbsp;   * @return variables context from include instance (no inherited values)
+<i>111</i>&nbsp;   */
+<i>112</i>&nbsp;  private Properties getVariablesContext(Node node, Properties inheritedVariablesContext) {
+<b class="fc"><i>113</i>&nbsp;    Map&lt;String, String&gt; declaredProperties = null;</b>
+<b class="fc"><i>114</i>&nbsp;    NodeList children = node.getChildNodes();</b>
+<b class="fc"><i>115</i>&nbsp;    for (int i = 0; i &lt; children.getLength(); i++) {</b>
+<b class="fc"><i>116</i>&nbsp;      Node n = children.item(i);</b>
+<b class="fc"><i>117</i>&nbsp;      if (n.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="fc"><i>118</i>&nbsp;        String name = getStringAttribute(n, &quot;name&quot;);</b>
+<i>119</i>&nbsp;        // Replace variables inside
+<b class="fc"><i>120</i>&nbsp;        String value = PropertyParser.parse(getStringAttribute(n, &quot;value&quot;), inheritedVariablesContext);</b>
+<b class="fc"><i>121</i>&nbsp;        if (declaredProperties == null) {</b>
+<b class="fc"><i>122</i>&nbsp;          declaredProperties = new HashMap&lt;&gt;();</b>
+<i>123</i>&nbsp;        }
+<b class="fc"><i>124</i>&nbsp;        if (declaredProperties.put(name, value) != null) {</b>
+<b class="fc"><i>125</i>&nbsp;          throw new BuilderException(&quot;Variable &quot; + name + &quot; defined twice in the same include definition&quot;);</b>
+<i>126</i>&nbsp;        }
+<i>127</i>&nbsp;      }
+<i>128</i>&nbsp;    }
+<b class="fc"><i>129</i>&nbsp;    if (declaredProperties == null) {</b>
+<b class="fc"><i>130</i>&nbsp;      return inheritedVariablesContext;</b>
+<i>131</i>&nbsp;    } else {
+<b class="fc"><i>132</i>&nbsp;      Properties newProperties = new Properties();</b>
+<b class="fc"><i>133</i>&nbsp;      newProperties.putAll(inheritedVariablesContext);</b>
+<b class="fc"><i>134</i>&nbsp;      newProperties.putAll(declaredProperties);</b>
+<b class="fc"><i>135</i>&nbsp;      return newProperties;</b>
+<i>136</i>&nbsp;    }
+<i>137</i>&nbsp;  }
+<i>138</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

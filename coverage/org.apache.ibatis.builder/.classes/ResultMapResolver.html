@@ -1,0 +1,133 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ResultMapResolver</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.builder</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ResultMapResolver (org.apache.ibatis.builder)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResultMapResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/ 10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2017 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.builder;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.List;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import org.apache.ibatis.mapping.Discriminator;
+<i>21</i>&nbsp;import org.apache.ibatis.mapping.ResultMap;
+<i>22</i>&nbsp;import org.apache.ibatis.mapping.ResultMapping;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;/**
+<i>25</i>&nbsp; * @author Eduardo Macarron
+<i>26</i>&nbsp; */
+<i>27</i>&nbsp;public class ResultMapResolver {
+<i>28</i>&nbsp;  private final MapperBuilderAssistant assistant;
+<i>29</i>&nbsp;  private final String id;
+<i>30</i>&nbsp;  private final Class&lt;?&gt; type;
+<i>31</i>&nbsp;  private final String extend;
+<i>32</i>&nbsp;  private final Discriminator discriminator;
+<i>33</i>&nbsp;  private final List&lt;ResultMapping&gt; resultMappings;
+<i>34</i>&nbsp;  private final Boolean autoMapping;
+<i>35</i>&nbsp;
+<b class="fc"><i>36</i>&nbsp;  public ResultMapResolver(MapperBuilderAssistant assistant, String id, Class&lt;?&gt; type, String extend, Discriminator discriminator, List&lt;ResultMapping&gt; resultMappings, Boolean autoMapping) {</b>
+<b class="fc"><i>37</i>&nbsp;    this.assistant = assistant;</b>
+<b class="fc"><i>38</i>&nbsp;    this.id = id;</b>
+<b class="fc"><i>39</i>&nbsp;    this.type = type;</b>
+<b class="fc"><i>40</i>&nbsp;    this.extend = extend;</b>
+<b class="fc"><i>41</i>&nbsp;    this.discriminator = discriminator;</b>
+<b class="fc"><i>42</i>&nbsp;    this.resultMappings = resultMappings;</b>
+<b class="fc"><i>43</i>&nbsp;    this.autoMapping = autoMapping;</b>
+<b class="fc"><i>44</i>&nbsp;  }</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;  public ResultMap resolve() {
+<b class="fc"><i>47</i>&nbsp;    return assistant.addResultMap(this.id, this.type, this.extend, this.discriminator, this.resultMappings, this.autoMapping);</b>
+<i>48</i>&nbsp;  }
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

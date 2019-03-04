@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ParamNameResolver</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.reflection</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ParamNameResolver (org.apache.ibatis.reflection)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParamNameResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (40/ 40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.reflection;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.annotation.Annotation;
+<i>19</i>&nbsp;import java.lang.reflect.Method;
+<i>20</i>&nbsp;import java.util.Collections;
+<i>21</i>&nbsp;import java.util.Map;
+<i>22</i>&nbsp;import java.util.SortedMap;
+<i>23</i>&nbsp;import java.util.TreeMap;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;import org.apache.ibatis.annotations.Param;
+<i>26</i>&nbsp;import org.apache.ibatis.binding.MapperMethod.ParamMap;
+<i>27</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>28</i>&nbsp;import org.apache.ibatis.session.ResultHandler;
+<i>29</i>&nbsp;import org.apache.ibatis.session.RowBounds;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;public class ParamNameResolver {
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;  private static final String GENERIC_NAME_PREFIX = &quot;param&quot;;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;  /**
+<i>36</i>&nbsp;   * &lt;p&gt;
+<i>37</i>&nbsp;   * The key is the index and the value is the name of the parameter.&lt;br /&gt;
+<i>38</i>&nbsp;   * The name is obtained from {@link Param} if specified. When {@link Param} is not specified,
+<i>39</i>&nbsp;   * the parameter index is used. Note that this index could be different from the actual index
+<i>40</i>&nbsp;   * when the method has special parameters (i.e. {@link RowBounds} or {@link ResultHandler}).
+<i>41</i>&nbsp;   * &lt;/p&gt;
+<i>42</i>&nbsp;   * &lt;ul&gt;
+<i>43</i>&nbsp;   * &lt;li&gt;aMethod(@Param(&quot;M&quot;) int a, @Param(&quot;N&quot;) int b) -&amp;gt; {{0, &quot;M&quot;}, {1, &quot;N&quot;}}&lt;/li&gt;
+<i>44</i>&nbsp;   * &lt;li&gt;aMethod(int a, int b) -&amp;gt; {{0, &quot;0&quot;}, {1, &quot;1&quot;}}&lt;/li&gt;
+<i>45</i>&nbsp;   * &lt;li&gt;aMethod(int a, RowBounds rb, int b) -&amp;gt; {{0, &quot;0&quot;}, {2, &quot;1&quot;}}&lt;/li&gt;
+<i>46</i>&nbsp;   * &lt;/ul&gt;
+<i>47</i>&nbsp;   */
+<i>48</i>&nbsp;  private final SortedMap&lt;Integer, String&gt; names;
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;  private boolean hasParamAnnotation;
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;  public ParamNameResolver(Configuration config, Method method) {</b>
+<b class="fc"><i>53</i>&nbsp;    final Class&lt;?&gt;[] paramTypes = method.getParameterTypes();</b>
+<b class="fc"><i>54</i>&nbsp;    final Annotation[][] paramAnnotations = method.getParameterAnnotations();</b>
+<b class="fc"><i>55</i>&nbsp;    final SortedMap&lt;Integer, String&gt; map = new TreeMap&lt;&gt;();</b>
+<b class="fc"><i>56</i>&nbsp;    int paramCount = paramAnnotations.length;</b>
+<i>57</i>&nbsp;    // get names from @Param annotations
+<b class="fc"><i>58</i>&nbsp;    for (int paramIndex = 0; paramIndex &lt; paramCount; paramIndex++) {</b>
+<b class="fc"><i>59</i>&nbsp;      if (isSpecialParameter(paramTypes[paramIndex])) {</b>
+<i>60</i>&nbsp;        // skip special parameters
+<b class="fc"><i>61</i>&nbsp;        continue;</b>
+<i>62</i>&nbsp;      }
+<b class="fc"><i>63</i>&nbsp;      String name = null;</b>
+<b class="fc"><i>64</i>&nbsp;      for (Annotation annotation : paramAnnotations[paramIndex]) {</b>
+<b class="fc"><i>65</i>&nbsp;        if (annotation instanceof Param) {</b>
+<b class="fc"><i>66</i>&nbsp;          hasParamAnnotation = true;</b>
+<b class="fc"><i>67</i>&nbsp;          name = ((Param) annotation).value();</b>
+<b class="fc"><i>68</i>&nbsp;          break;</b>
+<i>69</i>&nbsp;        }
+<i>70</i>&nbsp;      }
+<b class="fc"><i>71</i>&nbsp;      if (name == null) {</b>
+<i>72</i>&nbsp;        // @Param was not specified.
+<b class="fc"><i>73</i>&nbsp;        if (config.isUseActualParamName()) {</b>
+<b class="fc"><i>74</i>&nbsp;          name = getActualParamName(method, paramIndex);</b>
+<i>75</i>&nbsp;        }
+<b class="fc"><i>76</i>&nbsp;        if (name == null) {</b>
+<i>77</i>&nbsp;          // use the parameter index as the name (&quot;0&quot;, &quot;1&quot;, ...)
+<i>78</i>&nbsp;          // gcode issue #71
+<b class="fc"><i>79</i>&nbsp;          name = String.valueOf(map.size());</b>
+<i>80</i>&nbsp;        }
+<i>81</i>&nbsp;      }
+<b class="fc"><i>82</i>&nbsp;      map.put(paramIndex, name);</b>
+<i>83</i>&nbsp;    }
+<b class="fc"><i>84</i>&nbsp;    names = Collections.unmodifiableSortedMap(map);</b>
+<b class="fc"><i>85</i>&nbsp;  }</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;  private String getActualParamName(Method method, int paramIndex) {
+<b class="fc"><i>88</i>&nbsp;    return ParamNameUtil.getParamNames(method).get(paramIndex);</b>
+<i>89</i>&nbsp;  }
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;  private static boolean isSpecialParameter(Class&lt;?&gt; clazz) {
+<b class="fc"><i>92</i>&nbsp;    return RowBounds.class.isAssignableFrom(clazz) || ResultHandler.class.isAssignableFrom(clazz);</b>
+<i>93</i>&nbsp;  }
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;  /**
+<i>96</i>&nbsp;   * Returns parameter names referenced by SQL providers.
+<i>97</i>&nbsp;   */
+<i>98</i>&nbsp;  public String[] getNames() {
+<b class="fc"><i>99</i>&nbsp;    return names.values().toArray(new String[0]);</b>
+<i>100</i>&nbsp;  }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;  /**
+<i>103</i>&nbsp;   * &lt;p&gt;
+<i>104</i>&nbsp;   * A single non-special parameter is returned without a name.
+<i>105</i>&nbsp;   * Multiple parameters are named using the naming rule.
+<i>106</i>&nbsp;   * In addition to the default names, this method also adds the generic names (param1, param2,
+<i>107</i>&nbsp;   * ...).
+<i>108</i>&nbsp;   * &lt;/p&gt;
+<i>109</i>&nbsp;   */
+<i>110</i>&nbsp;  public Object getNamedParams(Object[] args) {
+<b class="fc"><i>111</i>&nbsp;    final int paramCount = names.size();</b>
+<b class="fc"><i>112</i>&nbsp;    if (args == null || paramCount == 0) {</b>
+<b class="fc"><i>113</i>&nbsp;      return null;</b>
+<b class="fc"><i>114</i>&nbsp;    } else if (!hasParamAnnotation &amp;&amp; paramCount == 1) {</b>
+<b class="fc"><i>115</i>&nbsp;      return args[names.firstKey()];</b>
+<i>116</i>&nbsp;    } else {
+<b class="fc"><i>117</i>&nbsp;      final Map&lt;String, Object&gt; param = new ParamMap&lt;&gt;();</b>
+<b class="fc"><i>118</i>&nbsp;      int i = 0;</b>
+<b class="fc"><i>119</i>&nbsp;      for (Map.Entry&lt;Integer, String&gt; entry : names.entrySet()) {</b>
+<b class="fc"><i>120</i>&nbsp;        param.put(entry.getValue(), args[entry.getKey()]);</b>
+<i>121</i>&nbsp;        // add generic param names (param1, param2, ...)
+<b class="fc"><i>122</i>&nbsp;        final String genericParamName = GENERIC_NAME_PREFIX + String.valueOf(i + 1);</b>
+<i>123</i>&nbsp;        // ensure not to overwrite parameter named with @Param
+<b class="fc"><i>124</i>&nbsp;        if (!names.containsValue(genericParamName)) {</b>
+<b class="fc"><i>125</i>&nbsp;          param.put(genericParamName, args[entry.getKey()]);</b>
+<i>126</i>&nbsp;        }
+<b class="fc"><i>127</i>&nbsp;        i++;</b>
+<b class="fc"><i>128</i>&nbsp;      }</b>
+<b class="fc"><i>129</i>&nbsp;      return param;</b>
+<i>130</i>&nbsp;    }
+<i>131</i>&nbsp;  }
+<i>132</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

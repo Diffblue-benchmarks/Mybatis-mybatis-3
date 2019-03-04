@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TrimSqlNode</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.scripting.xmltags</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TrimSqlNode (org.apache.ibatis.scripting.xmltags)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TrimSqlNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/ 22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TrimSqlNode$FilteredDynamicContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.6%
+  </span>
+  <span class="absValue">
+    (44/ 47)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.7%
+  </span>
+  <span class="absValue">
+    (66/ 69)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.scripting.xmltags;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.ArrayList;
+<i>19</i>&nbsp;import java.util.Collections;
+<i>20</i>&nbsp;import java.util.List;
+<i>21</i>&nbsp;import java.util.Locale;
+<i>22</i>&nbsp;import java.util.Map;
+<i>23</i>&nbsp;import java.util.StringTokenizer;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;/**
+<i>28</i>&nbsp; * @author Clinton Begin
+<i>29</i>&nbsp; */
+<b class="fc"><i>30</i>&nbsp;public class TrimSqlNode implements SqlNode {</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;  private final SqlNode contents;
+<i>33</i>&nbsp;  private final String prefix;
+<i>34</i>&nbsp;  private final String suffix;
+<i>35</i>&nbsp;  private final List&lt;String&gt; prefixesToOverride;
+<i>36</i>&nbsp;  private final List&lt;String&gt; suffixesToOverride;
+<i>37</i>&nbsp;  private final Configuration configuration;
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;  public TrimSqlNode(Configuration configuration, SqlNode contents, String prefix, String prefixesToOverride, String suffix, String suffixesToOverride) {
+<b class="fc"><i>40</i>&nbsp;    this(configuration, contents, prefix, parseOverrides(prefixesToOverride), suffix, parseOverrides(suffixesToOverride));</b>
+<b class="fc"><i>41</i>&nbsp;  }</b>
+<i>42</i>&nbsp;
+<b class="fc"><i>43</i>&nbsp;  protected TrimSqlNode(Configuration configuration, SqlNode contents, String prefix, List&lt;String&gt; prefixesToOverride, String suffix, List&lt;String&gt; suffixesToOverride) {</b>
+<b class="fc"><i>44</i>&nbsp;    this.contents = contents;</b>
+<b class="fc"><i>45</i>&nbsp;    this.prefix = prefix;</b>
+<b class="fc"><i>46</i>&nbsp;    this.prefixesToOverride = prefixesToOverride;</b>
+<b class="fc"><i>47</i>&nbsp;    this.suffix = suffix;</b>
+<b class="fc"><i>48</i>&nbsp;    this.suffixesToOverride = suffixesToOverride;</b>
+<b class="fc"><i>49</i>&nbsp;    this.configuration = configuration;</b>
+<b class="fc"><i>50</i>&nbsp;  }</b>
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;  @Override
+<i>53</i>&nbsp;  public boolean apply(DynamicContext context) {
+<b class="fc"><i>54</i>&nbsp;    FilteredDynamicContext filteredDynamicContext = new FilteredDynamicContext(context);</b>
+<b class="fc"><i>55</i>&nbsp;    boolean result = contents.apply(filteredDynamicContext);</b>
+<b class="fc"><i>56</i>&nbsp;    filteredDynamicContext.applyAll();</b>
+<b class="fc"><i>57</i>&nbsp;    return result;</b>
+<i>58</i>&nbsp;  }
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  private static List&lt;String&gt; parseOverrides(String overrides) {
+<b class="fc"><i>61</i>&nbsp;    if (overrides != null) {</b>
+<b class="fc"><i>62</i>&nbsp;      final StringTokenizer parser = new StringTokenizer(overrides, &quot;|&quot;, false);</b>
+<b class="fc"><i>63</i>&nbsp;      final List&lt;String&gt; list = new ArrayList&lt;&gt;(parser.countTokens());</b>
+<b class="fc"><i>64</i>&nbsp;      while (parser.hasMoreTokens()) {</b>
+<b class="fc"><i>65</i>&nbsp;        list.add(parser.nextToken().toUpperCase(Locale.ENGLISH));</b>
+<i>66</i>&nbsp;      }
+<b class="fc"><i>67</i>&nbsp;      return list;</b>
+<i>68</i>&nbsp;    }
+<b class="fc"><i>69</i>&nbsp;    return Collections.emptyList();</b>
+<i>70</i>&nbsp;  }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  private class FilteredDynamicContext extends DynamicContext {
+<i>73</i>&nbsp;    private DynamicContext delegate;
+<i>74</i>&nbsp;    private boolean prefixApplied;
+<i>75</i>&nbsp;    private boolean suffixApplied;
+<i>76</i>&nbsp;    private StringBuilder sqlBuffer;
+<i>77</i>&nbsp;
+<b class="fc"><i>78</i>&nbsp;    public FilteredDynamicContext(DynamicContext delegate) {</b>
+<b class="fc"><i>79</i>&nbsp;      super(configuration, null);</b>
+<b class="fc"><i>80</i>&nbsp;      this.delegate = delegate;</b>
+<b class="fc"><i>81</i>&nbsp;      this.prefixApplied = false;</b>
+<b class="fc"><i>82</i>&nbsp;      this.suffixApplied = false;</b>
+<b class="fc"><i>83</i>&nbsp;      this.sqlBuffer = new StringBuilder();</b>
+<b class="fc"><i>84</i>&nbsp;    }</b>
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    public void applyAll() {
+<b class="fc"><i>87</i>&nbsp;      sqlBuffer = new StringBuilder(sqlBuffer.toString().trim());</b>
+<b class="fc"><i>88</i>&nbsp;      String trimmedUppercaseSql = sqlBuffer.toString().toUpperCase(Locale.ENGLISH);</b>
+<b class="fc"><i>89</i>&nbsp;      if (trimmedUppercaseSql.length() &gt; 0) {</b>
+<b class="fc"><i>90</i>&nbsp;        applyPrefix(sqlBuffer, trimmedUppercaseSql);</b>
+<b class="fc"><i>91</i>&nbsp;        applySuffix(sqlBuffer, trimmedUppercaseSql);</b>
+<i>92</i>&nbsp;      }
+<b class="fc"><i>93</i>&nbsp;      delegate.appendSql(sqlBuffer.toString());</b>
+<b class="fc"><i>94</i>&nbsp;    }</b>
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;    @Override
+<i>97</i>&nbsp;    public Map&lt;String, Object&gt; getBindings() {
+<b class="fc"><i>98</i>&nbsp;      return delegate.getBindings();</b>
+<i>99</i>&nbsp;    }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;    @Override
+<i>102</i>&nbsp;    public void bind(String name, Object value) {
+<b class="fc"><i>103</i>&nbsp;      delegate.bind(name, value);</b>
+<b class="fc"><i>104</i>&nbsp;    }</b>
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    @Override
+<i>107</i>&nbsp;    public int getUniqueNumber() {
+<b class="fc"><i>108</i>&nbsp;      return delegate.getUniqueNumber();</b>
+<i>109</i>&nbsp;    }
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    @Override
+<i>112</i>&nbsp;    public void appendSql(String sql) {
+<b class="fc"><i>113</i>&nbsp;      sqlBuffer.append(sql);</b>
+<b class="fc"><i>114</i>&nbsp;    }</b>
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    @Override
+<i>117</i>&nbsp;    public String getSql() {
+<b class="nc"><i>118</i>&nbsp;      return delegate.getSql();</b>
+<i>119</i>&nbsp;    }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    private void applyPrefix(StringBuilder sql, String trimmedUppercaseSql) {
+<b class="fc"><i>122</i>&nbsp;      if (!prefixApplied) {</b>
+<b class="fc"><i>123</i>&nbsp;        prefixApplied = true;</b>
+<b class="fc"><i>124</i>&nbsp;        if (prefixesToOverride != null) {</b>
+<b class="fc"><i>125</i>&nbsp;          for (String toRemove : prefixesToOverride) {</b>
+<b class="fc"><i>126</i>&nbsp;            if (trimmedUppercaseSql.startsWith(toRemove)) {</b>
+<b class="fc"><i>127</i>&nbsp;              sql.delete(0, toRemove.trim().length());</b>
+<b class="fc"><i>128</i>&nbsp;              break;</b>
+<i>129</i>&nbsp;            }
+<b class="fc"><i>130</i>&nbsp;          }</b>
+<i>131</i>&nbsp;        }
+<b class="fc"><i>132</i>&nbsp;        if (prefix != null) {</b>
+<b class="fc"><i>133</i>&nbsp;          sql.insert(0, &quot; &quot;);</b>
+<b class="fc"><i>134</i>&nbsp;          sql.insert(0, prefix);</b>
+<i>135</i>&nbsp;        }
+<i>136</i>&nbsp;      }
+<b class="fc"><i>137</i>&nbsp;    }</b>
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;    private void applySuffix(StringBuilder sql, String trimmedUppercaseSql) {
+<b class="fc"><i>140</i>&nbsp;      if (!suffixApplied) {</b>
+<b class="fc"><i>141</i>&nbsp;        suffixApplied = true;</b>
+<b class="fc"><i>142</i>&nbsp;        if (suffixesToOverride != null) {</b>
+<b class="fc"><i>143</i>&nbsp;          for (String toRemove : suffixesToOverride) {</b>
+<b class="fc"><i>144</i>&nbsp;            if (trimmedUppercaseSql.endsWith(toRemove) || trimmedUppercaseSql.endsWith(toRemove.trim())) {</b>
+<b class="fc"><i>145</i>&nbsp;              int start = sql.length() - toRemove.trim().length();</b>
+<b class="fc"><i>146</i>&nbsp;              int end = sql.length();</b>
+<b class="fc"><i>147</i>&nbsp;              sql.delete(start, end);</b>
+<b class="fc"><i>148</i>&nbsp;              break;</b>
+<i>149</i>&nbsp;            }
+<b class="fc"><i>150</i>&nbsp;          }</b>
+<i>151</i>&nbsp;        }
+<b class="fc"><i>152</i>&nbsp;        if (suffix != null) {</b>
+<b class="nc"><i>153</i>&nbsp;          sql.append(&quot; &quot;);</b>
+<b class="nc"><i>154</i>&nbsp;          sql.append(suffix);</b>
+<i>155</i>&nbsp;        }
+<i>156</i>&nbsp;      }
+<b class="fc"><i>157</i>&nbsp;    }</b>
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;  }
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

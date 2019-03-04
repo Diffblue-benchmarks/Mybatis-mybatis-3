@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: PreparedStatementLogger</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.logging.jdbc</a> ]
+</div>
+
+<h1>Coverage Summary for Class: PreparedStatementLogger (org.apache.ibatis.logging.jdbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreparedStatementLogger</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.9%
+  </span>
+  <span class="absValue">
+    (29/ 33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.logging.jdbc;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.reflect.InvocationHandler;
+<i>19</i>&nbsp;import java.lang.reflect.Method;
+<i>20</i>&nbsp;import java.lang.reflect.Proxy;
+<i>21</i>&nbsp;import java.sql.CallableStatement;
+<i>22</i>&nbsp;import java.sql.PreparedStatement;
+<i>23</i>&nbsp;import java.sql.ResultSet;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;import org.apache.ibatis.logging.Log;
+<i>26</i>&nbsp;import org.apache.ibatis.reflection.ExceptionUtil;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;/**
+<i>29</i>&nbsp; * PreparedStatement proxy to add logging.
+<i>30</i>&nbsp; *
+<i>31</i>&nbsp; * @author Clinton Begin
+<i>32</i>&nbsp; * @author Eduardo Macarron
+<i>33</i>&nbsp; *
+<i>34</i>&nbsp; */
+<i>35</i>&nbsp;public final class PreparedStatementLogger extends BaseJdbcLogger implements InvocationHandler {
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;  private final PreparedStatement statement;
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;  private PreparedStatementLogger(PreparedStatement stmt, Log statementLog, int queryStack) {
+<b class="fc"><i>40</i>&nbsp;    super(statementLog, queryStack);</b>
+<b class="fc"><i>41</i>&nbsp;    this.statement = stmt;</b>
+<b class="fc"><i>42</i>&nbsp;  }</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  @Override
+<i>45</i>&nbsp;  public Object invoke(Object proxy, Method method, Object[] params) throws Throwable {
+<i>46</i>&nbsp;    try {
+<b class="fc"><i>47</i>&nbsp;      if (Object.class.equals(method.getDeclaringClass())) {</b>
+<b class="nc"><i>48</i>&nbsp;        return method.invoke(this, params);</b>
+<i>49</i>&nbsp;      }
+<b class="fc"><i>50</i>&nbsp;      if (EXECUTE_METHODS.contains(method.getName())) {</b>
+<b class="fc"><i>51</i>&nbsp;        if (isDebugEnabled()) {</b>
+<b class="fc"><i>52</i>&nbsp;          debug(&quot;Parameters: &quot; + getParameterValueString(), true);</b>
+<i>53</i>&nbsp;        }
+<b class="fc"><i>54</i>&nbsp;        clearColumnInfo();</b>
+<b class="fc"><i>55</i>&nbsp;        if (&quot;executeQuery&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>56</i>&nbsp;          ResultSet rs = (ResultSet) method.invoke(statement, params);</b>
+<b class="fc"><i>57</i>&nbsp;          return rs == null ? null : ResultSetLogger.newInstance(rs, statementLog, queryStack);</b>
+<i>58</i>&nbsp;        } else {
+<b class="fc"><i>59</i>&nbsp;          return method.invoke(statement, params);</b>
+<i>60</i>&nbsp;        }
+<b class="fc"><i>61</i>&nbsp;      } else if (SET_METHODS.contains(method.getName())) {</b>
+<b class="fc"><i>62</i>&nbsp;        if (&quot;setNull&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>63</i>&nbsp;          setColumn(params[0], null);</b>
+<i>64</i>&nbsp;        } else {
+<b class="fc"><i>65</i>&nbsp;          setColumn(params[0], params[1]);</b>
+<i>66</i>&nbsp;        }
+<b class="fc"><i>67</i>&nbsp;        return method.invoke(statement, params);</b>
+<b class="fc"><i>68</i>&nbsp;      } else if (&quot;getResultSet&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>69</i>&nbsp;        ResultSet rs = (ResultSet) method.invoke(statement, params);</b>
+<b class="fc"><i>70</i>&nbsp;        return rs == null ? null : ResultSetLogger.newInstance(rs, statementLog, queryStack);</b>
+<b class="fc"><i>71</i>&nbsp;      } else if (&quot;getUpdateCount&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>72</i>&nbsp;        int updateCount = (Integer) method.invoke(statement, params);</b>
+<b class="fc"><i>73</i>&nbsp;        if (updateCount != -1) {</b>
+<b class="fc"><i>74</i>&nbsp;          debug(&quot;   Updates: &quot; + updateCount, false);</b>
+<i>75</i>&nbsp;        }
+<b class="fc"><i>76</i>&nbsp;        return updateCount;</b>
+<i>77</i>&nbsp;      } else {
+<b class="fc"><i>78</i>&nbsp;        return method.invoke(statement, params);</b>
+<i>79</i>&nbsp;      }
+<b class="nc"><i>80</i>&nbsp;    } catch (Throwable t) {</b>
+<b class="nc"><i>81</i>&nbsp;      throw ExceptionUtil.unwrapThrowable(t);</b>
+<i>82</i>&nbsp;    }
+<i>83</i>&nbsp;  }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;  /**
+<i>86</i>&nbsp;   * Creates a logging version of a PreparedStatement.
+<i>87</i>&nbsp;   *
+<i>88</i>&nbsp;   * @param stmt - the statement
+<i>89</i>&nbsp;   * @param statementLog - the statement log
+<i>90</i>&nbsp;   * @param queryStack - the query stack
+<i>91</i>&nbsp;   * @return - the proxy
+<i>92</i>&nbsp;   */
+<i>93</i>&nbsp;  public static PreparedStatement newInstance(PreparedStatement stmt, Log statementLog, int queryStack) {
+<b class="fc"><i>94</i>&nbsp;    InvocationHandler handler = new PreparedStatementLogger(stmt, statementLog, queryStack);</b>
+<b class="fc"><i>95</i>&nbsp;    ClassLoader cl = PreparedStatement.class.getClassLoader();</b>
+<b class="fc"><i>96</i>&nbsp;    return (PreparedStatement) Proxy.newProxyInstance(cl, new Class[]{PreparedStatement.class, CallableStatement.class}, handler);</b>
+<i>97</i>&nbsp;  }
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;  /**
+<i>100</i>&nbsp;   * Return the wrapped prepared statement.
+<i>101</i>&nbsp;   *
+<i>102</i>&nbsp;   * @return the PreparedStatement
+<i>103</i>&nbsp;   */
+<i>104</i>&nbsp;  public PreparedStatement getPreparedStatement() {
+<b class="nc"><i>105</i>&nbsp;    return statement;</b>
+<i>106</i>&nbsp;  }
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

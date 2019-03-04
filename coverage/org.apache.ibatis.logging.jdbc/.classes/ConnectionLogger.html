@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ConnectionLogger</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.logging.jdbc</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ConnectionLogger (org.apache.ibatis.logging.jdbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectionLogger</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (24/ 28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.logging.jdbc;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.reflect.InvocationHandler;
+<i>19</i>&nbsp;import java.lang.reflect.Method;
+<i>20</i>&nbsp;import java.lang.reflect.Proxy;
+<i>21</i>&nbsp;import java.sql.Connection;
+<i>22</i>&nbsp;import java.sql.PreparedStatement;
+<i>23</i>&nbsp;import java.sql.Statement;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;import org.apache.ibatis.logging.Log;
+<i>26</i>&nbsp;import org.apache.ibatis.reflection.ExceptionUtil;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;/**
+<i>29</i>&nbsp; * Connection proxy to add logging.
+<i>30</i>&nbsp; *
+<i>31</i>&nbsp; * @author Clinton Begin
+<i>32</i>&nbsp; * @author Eduardo Macarron
+<i>33</i>&nbsp; *
+<i>34</i>&nbsp; */
+<i>35</i>&nbsp;public final class ConnectionLogger extends BaseJdbcLogger implements InvocationHandler {
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;  private final Connection connection;
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;  private ConnectionLogger(Connection conn, Log statementLog, int queryStack) {
+<b class="fc"><i>40</i>&nbsp;    super(statementLog, queryStack);</b>
+<b class="fc"><i>41</i>&nbsp;    this.connection = conn;</b>
+<b class="fc"><i>42</i>&nbsp;  }</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  @Override
+<i>45</i>&nbsp;  public Object invoke(Object proxy, Method method, Object[] params)
+<i>46</i>&nbsp;      throws Throwable {
+<i>47</i>&nbsp;    try {
+<b class="fc"><i>48</i>&nbsp;      if (Object.class.equals(method.getDeclaringClass())) {</b>
+<b class="nc"><i>49</i>&nbsp;        return method.invoke(this, params);</b>
+<i>50</i>&nbsp;      }
+<b class="fc"><i>51</i>&nbsp;      if (&quot;prepareStatement&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>52</i>&nbsp;        if (isDebugEnabled()) {</b>
+<b class="fc"><i>53</i>&nbsp;          debug(&quot; Preparing: &quot; + removeBreakingWhitespace((String) params[0]), true);</b>
+<i>54</i>&nbsp;        }
+<b class="fc"><i>55</i>&nbsp;        PreparedStatement stmt = (PreparedStatement) method.invoke(connection, params);</b>
+<b class="fc"><i>56</i>&nbsp;        stmt = PreparedStatementLogger.newInstance(stmt, statementLog, queryStack);</b>
+<b class="fc"><i>57</i>&nbsp;        return stmt;</b>
+<b class="fc"><i>58</i>&nbsp;      } else if (&quot;prepareCall&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>59</i>&nbsp;        if (isDebugEnabled()) {</b>
+<b class="fc"><i>60</i>&nbsp;          debug(&quot; Preparing: &quot; + removeBreakingWhitespace((String) params[0]), true);</b>
+<i>61</i>&nbsp;        }
+<b class="fc"><i>62</i>&nbsp;        PreparedStatement stmt = (PreparedStatement) method.invoke(connection, params);</b>
+<b class="fc"><i>63</i>&nbsp;        stmt = PreparedStatementLogger.newInstance(stmt, statementLog, queryStack);</b>
+<b class="fc"><i>64</i>&nbsp;        return stmt;</b>
+<b class="fc"><i>65</i>&nbsp;      } else if (&quot;createStatement&quot;.equals(method.getName())) {</b>
+<b class="fc"><i>66</i>&nbsp;        Statement stmt = (Statement) method.invoke(connection, params);</b>
+<b class="fc"><i>67</i>&nbsp;        stmt = StatementLogger.newInstance(stmt, statementLog, queryStack);</b>
+<b class="fc"><i>68</i>&nbsp;        return stmt;</b>
+<i>69</i>&nbsp;      } else {
+<b class="fc"><i>70</i>&nbsp;        return method.invoke(connection, params);</b>
+<i>71</i>&nbsp;      }
+<b class="nc"><i>72</i>&nbsp;    } catch (Throwable t) {</b>
+<b class="nc"><i>73</i>&nbsp;      throw ExceptionUtil.unwrapThrowable(t);</b>
+<i>74</i>&nbsp;    }
+<i>75</i>&nbsp;  }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;  /**
+<i>78</i>&nbsp;   * Creates a logging version of a connection.
+<i>79</i>&nbsp;   *
+<i>80</i>&nbsp;   * @param conn - the original connection
+<i>81</i>&nbsp;   * @return - the connection with logging
+<i>82</i>&nbsp;   */
+<i>83</i>&nbsp;  public static Connection newInstance(Connection conn, Log statementLog, int queryStack) {
+<b class="fc"><i>84</i>&nbsp;    InvocationHandler handler = new ConnectionLogger(conn, statementLog, queryStack);</b>
+<b class="fc"><i>85</i>&nbsp;    ClassLoader cl = Connection.class.getClassLoader();</b>
+<b class="fc"><i>86</i>&nbsp;    return (Connection) Proxy.newProxyInstance(cl, new Class[]{Connection.class}, handler);</b>
+<i>87</i>&nbsp;  }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;  /**
+<i>90</i>&nbsp;   * return the wrapped connection.
+<i>91</i>&nbsp;   *
+<i>92</i>&nbsp;   * @return the connection
+<i>93</i>&nbsp;   */
+<i>94</i>&nbsp;  public Connection getConnection() {
+<b class="nc"><i>95</i>&nbsp;    return connection;</b>
+<i>96</i>&nbsp;  }
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

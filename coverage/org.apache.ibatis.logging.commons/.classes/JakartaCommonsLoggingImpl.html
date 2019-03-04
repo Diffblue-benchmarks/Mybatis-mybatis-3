@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: JakartaCommonsLoggingImpl</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.logging.commons</a> ]
+</div>
+
+<h1>Coverage Summary for Class: JakartaCommonsLoggingImpl (org.apache.ibatis.logging.commons)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JakartaCommonsLoggingImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (12/ 15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2017 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.logging.commons;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import org.apache.commons.logging.Log;
+<i>19</i>&nbsp;import org.apache.commons.logging.LogFactory;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;/**
+<i>22</i>&nbsp; * @author Clinton Begin
+<i>23</i>&nbsp; */
+<i>24</i>&nbsp;public class JakartaCommonsLoggingImpl implements org.apache.ibatis.logging.Log {
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;  private final Log log;
+<i>27</i>&nbsp;
+<b class="fc"><i>28</i>&nbsp;  public JakartaCommonsLoggingImpl(String clazz) {</b>
+<b class="fc"><i>29</i>&nbsp;    log = LogFactory.getLog(clazz);</b>
+<b class="fc"><i>30</i>&nbsp;  }</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;  @Override
+<i>33</i>&nbsp;  public boolean isDebugEnabled() {
+<b class="fc"><i>34</i>&nbsp;    return log.isDebugEnabled();</b>
+<i>35</i>&nbsp;  }
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;  @Override
+<i>38</i>&nbsp;  public boolean isTraceEnabled() {
+<b class="nc"><i>39</i>&nbsp;    return log.isTraceEnabled();</b>
+<i>40</i>&nbsp;  }
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;  @Override
+<i>43</i>&nbsp;  public void error(String s, Throwable e) {
+<b class="fc"><i>44</i>&nbsp;    log.error(s, e);</b>
+<b class="fc"><i>45</i>&nbsp;  }</b>
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;  @Override
+<i>48</i>&nbsp;  public void error(String s) {
+<b class="fc"><i>49</i>&nbsp;    log.error(s);</b>
+<b class="fc"><i>50</i>&nbsp;  }</b>
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;  @Override
+<i>53</i>&nbsp;  public void debug(String s) {
+<b class="fc"><i>54</i>&nbsp;    log.debug(s);</b>
+<b class="fc"><i>55</i>&nbsp;  }</b>
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;  @Override
+<i>58</i>&nbsp;  public void trace(String s) {
+<b class="nc"><i>59</i>&nbsp;    log.trace(s);</b>
+<b class="nc"><i>60</i>&nbsp;  }</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;  @Override
+<i>63</i>&nbsp;  public void warn(String s) {
+<b class="fc"><i>64</i>&nbsp;    log.warn(s);</b>
+<b class="fc"><i>65</i>&nbsp;  }</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

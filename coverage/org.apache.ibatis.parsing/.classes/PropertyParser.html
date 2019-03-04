@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: PropertyParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.parsing</a> ]
+</div>
+
+<h1>Coverage Summary for Class: PropertyParser (org.apache.ibatis.parsing)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/ 5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PropertyParser$1</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyParser$VariableTokenHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/ 20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92%
+  </span>
+  <span class="absValue">
+    (23/ 25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2016 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.parsing;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.Properties;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;/**
+<i>21</i>&nbsp; * @author Clinton Begin
+<i>22</i>&nbsp; * @author Kazuki Shimizu
+<i>23</i>&nbsp; */
+<i>24</i>&nbsp;public class PropertyParser {
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;  private static final String KEY_PREFIX = &quot;org.apache.ibatis.parsing.PropertyParser.&quot;;
+<i>27</i>&nbsp;  /**
+<i>28</i>&nbsp;   * The special property key that indicate whether enable a default value on placeholder.
+<i>29</i>&nbsp;   * &lt;p&gt;
+<i>30</i>&nbsp;   *   The default value is {@code false} (indicate disable a default value on placeholder)
+<i>31</i>&nbsp;   *   If you specify the {@code true}, you can specify key and default value on placeholder (e.g. {@code ${db.username:postgres}}).
+<i>32</i>&nbsp;   * &lt;/p&gt;
+<i>33</i>&nbsp;   * @since 3.4.2
+<i>34</i>&nbsp;   */
+<i>35</i>&nbsp;  public static final String KEY_ENABLE_DEFAULT_VALUE = KEY_PREFIX + &quot;enable-default-value&quot;;
+<i>36</i>&nbsp;
+<i>37</i>&nbsp;  /**
+<i>38</i>&nbsp;   * The special property key that specify a separator for key and default value on placeholder.
+<i>39</i>&nbsp;   * &lt;p&gt;
+<i>40</i>&nbsp;   *   The default separator is {@code &quot;:&quot;}.
+<i>41</i>&nbsp;   * &lt;/p&gt;
+<i>42</i>&nbsp;   * @since 3.4.2
+<i>43</i>&nbsp;   */
+<i>44</i>&nbsp;  public static final String KEY_DEFAULT_VALUE_SEPARATOR = KEY_PREFIX + &quot;default-value-separator&quot;;
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;  private static final String ENABLE_DEFAULT_VALUE = &quot;false&quot;;
+<i>47</i>&nbsp;  private static final String DEFAULT_VALUE_SEPARATOR = &quot;:&quot;;
+<i>48</i>&nbsp;
+<b class="nc"><i>49</i>&nbsp;  private PropertyParser() {</b>
+<i>50</i>&nbsp;    // Prevent Instantiation
+<b class="nc"><i>51</i>&nbsp;  }</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  public static String parse(String string, Properties variables) {
+<b class="fc"><i>54</i>&nbsp;    VariableTokenHandler handler = new VariableTokenHandler(variables);</b>
+<b class="fc"><i>55</i>&nbsp;    GenericTokenParser parser = new GenericTokenParser(&quot;${&quot;, &quot;}&quot;, handler);</b>
+<b class="fc"><i>56</i>&nbsp;    return parser.parse(string);</b>
+<i>57</i>&nbsp;  }
+<i>58</i>&nbsp;
+<b class="fc"><i>59</i>&nbsp;  private static class VariableTokenHandler implements TokenHandler {</b>
+<i>60</i>&nbsp;    private final Properties variables;
+<i>61</i>&nbsp;    private final boolean enableDefaultValue;
+<i>62</i>&nbsp;    private final String defaultValueSeparator;
+<i>63</i>&nbsp;
+<b class="fc"><i>64</i>&nbsp;    private VariableTokenHandler(Properties variables) {</b>
+<b class="fc"><i>65</i>&nbsp;      this.variables = variables;</b>
+<b class="fc"><i>66</i>&nbsp;      this.enableDefaultValue = Boolean.parseBoolean(getPropertyValue(KEY_ENABLE_DEFAULT_VALUE, ENABLE_DEFAULT_VALUE));</b>
+<b class="fc"><i>67</i>&nbsp;      this.defaultValueSeparator = getPropertyValue(KEY_DEFAULT_VALUE_SEPARATOR, DEFAULT_VALUE_SEPARATOR);</b>
+<b class="fc"><i>68</i>&nbsp;    }</b>
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    private String getPropertyValue(String key, String defaultValue) {
+<b class="fc"><i>71</i>&nbsp;      return (variables == null) ? defaultValue : variables.getProperty(key, defaultValue);</b>
+<i>72</i>&nbsp;    }
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    @Override
+<i>75</i>&nbsp;    public String handleToken(String content) {
+<b class="fc"><i>76</i>&nbsp;      if (variables != null) {</b>
+<b class="fc"><i>77</i>&nbsp;        String key = content;</b>
+<b class="fc"><i>78</i>&nbsp;        if (enableDefaultValue) {</b>
+<b class="fc"><i>79</i>&nbsp;          final int separatorIndex = content.indexOf(defaultValueSeparator);</b>
+<b class="fc"><i>80</i>&nbsp;          String defaultValue = null;</b>
+<b class="fc"><i>81</i>&nbsp;          if (separatorIndex &gt;= 0) {</b>
+<b class="fc"><i>82</i>&nbsp;            key = content.substring(0, separatorIndex);</b>
+<b class="fc"><i>83</i>&nbsp;            defaultValue = content.substring(separatorIndex + defaultValueSeparator.length());</b>
+<i>84</i>&nbsp;          }
+<b class="fc"><i>85</i>&nbsp;          if (defaultValue != null) {</b>
+<b class="fc"><i>86</i>&nbsp;            return variables.getProperty(key, defaultValue);</b>
+<i>87</i>&nbsp;          }
+<i>88</i>&nbsp;        }
+<b class="fc"><i>89</i>&nbsp;        if (variables.containsKey(key)) {</b>
+<b class="fc"><i>90</i>&nbsp;          return variables.getProperty(key);</b>
+<i>91</i>&nbsp;        }
+<i>92</i>&nbsp;      }
+<b class="fc"><i>93</i>&nbsp;      return &quot;${&quot; + content + &quot;}&quot;;</b>
+<i>94</i>&nbsp;    }
+<i>95</i>&nbsp;  }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

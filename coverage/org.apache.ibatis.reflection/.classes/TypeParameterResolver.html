@@ -1,0 +1,438 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TypeParameterResolver</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.reflection</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TypeParameterResolver (org.apache.ibatis.reflection)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypeParameterResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (100/ 109)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TypeParameterResolver$GenericArrayTypeImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TypeParameterResolver$ParameterizedTypeImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TypeParameterResolver$WildcardTypeImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    86.4%
+  </span>
+  <span class="absValue">
+    (19/ 22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.4%
+  </span>
+  <span class="absValue">
+    (117/ 128)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.reflection;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.reflect.Array;
+<i>19</i>&nbsp;import java.lang.reflect.Field;
+<i>20</i>&nbsp;import java.lang.reflect.GenericArrayType;
+<i>21</i>&nbsp;import java.lang.reflect.Method;
+<i>22</i>&nbsp;import java.lang.reflect.ParameterizedType;
+<i>23</i>&nbsp;import java.lang.reflect.Type;
+<i>24</i>&nbsp;import java.lang.reflect.TypeVariable;
+<i>25</i>&nbsp;import java.lang.reflect.WildcardType;
+<i>26</i>&nbsp;import java.util.Arrays;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;/**
+<i>29</i>&nbsp; * @author Iwao AVE!
+<i>30</i>&nbsp; */
+<i>31</i>&nbsp;public class TypeParameterResolver {
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;  /**
+<i>34</i>&nbsp;   * @return The field type as {@link Type}. If it has type parameters in the declaration,&lt;br&gt;
+<i>35</i>&nbsp;   *         they will be resolved to the actual runtime {@link Type}s.
+<i>36</i>&nbsp;   */
+<i>37</i>&nbsp;  public static Type resolveFieldType(Field field, Type srcType) {
+<b class="fc"><i>38</i>&nbsp;    Type fieldType = field.getGenericType();</b>
+<b class="fc"><i>39</i>&nbsp;    Class&lt;?&gt; declaringClass = field.getDeclaringClass();</b>
+<b class="fc"><i>40</i>&nbsp;    return resolveType(fieldType, srcType, declaringClass);</b>
+<i>41</i>&nbsp;  }
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;  /**
+<i>44</i>&nbsp;   * @return The return type of the method as {@link Type}. If it has type parameters in the declaration,&lt;br&gt;
+<i>45</i>&nbsp;   *         they will be resolved to the actual runtime {@link Type}s.
+<i>46</i>&nbsp;   */
+<i>47</i>&nbsp;  public static Type resolveReturnType(Method method, Type srcType) {
+<b class="fc"><i>48</i>&nbsp;    Type returnType = method.getGenericReturnType();</b>
+<b class="fc"><i>49</i>&nbsp;    Class&lt;?&gt; declaringClass = method.getDeclaringClass();</b>
+<b class="fc"><i>50</i>&nbsp;    return resolveType(returnType, srcType, declaringClass);</b>
+<i>51</i>&nbsp;  }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  /**
+<i>54</i>&nbsp;   * @return The parameter types of the method as an array of {@link Type}s. If they have type parameters in the declaration,&lt;br&gt;
+<i>55</i>&nbsp;   *         they will be resolved to the actual runtime {@link Type}s.
+<i>56</i>&nbsp;   */
+<i>57</i>&nbsp;  public static Type[] resolveParamTypes(Method method, Type srcType) {
+<b class="fc"><i>58</i>&nbsp;    Type[] paramTypes = method.getGenericParameterTypes();</b>
+<b class="fc"><i>59</i>&nbsp;    Class&lt;?&gt; declaringClass = method.getDeclaringClass();</b>
+<b class="fc"><i>60</i>&nbsp;    Type[] result = new Type[paramTypes.length];</b>
+<b class="fc"><i>61</i>&nbsp;    for (int i = 0; i &lt; paramTypes.length; i++) {</b>
+<b class="fc"><i>62</i>&nbsp;      result[i] = resolveType(paramTypes[i], srcType, declaringClass);</b>
+<i>63</i>&nbsp;    }
+<b class="fc"><i>64</i>&nbsp;    return result;</b>
+<i>65</i>&nbsp;  }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;  private static Type resolveType(Type type, Type srcType, Class&lt;?&gt; declaringClass) {
+<b class="fc"><i>68</i>&nbsp;    if (type instanceof TypeVariable) {</b>
+<b class="fc"><i>69</i>&nbsp;      return resolveTypeVar((TypeVariable&lt;?&gt;) type, srcType, declaringClass);</b>
+<b class="fc"><i>70</i>&nbsp;    } else if (type instanceof ParameterizedType) {</b>
+<b class="fc"><i>71</i>&nbsp;      return resolveParameterizedType((ParameterizedType) type, srcType, declaringClass);</b>
+<b class="fc"><i>72</i>&nbsp;    } else if (type instanceof GenericArrayType) {</b>
+<b class="fc"><i>73</i>&nbsp;      return resolveGenericArrayType((GenericArrayType) type, srcType, declaringClass);</b>
+<i>74</i>&nbsp;    } else {
+<b class="fc"><i>75</i>&nbsp;      return type;</b>
+<i>76</i>&nbsp;    }
+<i>77</i>&nbsp;  }
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;  private static Type resolveGenericArrayType(GenericArrayType genericArrayType, Type srcType, Class&lt;?&gt; declaringClass) {
+<b class="fc"><i>80</i>&nbsp;    Type componentType = genericArrayType.getGenericComponentType();</b>
+<b class="fc"><i>81</i>&nbsp;    Type resolvedComponentType = null;</b>
+<b class="fc"><i>82</i>&nbsp;    if (componentType instanceof TypeVariable) {</b>
+<b class="fc"><i>83</i>&nbsp;      resolvedComponentType = resolveTypeVar((TypeVariable&lt;?&gt;) componentType, srcType, declaringClass);</b>
+<b class="fc"><i>84</i>&nbsp;    } else if (componentType instanceof GenericArrayType) {</b>
+<b class="fc"><i>85</i>&nbsp;      resolvedComponentType = resolveGenericArrayType((GenericArrayType) componentType, srcType, declaringClass);</b>
+<b class="fc"><i>86</i>&nbsp;    } else if (componentType instanceof ParameterizedType) {</b>
+<b class="fc"><i>87</i>&nbsp;      resolvedComponentType = resolveParameterizedType((ParameterizedType) componentType, srcType, declaringClass);</b>
+<i>88</i>&nbsp;    }
+<b class="fc"><i>89</i>&nbsp;    if (resolvedComponentType instanceof Class) {</b>
+<b class="fc"><i>90</i>&nbsp;      return Array.newInstance((Class&lt;?&gt;) resolvedComponentType, 0).getClass();</b>
+<i>91</i>&nbsp;    } else {
+<b class="fc"><i>92</i>&nbsp;      return new GenericArrayTypeImpl(resolvedComponentType);</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;  }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;  private static ParameterizedType resolveParameterizedType(ParameterizedType parameterizedType, Type srcType, Class&lt;?&gt; declaringClass) {
+<b class="fc"><i>97</i>&nbsp;    Class&lt;?&gt; rawType = (Class&lt;?&gt;) parameterizedType.getRawType();</b>
+<b class="fc"><i>98</i>&nbsp;    Type[] typeArgs = parameterizedType.getActualTypeArguments();</b>
+<b class="fc"><i>99</i>&nbsp;    Type[] args = new Type[typeArgs.length];</b>
+<b class="fc"><i>100</i>&nbsp;    for (int i = 0; i &lt; typeArgs.length; i++) {</b>
+<b class="fc"><i>101</i>&nbsp;      if (typeArgs[i] instanceof TypeVariable) {</b>
+<b class="fc"><i>102</i>&nbsp;        args[i] = resolveTypeVar((TypeVariable&lt;?&gt;) typeArgs[i], srcType, declaringClass);</b>
+<b class="fc"><i>103</i>&nbsp;      } else if (typeArgs[i] instanceof ParameterizedType) {</b>
+<b class="fc"><i>104</i>&nbsp;        args[i] = resolveParameterizedType((ParameterizedType) typeArgs[i], srcType, declaringClass);</b>
+<b class="fc"><i>105</i>&nbsp;      } else if (typeArgs[i] instanceof WildcardType) {</b>
+<b class="fc"><i>106</i>&nbsp;        args[i] = resolveWildcardType((WildcardType) typeArgs[i], srcType, declaringClass);</b>
+<i>107</i>&nbsp;      } else {
+<b class="fc"><i>108</i>&nbsp;        args[i] = typeArgs[i];</b>
+<i>109</i>&nbsp;      }
+<i>110</i>&nbsp;    }
+<b class="fc"><i>111</i>&nbsp;    return new ParameterizedTypeImpl(rawType, null, args);</b>
+<i>112</i>&nbsp;  }
+<i>113</i>&nbsp;
+<i>114</i>&nbsp;  private static Type resolveWildcardType(WildcardType wildcardType, Type srcType, Class&lt;?&gt; declaringClass) {
+<b class="fc"><i>115</i>&nbsp;    Type[] lowerBounds = resolveWildcardTypeBounds(wildcardType.getLowerBounds(), srcType, declaringClass);</b>
+<b class="fc"><i>116</i>&nbsp;    Type[] upperBounds = resolveWildcardTypeBounds(wildcardType.getUpperBounds(), srcType, declaringClass);</b>
+<b class="fc"><i>117</i>&nbsp;    return new WildcardTypeImpl(lowerBounds, upperBounds);</b>
+<i>118</i>&nbsp;  }
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;  private static Type[] resolveWildcardTypeBounds(Type[] bounds, Type srcType, Class&lt;?&gt; declaringClass) {
+<b class="fc"><i>121</i>&nbsp;    Type[] result = new Type[bounds.length];</b>
+<b class="fc"><i>122</i>&nbsp;    for (int i = 0; i &lt; bounds.length; i++) {</b>
+<b class="fc"><i>123</i>&nbsp;      if (bounds[i] instanceof TypeVariable) {</b>
+<b class="fc"><i>124</i>&nbsp;        result[i] = resolveTypeVar((TypeVariable&lt;?&gt;) bounds[i], srcType, declaringClass);</b>
+<b class="fc"><i>125</i>&nbsp;      } else if (bounds[i] instanceof ParameterizedType) {</b>
+<b class="nc"><i>126</i>&nbsp;        result[i] = resolveParameterizedType((ParameterizedType) bounds[i], srcType, declaringClass);</b>
+<b class="fc"><i>127</i>&nbsp;      } else if (bounds[i] instanceof WildcardType) {</b>
+<b class="nc"><i>128</i>&nbsp;        result[i] = resolveWildcardType((WildcardType) bounds[i], srcType, declaringClass);</b>
+<i>129</i>&nbsp;      } else {
+<b class="fc"><i>130</i>&nbsp;        result[i] = bounds[i];</b>
+<i>131</i>&nbsp;      }
+<i>132</i>&nbsp;    }
+<b class="fc"><i>133</i>&nbsp;    return result;</b>
+<i>134</i>&nbsp;  }
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;  private static Type resolveTypeVar(TypeVariable&lt;?&gt; typeVar, Type srcType, Class&lt;?&gt; declaringClass) {
+<b class="fc"><i>137</i>&nbsp;    Type result = null;</b>
+<b class="fc"><i>138</i>&nbsp;    Class&lt;?&gt; clazz = null;</b>
+<b class="fc"><i>139</i>&nbsp;    if (srcType instanceof Class) {</b>
+<b class="fc"><i>140</i>&nbsp;      clazz = (Class&lt;?&gt;) srcType;</b>
+<b class="fc"><i>141</i>&nbsp;    } else if (srcType instanceof ParameterizedType) {</b>
+<b class="fc"><i>142</i>&nbsp;      ParameterizedType parameterizedType = (ParameterizedType) srcType;</b>
+<b class="fc"><i>143</i>&nbsp;      clazz = (Class&lt;?&gt;) parameterizedType.getRawType();</b>
+<b class="fc"><i>144</i>&nbsp;    } else {</b>
+<b class="nc"><i>145</i>&nbsp;      throw new IllegalArgumentException(&quot;The 2nd arg must be Class or ParameterizedType, but was: &quot; + srcType.getClass());</b>
+<i>146</i>&nbsp;    }
+<i>147</i>&nbsp;
+<b class="fc"><i>148</i>&nbsp;    if (clazz == declaringClass) {</b>
+<b class="fc"><i>149</i>&nbsp;      Type[] bounds = typeVar.getBounds();</b>
+<b class="fc"><i>150</i>&nbsp;      if (bounds.length &gt; 0) {</b>
+<b class="fc"><i>151</i>&nbsp;        return bounds[0];</b>
+<i>152</i>&nbsp;      }
+<b class="nc"><i>153</i>&nbsp;      return Object.class;</b>
+<i>154</i>&nbsp;    }
+<i>155</i>&nbsp;
+<b class="fc"><i>156</i>&nbsp;    Type superclass = clazz.getGenericSuperclass();</b>
+<b class="fc"><i>157</i>&nbsp;    result = scanSuperTypes(typeVar, srcType, declaringClass, clazz, superclass);</b>
+<b class="fc"><i>158</i>&nbsp;    if (result != null) {</b>
+<b class="fc"><i>159</i>&nbsp;      return result;</b>
+<i>160</i>&nbsp;    }
+<i>161</i>&nbsp;
+<b class="fc"><i>162</i>&nbsp;    Type[] superInterfaces = clazz.getGenericInterfaces();</b>
+<b class="fc"><i>163</i>&nbsp;    for (Type superInterface : superInterfaces) {</b>
+<b class="fc"><i>164</i>&nbsp;      result = scanSuperTypes(typeVar, srcType, declaringClass, clazz, superInterface);</b>
+<b class="fc"><i>165</i>&nbsp;      if (result != null) {</b>
+<b class="fc"><i>166</i>&nbsp;        return result;</b>
+<i>167</i>&nbsp;      }
+<i>168</i>&nbsp;    }
+<b class="nc"><i>169</i>&nbsp;    return Object.class;</b>
+<i>170</i>&nbsp;  }
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;  private static Type scanSuperTypes(TypeVariable&lt;?&gt; typeVar, Type srcType, Class&lt;?&gt; declaringClass, Class&lt;?&gt; clazz, Type superclass) {
+<b class="fc"><i>173</i>&nbsp;    if (superclass instanceof ParameterizedType) {</b>
+<b class="fc"><i>174</i>&nbsp;      ParameterizedType parentAsType = (ParameterizedType) superclass;</b>
+<b class="fc"><i>175</i>&nbsp;      Class&lt;?&gt; parentAsClass = (Class&lt;?&gt;) parentAsType.getRawType();</b>
+<b class="fc"><i>176</i>&nbsp;      TypeVariable&lt;?&gt;[] parentTypeVars = parentAsClass.getTypeParameters();</b>
+<b class="fc"><i>177</i>&nbsp;      if (srcType instanceof ParameterizedType) {</b>
+<b class="fc"><i>178</i>&nbsp;        parentAsType = translateParentTypeVars((ParameterizedType) srcType, clazz, parentAsType);</b>
+<i>179</i>&nbsp;      }
+<b class="fc"><i>180</i>&nbsp;      if (declaringClass == parentAsClass) {</b>
+<b class="fc"><i>181</i>&nbsp;        for (int i = 0; i &lt; parentTypeVars.length; i++) {</b>
+<b class="fc"><i>182</i>&nbsp;          if (typeVar == parentTypeVars[i]) {</b>
+<b class="fc"><i>183</i>&nbsp;            return parentAsType.getActualTypeArguments()[i];</b>
+<i>184</i>&nbsp;          }
+<i>185</i>&nbsp;        }
+<i>186</i>&nbsp;      }
+<b class="fc"><i>187</i>&nbsp;      if (declaringClass.isAssignableFrom(parentAsClass)) {</b>
+<b class="fc"><i>188</i>&nbsp;        return resolveTypeVar(typeVar, parentAsType, declaringClass);</b>
+<i>189</i>&nbsp;      }
+<b class="nc"><i>190</i>&nbsp;    } else if (superclass instanceof Class &amp;&amp; declaringClass.isAssignableFrom((Class&lt;?&gt;) superclass)) {</b>
+<b class="nc"><i>191</i>&nbsp;      return resolveTypeVar(typeVar, superclass, declaringClass);</b>
+<i>192</i>&nbsp;    }
+<b class="fc"><i>193</i>&nbsp;    return null;</b>
+<i>194</i>&nbsp;  }
+<i>195</i>&nbsp;
+<i>196</i>&nbsp;  private static ParameterizedType translateParentTypeVars(ParameterizedType srcType, Class&lt;?&gt; srcClass, ParameterizedType parentType) {
+<b class="fc"><i>197</i>&nbsp;    Type[] parentTypeArgs = parentType.getActualTypeArguments();</b>
+<b class="fc"><i>198</i>&nbsp;    Type[] srcTypeArgs = srcType.getActualTypeArguments();</b>
+<b class="fc"><i>199</i>&nbsp;    TypeVariable&lt;?&gt;[] srcTypeVars = srcClass.getTypeParameters();</b>
+<b class="fc"><i>200</i>&nbsp;    Type[] newParentArgs = new Type[parentTypeArgs.length];</b>
+<b class="fc"><i>201</i>&nbsp;    boolean noChange = true;</b>
+<b class="fc"><i>202</i>&nbsp;    for (int i = 0; i &lt; parentTypeArgs.length; i++) {</b>
+<b class="fc"><i>203</i>&nbsp;      if (parentTypeArgs[i] instanceof TypeVariable) {</b>
+<b class="fc"><i>204</i>&nbsp;        for (int j = 0; j &lt; srcTypeVars.length; j++) {</b>
+<b class="fc"><i>205</i>&nbsp;          if (srcTypeVars[j] == parentTypeArgs[i]) {</b>
+<b class="fc"><i>206</i>&nbsp;            noChange = false;</b>
+<b class="fc"><i>207</i>&nbsp;            newParentArgs[i] = srcTypeArgs[j];</b>
+<i>208</i>&nbsp;          }
+<i>209</i>&nbsp;        }
+<i>210</i>&nbsp;      } else {
+<b class="fc"><i>211</i>&nbsp;        newParentArgs[i] = parentTypeArgs[i];</b>
+<i>212</i>&nbsp;      }
+<i>213</i>&nbsp;    }
+<b class="fc"><i>214</i>&nbsp;    return noChange ? parentType : new ParameterizedTypeImpl((Class&lt;?&gt;)parentType.getRawType(), null, newParentArgs);</b>
+<i>215</i>&nbsp;  }
+<i>216</i>&nbsp;
+<i>217</i>&nbsp;  private TypeParameterResolver() {
+<b class="nc"><i>218</i>&nbsp;    super();</b>
+<b class="nc"><i>219</i>&nbsp;  }</b>
+<i>220</i>&nbsp;
+<i>221</i>&nbsp;  static class ParameterizedTypeImpl implements ParameterizedType {
+<i>222</i>&nbsp;    private Class&lt;?&gt; rawType;
+<i>223</i>&nbsp;
+<i>224</i>&nbsp;    private Type ownerType;
+<i>225</i>&nbsp;
+<i>226</i>&nbsp;    private Type[] actualTypeArguments;
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;    public ParameterizedTypeImpl(Class&lt;?&gt; rawType, Type ownerType, Type[] actualTypeArguments) {
+<b class="fc"><i>229</i>&nbsp;      super();</b>
+<b class="fc"><i>230</i>&nbsp;      this.rawType = rawType;</b>
+<b class="fc"><i>231</i>&nbsp;      this.ownerType = ownerType;</b>
+<b class="fc"><i>232</i>&nbsp;      this.actualTypeArguments = actualTypeArguments;</b>
+<b class="fc"><i>233</i>&nbsp;    }</b>
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;    @Override
+<i>236</i>&nbsp;    public Type[] getActualTypeArguments() {
+<b class="fc"><i>237</i>&nbsp;      return actualTypeArguments;</b>
+<i>238</i>&nbsp;    }
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;    @Override
+<i>241</i>&nbsp;    public Type getOwnerType() {
+<b class="nc"><i>242</i>&nbsp;      return ownerType;</b>
+<i>243</i>&nbsp;    }
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;    @Override
+<i>246</i>&nbsp;    public Type getRawType() {
+<b class="fc"><i>247</i>&nbsp;      return rawType;</b>
+<i>248</i>&nbsp;    }
+<i>249</i>&nbsp;
+<i>250</i>&nbsp;    @Override
+<i>251</i>&nbsp;    public String toString() {
+<b class="nc"><i>252</i>&nbsp;      return &quot;ParameterizedTypeImpl [rawType=&quot; + rawType + &quot;, ownerType=&quot; + ownerType + &quot;, actualTypeArguments=&quot; + Arrays.toString(actualTypeArguments) + &quot;]&quot;;</b>
+<i>253</i>&nbsp;    }
+<i>254</i>&nbsp;  }
+<i>255</i>&nbsp;
+<i>256</i>&nbsp;  static class WildcardTypeImpl implements WildcardType {
+<i>257</i>&nbsp;    private Type[] lowerBounds;
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;    private Type[] upperBounds;
+<i>260</i>&nbsp;
+<i>261</i>&nbsp;    WildcardTypeImpl(Type[] lowerBounds, Type[] upperBounds) {
+<b class="fc"><i>262</i>&nbsp;      super();</b>
+<b class="fc"><i>263</i>&nbsp;      this.lowerBounds = lowerBounds;</b>
+<b class="fc"><i>264</i>&nbsp;      this.upperBounds = upperBounds;</b>
+<b class="fc"><i>265</i>&nbsp;    }</b>
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;    @Override
+<i>268</i>&nbsp;    public Type[] getLowerBounds() {
+<b class="fc"><i>269</i>&nbsp;      return lowerBounds;</b>
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;    @Override
+<i>273</i>&nbsp;    public Type[] getUpperBounds() {
+<b class="fc"><i>274</i>&nbsp;      return upperBounds;</b>
+<i>275</i>&nbsp;    }
+<i>276</i>&nbsp;  }
+<i>277</i>&nbsp;
+<i>278</i>&nbsp;  static class GenericArrayTypeImpl implements GenericArrayType {
+<i>279</i>&nbsp;    private Type genericComponentType;
+<i>280</i>&nbsp;
+<i>281</i>&nbsp;    GenericArrayTypeImpl(Type genericComponentType) {
+<b class="fc"><i>282</i>&nbsp;      super();</b>
+<b class="fc"><i>283</i>&nbsp;      this.genericComponentType = genericComponentType;</b>
+<b class="fc"><i>284</i>&nbsp;    }</b>
+<i>285</i>&nbsp;
+<i>286</i>&nbsp;    @Override
+<i>287</i>&nbsp;    public Type getGenericComponentType() {
+<b class="fc"><i>288</i>&nbsp;      return genericComponentType;</b>
+<i>289</i>&nbsp;    }
+<i>290</i>&nbsp;  }
+<i>291</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

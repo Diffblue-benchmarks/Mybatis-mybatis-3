@@ -1,0 +1,403 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UnpooledDataSource</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.datasource.unpooled</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UnpooledDataSource (org.apache.ibatis.datasource.unpooled)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnpooledDataSource</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.3%
+  </span>
+  <span class="absValue">
+    (19/ 35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.5%
+  </span>
+  <span class="absValue">
+    (61/ 96)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UnpooledDataSource$DriverProxy</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (3/ 10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    46.5%
+  </span>
+  <span class="absValue">
+    (20/ 43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60.4%
+  </span>
+  <span class="absValue">
+    (64/ 106)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.datasource.unpooled;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.io.PrintWriter;
+<i>19</i>&nbsp;import java.sql.Connection;
+<i>20</i>&nbsp;import java.sql.Driver;
+<i>21</i>&nbsp;import java.sql.DriverManager;
+<i>22</i>&nbsp;import java.sql.DriverPropertyInfo;
+<i>23</i>&nbsp;import java.sql.SQLException;
+<i>24</i>&nbsp;import java.util.Enumeration;
+<i>25</i>&nbsp;import java.util.Map;
+<i>26</i>&nbsp;import java.util.Properties;
+<i>27</i>&nbsp;import java.util.concurrent.ConcurrentHashMap;
+<i>28</i>&nbsp;import java.util.logging.Logger;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;import javax.sql.DataSource;
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;import org.apache.ibatis.io.Resources;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;/**
+<i>35</i>&nbsp; * @author Clinton Begin
+<i>36</i>&nbsp; * @author Eduardo Macarron
+<i>37</i>&nbsp; */
+<i>38</i>&nbsp;public class UnpooledDataSource implements DataSource {
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;  private ClassLoader driverClassLoader;
+<i>41</i>&nbsp;  private Properties driverProperties;
+<b class="fc"><i>42</i>&nbsp;  private static Map&lt;String, Driver&gt; registeredDrivers = new ConcurrentHashMap&lt;&gt;();</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  private String driver;
+<i>45</i>&nbsp;  private String url;
+<i>46</i>&nbsp;  private String username;
+<i>47</i>&nbsp;  private String password;
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;  private Boolean autoCommit;
+<i>50</i>&nbsp;  private Integer defaultTransactionIsolationLevel;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;  static {
+<b class="fc"><i>53</i>&nbsp;    Enumeration&lt;Driver&gt; drivers = DriverManager.getDrivers();</b>
+<b class="fc"><i>54</i>&nbsp;    while (drivers.hasMoreElements()) {</b>
+<b class="fc"><i>55</i>&nbsp;      Driver driver = drivers.nextElement();</b>
+<b class="fc"><i>56</i>&nbsp;      registeredDrivers.put(driver.getClass().getName(), driver);</b>
+<b class="fc"><i>57</i>&nbsp;    }</b>
+<b class="fc"><i>58</i>&nbsp;  }</b>
+<i>59</i>&nbsp;
+<b class="fc"><i>60</i>&nbsp;  public UnpooledDataSource() {</b>
+<b class="fc"><i>61</i>&nbsp;  }</b>
+<i>62</i>&nbsp;
+<b class="fc"><i>63</i>&nbsp;  public UnpooledDataSource(String driver, String url, String username, String password) {</b>
+<b class="fc"><i>64</i>&nbsp;    this.driver = driver;</b>
+<b class="fc"><i>65</i>&nbsp;    this.url = url;</b>
+<b class="fc"><i>66</i>&nbsp;    this.username = username;</b>
+<b class="fc"><i>67</i>&nbsp;    this.password = password;</b>
+<b class="fc"><i>68</i>&nbsp;  }</b>
+<i>69</i>&nbsp;
+<b class="fc"><i>70</i>&nbsp;  public UnpooledDataSource(String driver, String url, Properties driverProperties) {</b>
+<b class="fc"><i>71</i>&nbsp;    this.driver = driver;</b>
+<b class="fc"><i>72</i>&nbsp;    this.url = url;</b>
+<b class="fc"><i>73</i>&nbsp;    this.driverProperties = driverProperties;</b>
+<b class="fc"><i>74</i>&nbsp;  }</b>
+<i>75</i>&nbsp;
+<b class="nc"><i>76</i>&nbsp;  public UnpooledDataSource(ClassLoader driverClassLoader, String driver, String url, String username, String password) {</b>
+<b class="nc"><i>77</i>&nbsp;    this.driverClassLoader = driverClassLoader;</b>
+<b class="nc"><i>78</i>&nbsp;    this.driver = driver;</b>
+<b class="nc"><i>79</i>&nbsp;    this.url = url;</b>
+<b class="nc"><i>80</i>&nbsp;    this.username = username;</b>
+<b class="nc"><i>81</i>&nbsp;    this.password = password;</b>
+<b class="nc"><i>82</i>&nbsp;  }</b>
+<i>83</i>&nbsp;
+<b class="nc"><i>84</i>&nbsp;  public UnpooledDataSource(ClassLoader driverClassLoader, String driver, String url, Properties driverProperties) {</b>
+<b class="nc"><i>85</i>&nbsp;    this.driverClassLoader = driverClassLoader;</b>
+<b class="nc"><i>86</i>&nbsp;    this.driver = driver;</b>
+<b class="nc"><i>87</i>&nbsp;    this.url = url;</b>
+<b class="nc"><i>88</i>&nbsp;    this.driverProperties = driverProperties;</b>
+<b class="nc"><i>89</i>&nbsp;  }</b>
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;  @Override
+<i>92</i>&nbsp;  public Connection getConnection() throws SQLException {
+<b class="fc"><i>93</i>&nbsp;    return doGetConnection(username, password);</b>
+<i>94</i>&nbsp;  }
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;  @Override
+<i>97</i>&nbsp;  public Connection getConnection(String username, String password) throws SQLException {
+<b class="nc"><i>98</i>&nbsp;    return doGetConnection(username, password);</b>
+<i>99</i>&nbsp;  }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;  @Override
+<i>102</i>&nbsp;  public void setLoginTimeout(int loginTimeout) {
+<b class="nc"><i>103</i>&nbsp;    DriverManager.setLoginTimeout(loginTimeout);</b>
+<b class="nc"><i>104</i>&nbsp;  }</b>
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;  @Override
+<i>107</i>&nbsp;  public int getLoginTimeout() {
+<b class="nc"><i>108</i>&nbsp;    return DriverManager.getLoginTimeout();</b>
+<i>109</i>&nbsp;  }
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;  @Override
+<i>112</i>&nbsp;  public void setLogWriter(PrintWriter logWriter) {
+<b class="nc"><i>113</i>&nbsp;    DriverManager.setLogWriter(logWriter);</b>
+<b class="nc"><i>114</i>&nbsp;  }</b>
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;  @Override
+<i>117</i>&nbsp;  public PrintWriter getLogWriter() {
+<b class="nc"><i>118</i>&nbsp;    return DriverManager.getLogWriter();</b>
+<i>119</i>&nbsp;  }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;  public ClassLoader getDriverClassLoader() {
+<b class="nc"><i>122</i>&nbsp;    return driverClassLoader;</b>
+<i>123</i>&nbsp;  }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;  public void setDriverClassLoader(ClassLoader driverClassLoader) {
+<b class="nc"><i>126</i>&nbsp;    this.driverClassLoader = driverClassLoader;</b>
+<b class="nc"><i>127</i>&nbsp;  }</b>
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;  public Properties getDriverProperties() {
+<b class="nc"><i>130</i>&nbsp;    return driverProperties;</b>
+<i>131</i>&nbsp;  }
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;  public void setDriverProperties(Properties driverProperties) {
+<b class="fc"><i>134</i>&nbsp;    this.driverProperties = driverProperties;</b>
+<b class="fc"><i>135</i>&nbsp;  }</b>
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;  public String getDriver() {
+<b class="fc"><i>138</i>&nbsp;    return driver;</b>
+<i>139</i>&nbsp;  }
+<i>140</i>&nbsp;
+<i>141</i>&nbsp;  public synchronized void setDriver(String driver) {
+<b class="fc"><i>142</i>&nbsp;    this.driver = driver;</b>
+<b class="fc"><i>143</i>&nbsp;  }</b>
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;  public String getUrl() {
+<b class="fc"><i>146</i>&nbsp;    return url;</b>
+<i>147</i>&nbsp;  }
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;  public void setUrl(String url) {
+<b class="fc"><i>150</i>&nbsp;    this.url = url;</b>
+<b class="fc"><i>151</i>&nbsp;  }</b>
+<i>152</i>&nbsp;
+<i>153</i>&nbsp;  public String getUsername() {
+<b class="fc"><i>154</i>&nbsp;    return username;</b>
+<i>155</i>&nbsp;  }
+<i>156</i>&nbsp;
+<i>157</i>&nbsp;  public void setUsername(String username) {
+<b class="fc"><i>158</i>&nbsp;    this.username = username;</b>
+<b class="fc"><i>159</i>&nbsp;  }</b>
+<i>160</i>&nbsp;
+<i>161</i>&nbsp;  public String getPassword() {
+<b class="fc"><i>162</i>&nbsp;    return password;</b>
+<i>163</i>&nbsp;  }
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;  public void setPassword(String password) {
+<b class="fc"><i>166</i>&nbsp;    this.password = password;</b>
+<b class="fc"><i>167</i>&nbsp;  }</b>
+<i>168</i>&nbsp;
+<i>169</i>&nbsp;  public Boolean isAutoCommit() {
+<b class="nc"><i>170</i>&nbsp;    return autoCommit;</b>
+<i>171</i>&nbsp;  }
+<i>172</i>&nbsp;
+<i>173</i>&nbsp;  public void setAutoCommit(Boolean autoCommit) {
+<b class="fc"><i>174</i>&nbsp;    this.autoCommit = autoCommit;</b>
+<b class="fc"><i>175</i>&nbsp;  }</b>
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;  public Integer getDefaultTransactionIsolationLevel() {
+<b class="nc"><i>178</i>&nbsp;    return defaultTransactionIsolationLevel;</b>
+<i>179</i>&nbsp;  }
+<i>180</i>&nbsp;
+<i>181</i>&nbsp;  public void setDefaultTransactionIsolationLevel(Integer defaultTransactionIsolationLevel) {
+<b class="nc"><i>182</i>&nbsp;    this.defaultTransactionIsolationLevel = defaultTransactionIsolationLevel;</b>
+<b class="nc"><i>183</i>&nbsp;  }</b>
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;  private Connection doGetConnection(String username, String password) throws SQLException {
+<b class="fc"><i>186</i>&nbsp;    Properties props = new Properties();</b>
+<b class="fc"><i>187</i>&nbsp;    if (driverProperties != null) {</b>
+<b class="fc"><i>188</i>&nbsp;      props.putAll(driverProperties);</b>
+<i>189</i>&nbsp;    }
+<b class="fc"><i>190</i>&nbsp;    if (username != null) {</b>
+<b class="fc"><i>191</i>&nbsp;      props.setProperty(&quot;user&quot;, username);</b>
+<i>192</i>&nbsp;    }
+<b class="fc"><i>193</i>&nbsp;    if (password != null) {</b>
+<b class="fc"><i>194</i>&nbsp;      props.setProperty(&quot;password&quot;, password);</b>
+<i>195</i>&nbsp;    }
+<b class="fc"><i>196</i>&nbsp;    return doGetConnection(props);</b>
+<i>197</i>&nbsp;  }
+<i>198</i>&nbsp;
+<i>199</i>&nbsp;  private Connection doGetConnection(Properties properties) throws SQLException {
+<b class="fc"><i>200</i>&nbsp;    initializeDriver();</b>
+<b class="fc"><i>201</i>&nbsp;    Connection connection = DriverManager.getConnection(url, properties);</b>
+<b class="fc"><i>202</i>&nbsp;    configureConnection(connection);</b>
+<b class="fc"><i>203</i>&nbsp;    return connection;</b>
+<i>204</i>&nbsp;  }
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;  private synchronized void initializeDriver() throws SQLException {
+<b class="fc"><i>207</i>&nbsp;    if (!registeredDrivers.containsKey(driver)) {</b>
+<i>208</i>&nbsp;      Class&lt;?&gt; driverType;
+<i>209</i>&nbsp;      try {
+<b class="fc"><i>210</i>&nbsp;        if (driverClassLoader != null) {</b>
+<b class="nc"><i>211</i>&nbsp;          driverType = Class.forName(driver, true, driverClassLoader);</b>
+<i>212</i>&nbsp;        } else {
+<b class="fc"><i>213</i>&nbsp;          driverType = Resources.classForName(driver);</b>
+<i>214</i>&nbsp;        }
+<i>215</i>&nbsp;        // DriverManager requires the driver to be loaded via the system ClassLoader.
+<i>216</i>&nbsp;        // http://www.kfu.com/~nsayer/Java/dyn-jdbc.html
+<b class="fc"><i>217</i>&nbsp;        Driver driverInstance = (Driver)driverType.newInstance();</b>
+<b class="fc"><i>218</i>&nbsp;        DriverManager.registerDriver(new DriverProxy(driverInstance));</b>
+<b class="fc"><i>219</i>&nbsp;        registeredDrivers.put(driver, driverInstance);</b>
+<b class="nc"><i>220</i>&nbsp;      } catch (Exception e) {</b>
+<b class="nc"><i>221</i>&nbsp;        throw new SQLException(&quot;Error setting driver on UnpooledDataSource. Cause: &quot; + e);</b>
+<b class="fc"><i>222</i>&nbsp;      }</b>
+<i>223</i>&nbsp;    }
+<b class="fc"><i>224</i>&nbsp;  }</b>
+<i>225</i>&nbsp;
+<i>226</i>&nbsp;  private void configureConnection(Connection conn) throws SQLException {
+<b class="fc"><i>227</i>&nbsp;    if (autoCommit != null &amp;&amp; autoCommit != conn.getAutoCommit()) {</b>
+<b class="fc"><i>228</i>&nbsp;      conn.setAutoCommit(autoCommit);</b>
+<i>229</i>&nbsp;    }
+<b class="fc"><i>230</i>&nbsp;    if (defaultTransactionIsolationLevel != null) {</b>
+<b class="nc"><i>231</i>&nbsp;      conn.setTransactionIsolation(defaultTransactionIsolationLevel);</b>
+<i>232</i>&nbsp;    }
+<b class="fc"><i>233</i>&nbsp;  }</b>
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;  private static class DriverProxy implements Driver {
+<i>236</i>&nbsp;    private Driver driver;
+<i>237</i>&nbsp;
+<b class="fc"><i>238</i>&nbsp;    DriverProxy(Driver d) {</b>
+<b class="fc"><i>239</i>&nbsp;      this.driver = d;</b>
+<b class="fc"><i>240</i>&nbsp;    }</b>
+<i>241</i>&nbsp;
+<i>242</i>&nbsp;    @Override
+<i>243</i>&nbsp;    public boolean acceptsURL(String u) throws SQLException {
+<b class="nc"><i>244</i>&nbsp;      return this.driver.acceptsURL(u);</b>
+<i>245</i>&nbsp;    }
+<i>246</i>&nbsp;
+<i>247</i>&nbsp;    @Override
+<i>248</i>&nbsp;    public Connection connect(String u, Properties p) throws SQLException {
+<b class="nc"><i>249</i>&nbsp;      return this.driver.connect(u, p);</b>
+<i>250</i>&nbsp;    }
+<i>251</i>&nbsp;
+<i>252</i>&nbsp;    @Override
+<i>253</i>&nbsp;    public int getMajorVersion() {
+<b class="nc"><i>254</i>&nbsp;      return this.driver.getMajorVersion();</b>
+<i>255</i>&nbsp;    }
+<i>256</i>&nbsp;
+<i>257</i>&nbsp;    @Override
+<i>258</i>&nbsp;    public int getMinorVersion() {
+<b class="nc"><i>259</i>&nbsp;      return this.driver.getMinorVersion();</b>
+<i>260</i>&nbsp;    }
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;    @Override
+<i>263</i>&nbsp;    public DriverPropertyInfo[] getPropertyInfo(String u, Properties p) throws SQLException {
+<b class="nc"><i>264</i>&nbsp;      return this.driver.getPropertyInfo(u, p);</b>
+<i>265</i>&nbsp;    }
+<i>266</i>&nbsp;
+<i>267</i>&nbsp;    @Override
+<i>268</i>&nbsp;    public boolean jdbcCompliant() {
+<b class="nc"><i>269</i>&nbsp;      return this.driver.jdbcCompliant();</b>
+<i>270</i>&nbsp;    }
+<i>271</i>&nbsp;
+<i>272</i>&nbsp;    // @Override only valid jdk7+
+<i>273</i>&nbsp;    public Logger getParentLogger() {
+<b class="nc"><i>274</i>&nbsp;      return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);</b>
+<i>275</i>&nbsp;    }
+<i>276</i>&nbsp;  }
+<i>277</i>&nbsp;
+<i>278</i>&nbsp;  @Override
+<i>279</i>&nbsp;  public &lt;T&gt; T unwrap(Class&lt;T&gt; iface) throws SQLException {
+<b class="nc"><i>280</i>&nbsp;    throw new SQLException(getClass().getName() + &quot; is not a wrapper.&quot;);</b>
+<i>281</i>&nbsp;  }
+<i>282</i>&nbsp;
+<i>283</i>&nbsp;  @Override
+<i>284</i>&nbsp;  public boolean isWrapperFor(Class&lt;?&gt; iface) throws SQLException {
+<b class="nc"><i>285</i>&nbsp;    return false;</b>
+<i>286</i>&nbsp;  }
+<i>287</i>&nbsp;
+<i>288</i>&nbsp;  // @Override only valid jdk7+
+<i>289</i>&nbsp;  public Logger getParentLogger() {
+<i>290</i>&nbsp;    // requires JDK version 1.6
+<b class="nc"><i>291</i>&nbsp;    return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);</b>
+<i>292</i>&nbsp;  }
+<i>293</i>&nbsp;
+<i>294</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

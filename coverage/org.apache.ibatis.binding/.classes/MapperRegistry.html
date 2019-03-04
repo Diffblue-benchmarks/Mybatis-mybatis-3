@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MapperRegistry</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.binding</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MapperRegistry (org.apache.ibatis.binding)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MapperRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.9%
+  </span>
+  <span class="absValue">
+    (29/ 33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MapperRegistry$$EnhancerByMockitoWithCGLIB$$6db55197</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.9%
+  </span>
+  <span class="absValue">
+    (29/ 33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.binding;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.Collection;
+<i>19</i>&nbsp;import java.util.Collections;
+<i>20</i>&nbsp;import java.util.HashMap;
+<i>21</i>&nbsp;import java.util.Map;
+<i>22</i>&nbsp;import java.util.Set;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import org.apache.ibatis.builder.annotation.MapperAnnotationBuilder;
+<i>25</i>&nbsp;import org.apache.ibatis.io.ResolverUtil;
+<i>26</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>27</i>&nbsp;import org.apache.ibatis.session.SqlSession;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;/**
+<i>30</i>&nbsp; * @author Clinton Begin
+<i>31</i>&nbsp; * @author Eduardo Macarron
+<i>32</i>&nbsp; * @author Lasse Voss
+<i>33</i>&nbsp; */
+<i>34</i>&nbsp;public class MapperRegistry {
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;  private final Configuration config;
+<b class="fc"><i>37</i>&nbsp;  private final Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt; knownMappers = new HashMap&lt;&gt;();</b>
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;  public MapperRegistry(Configuration config) {</b>
+<b class="fc"><i>40</i>&nbsp;    this.config = config;</b>
+<b class="fc"><i>41</i>&nbsp;  }</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;  @SuppressWarnings(&quot;unchecked&quot;)
+<i>44</i>&nbsp;  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+<b class="fc"><i>45</i>&nbsp;    final MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory&lt;T&gt;) knownMappers.get(type);</b>
+<b class="fc"><i>46</i>&nbsp;    if (mapperProxyFactory == null) {</b>
+<b class="nc"><i>47</i>&nbsp;      throw new BindingException(&quot;Type &quot; + type + &quot; is not known to the MapperRegistry.&quot;);</b>
+<i>48</i>&nbsp;    }
+<i>49</i>&nbsp;    try {
+<b class="fc"><i>50</i>&nbsp;      return mapperProxyFactory.newInstance(sqlSession);</b>
+<b class="nc"><i>51</i>&nbsp;    } catch (Exception e) {</b>
+<b class="nc"><i>52</i>&nbsp;      throw new BindingException(&quot;Error getting mapper instance. Cause: &quot; + e, e);</b>
+<i>53</i>&nbsp;    }
+<i>54</i>&nbsp;  }
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;  public &lt;T&gt; boolean hasMapper(Class&lt;T&gt; type) {
+<b class="fc"><i>57</i>&nbsp;    return knownMappers.containsKey(type);</b>
+<i>58</i>&nbsp;  }
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;  public &lt;T&gt; void addMapper(Class&lt;T&gt; type) {
+<b class="fc"><i>61</i>&nbsp;    if (type.isInterface()) {</b>
+<b class="fc"><i>62</i>&nbsp;      if (hasMapper(type)) {</b>
+<b class="nc"><i>63</i>&nbsp;        throw new BindingException(&quot;Type &quot; + type + &quot; is already known to the MapperRegistry.&quot;);</b>
+<i>64</i>&nbsp;      }
+<b class="fc"><i>65</i>&nbsp;      boolean loadCompleted = false;</b>
+<i>66</i>&nbsp;      try {
+<b class="fc"><i>67</i>&nbsp;        knownMappers.put(type, new MapperProxyFactory&lt;&gt;(type));</b>
+<i>68</i>&nbsp;        // It&#39;s important that the type is added before the parser is run
+<i>69</i>&nbsp;        // otherwise the binding may automatically be attempted by the
+<i>70</i>&nbsp;        // mapper parser. If the type is already known, it won&#39;t try.
+<b class="fc"><i>71</i>&nbsp;        MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);</b>
+<b class="fc"><i>72</i>&nbsp;        parser.parse();</b>
+<b class="fc"><i>73</i>&nbsp;        loadCompleted = true;</b>
+<i>74</i>&nbsp;      } finally {
+<b class="fc"><i>75</i>&nbsp;        if (!loadCompleted) {</b>
+<b class="fc"><i>76</i>&nbsp;          knownMappers.remove(type);</b>
+<i>77</i>&nbsp;        }
+<b class="fc"><i>78</i>&nbsp;      }</b>
+<i>79</i>&nbsp;    }
+<b class="fc"><i>80</i>&nbsp;  }</b>
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;  /**
+<i>83</i>&nbsp;   * @since 3.2.2
+<i>84</i>&nbsp;   */
+<i>85</i>&nbsp;  public Collection&lt;Class&lt;?&gt;&gt; getMappers() {
+<b class="fc"><i>86</i>&nbsp;    return Collections.unmodifiableCollection(knownMappers.keySet());</b>
+<i>87</i>&nbsp;  }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;  /**
+<i>90</i>&nbsp;   * @since 3.2.2
+<i>91</i>&nbsp;   */
+<i>92</i>&nbsp;  public void addMappers(String packageName, Class&lt;?&gt; superType) {
+<b class="fc"><i>93</i>&nbsp;    ResolverUtil&lt;Class&lt;?&gt;&gt; resolverUtil = new ResolverUtil&lt;&gt;();</b>
+<b class="fc"><i>94</i>&nbsp;    resolverUtil.find(new ResolverUtil.IsA(superType), packageName);</b>
+<b class="fc"><i>95</i>&nbsp;    Set&lt;Class&lt;? extends Class&lt;?&gt;&gt;&gt; mapperSet = resolverUtil.getClasses();</b>
+<b class="fc"><i>96</i>&nbsp;    for (Class&lt;?&gt; mapperClass : mapperSet) {</b>
+<b class="fc"><i>97</i>&nbsp;      addMapper(mapperClass);</b>
+<b class="fc"><i>98</i>&nbsp;    }</b>
+<b class="fc"><i>99</i>&nbsp;  }</b>
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;  /**
+<i>102</i>&nbsp;   * @since 3.2.2
+<i>103</i>&nbsp;   */
+<i>104</i>&nbsp;  public void addMappers(String packageName) {
+<b class="fc"><i>105</i>&nbsp;    addMappers(packageName, Object.class);</b>
+<b class="fc"><i>106</i>&nbsp;  }</b>
+<i>107</i>&nbsp;
+<i>108</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

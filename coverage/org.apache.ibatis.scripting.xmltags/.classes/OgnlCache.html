@@ -1,0 +1,144 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: OgnlCache</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.scripting.xmltags</a> ]
+</div>
+
+<h1>Coverage Summary for Class: OgnlCache (org.apache.ibatis.scripting.xmltags)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OgnlCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (10/ 14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.scripting.xmltags;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.Map;
+<i>19</i>&nbsp;import java.util.concurrent.ConcurrentHashMap;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;import ognl.Ognl;
+<i>22</i>&nbsp;import ognl.OgnlException;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import org.apache.ibatis.builder.BuilderException;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;/**
+<i>27</i>&nbsp; * Caches OGNL parsed expressions.
+<i>28</i>&nbsp; *
+<i>29</i>&nbsp; * @author Eduardo Macarron
+<i>30</i>&nbsp; *
+<i>31</i>&nbsp; * @see &lt;a href=&#39;http://code.google.com/p/mybatis/issues/detail?id=342&#39;&gt;Issue 342&lt;/a&gt;
+<i>32</i>&nbsp; */
+<i>33</i>&nbsp;public final class OgnlCache {
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;  private static final OgnlMemberAccess MEMBER_ACCESS = new OgnlMemberAccess();</b>
+<b class="fc"><i>36</i>&nbsp;  private static final OgnlClassResolver CLASS_RESOLVER = new OgnlClassResolver();</b>
+<b class="fc"><i>37</i>&nbsp;  private static final Map&lt;String, Object&gt; expressionCache = new ConcurrentHashMap&lt;&gt;();</b>
+<i>38</i>&nbsp;
+<b class="nc"><i>39</i>&nbsp;  private OgnlCache() {</b>
+<i>40</i>&nbsp;    // Prevent Instantiation of Static Class
+<b class="nc"><i>41</i>&nbsp;  }</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;  public static Object getValue(String expression, Object root) {
+<i>44</i>&nbsp;    try {
+<b class="fc"><i>45</i>&nbsp;      Map context = Ognl.createDefaultContext(root, MEMBER_ACCESS, CLASS_RESOLVER, null);</b>
+<b class="fc"><i>46</i>&nbsp;      return Ognl.getValue(parseExpression(expression), context, root);</b>
+<b class="nc"><i>47</i>&nbsp;    } catch (OgnlException e) {</b>
+<b class="nc"><i>48</i>&nbsp;      throw new BuilderException(&quot;Error evaluating expression &#39;&quot; + expression + &quot;&#39;. Cause: &quot; + e, e);</b>
+<i>49</i>&nbsp;    }
+<i>50</i>&nbsp;  }
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;  private static Object parseExpression(String expression) throws OgnlException {
+<b class="fc"><i>53</i>&nbsp;    Object node = expressionCache.get(expression);</b>
+<b class="fc"><i>54</i>&nbsp;    if (node == null) {</b>
+<b class="fc"><i>55</i>&nbsp;      node = Ognl.parseExpression(expression);</b>
+<b class="fc"><i>56</i>&nbsp;      expressionCache.put(expression, node);</b>
+<i>57</i>&nbsp;    }
+<b class="fc"><i>58</i>&nbsp;    return node;</b>
+<i>59</i>&nbsp;  }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LanguageDriverRegistry</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.scripting</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LanguageDriverRegistry (org.apache.ibatis.scripting)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LanguageDriverRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/ 22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LanguageDriverRegistry$$EnhancerByMockitoWithCGLIB$$ef050474</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/ 22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.scripting;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.HashMap;
+<i>19</i>&nbsp;import java.util.Map;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;/**
+<i>22</i>&nbsp; * @author Frank D. Martinez [mnesarco]
+<i>23</i>&nbsp; */
+<b class="fc"><i>24</i>&nbsp;public class LanguageDriverRegistry {</b>
+<i>25</i>&nbsp;
+<b class="fc"><i>26</i>&nbsp;  private final Map&lt;Class&lt;? extends LanguageDriver&gt;, LanguageDriver&gt; LANGUAGE_DRIVER_MAP = new HashMap&lt;&gt;();</b>
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;  private Class&lt;? extends LanguageDriver&gt; defaultDriverClass;
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;  public void register(Class&lt;? extends LanguageDriver&gt; cls) {
+<b class="fc"><i>31</i>&nbsp;    if (cls == null) {</b>
+<b class="fc"><i>32</i>&nbsp;      throw new IllegalArgumentException(&quot;null is not a valid Language Driver&quot;);</b>
+<i>33</i>&nbsp;    }
+<b class="fc"><i>34</i>&nbsp;    if (!LANGUAGE_DRIVER_MAP.containsKey(cls)) {</b>
+<i>35</i>&nbsp;      try {
+<b class="fc"><i>36</i>&nbsp;        LANGUAGE_DRIVER_MAP.put(cls, cls.newInstance());</b>
+<b class="fc"><i>37</i>&nbsp;      } catch (Exception ex) {</b>
+<b class="fc"><i>38</i>&nbsp;        throw new ScriptingException(&quot;Failed to load language driver for &quot; + cls.getName(), ex);</b>
+<b class="fc"><i>39</i>&nbsp;      }</b>
+<i>40</i>&nbsp;    }
+<b class="fc"><i>41</i>&nbsp;  }</b>
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;  public void register(LanguageDriver instance) {
+<b class="fc"><i>44</i>&nbsp;    if (instance == null) {</b>
+<b class="fc"><i>45</i>&nbsp;      throw new IllegalArgumentException(&quot;null is not a valid Language Driver&quot;);</b>
+<i>46</i>&nbsp;    }
+<b class="fc"><i>47</i>&nbsp;    Class&lt;? extends LanguageDriver&gt; cls = instance.getClass();</b>
+<b class="fc"><i>48</i>&nbsp;    if (!LANGUAGE_DRIVER_MAP.containsKey(cls)) {</b>
+<b class="fc"><i>49</i>&nbsp;      LANGUAGE_DRIVER_MAP.put(cls, instance);</b>
+<i>50</i>&nbsp;    }
+<b class="fc"><i>51</i>&nbsp;  }</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  public LanguageDriver getDriver(Class&lt;? extends LanguageDriver&gt; cls) {
+<b class="fc"><i>54</i>&nbsp;    return LANGUAGE_DRIVER_MAP.get(cls);</b>
+<i>55</i>&nbsp;  }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;  public LanguageDriver getDefaultDriver() {
+<b class="fc"><i>58</i>&nbsp;    return getDriver(getDefaultDriverClass());</b>
+<i>59</i>&nbsp;  }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;  public Class&lt;? extends LanguageDriver&gt; getDefaultDriverClass() {
+<b class="fc"><i>62</i>&nbsp;    return defaultDriverClass;</b>
+<i>63</i>&nbsp;  }
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;  public void setDefaultDriverClass(Class&lt;? extends LanguageDriver&gt; defaultDriverClass) {
+<b class="fc"><i>66</i>&nbsp;    register(defaultDriverClass);</b>
+<b class="fc"><i>67</i>&nbsp;    this.defaultDriverClass = defaultDriverClass;</b>
+<b class="fc"><i>68</i>&nbsp;  }</b>
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

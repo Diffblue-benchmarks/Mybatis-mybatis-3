@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SelectKeyGenerator</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.executor.keygen</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SelectKeyGenerator (org.apache.ibatis.executor.keygen)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SelectKeyGenerator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (45/ 46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.executor.keygen;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.Statement;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;import org.apache.ibatis.executor.Executor;
+<i>22</i>&nbsp;import org.apache.ibatis.executor.ExecutorException;
+<i>23</i>&nbsp;import org.apache.ibatis.mapping.MappedStatement;
+<i>24</i>&nbsp;import org.apache.ibatis.reflection.MetaObject;
+<i>25</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>26</i>&nbsp;import org.apache.ibatis.session.ExecutorType;
+<i>27</i>&nbsp;import org.apache.ibatis.session.RowBounds;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;/**
+<i>30</i>&nbsp; * @author Clinton Begin
+<i>31</i>&nbsp; * @author Jeff Butler
+<i>32</i>&nbsp; */
+<i>33</i>&nbsp;public class SelectKeyGenerator implements KeyGenerator {
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;  public static final String SELECT_KEY_SUFFIX = &quot;!selectKey&quot;;
+<i>36</i>&nbsp;  private final boolean executeBefore;
+<i>37</i>&nbsp;  private final MappedStatement keyStatement;
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;  public SelectKeyGenerator(MappedStatement keyStatement, boolean executeBefore) {</b>
+<b class="fc"><i>40</i>&nbsp;    this.executeBefore = executeBefore;</b>
+<b class="fc"><i>41</i>&nbsp;    this.keyStatement = keyStatement;</b>
+<b class="fc"><i>42</i>&nbsp;  }</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  @Override
+<i>45</i>&nbsp;  public void processBefore(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
+<b class="fc"><i>46</i>&nbsp;    if (executeBefore) {</b>
+<b class="fc"><i>47</i>&nbsp;      processGeneratedKeys(executor, ms, parameter);</b>
+<i>48</i>&nbsp;    }
+<b class="fc"><i>49</i>&nbsp;  }</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;  @Override
+<i>52</i>&nbsp;  public void processAfter(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
+<b class="fc"><i>53</i>&nbsp;    if (!executeBefore) {</b>
+<b class="fc"><i>54</i>&nbsp;      processGeneratedKeys(executor, ms, parameter);</b>
+<i>55</i>&nbsp;    }
+<b class="fc"><i>56</i>&nbsp;  }</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;  private void processGeneratedKeys(Executor executor, MappedStatement ms, Object parameter) {
+<i>59</i>&nbsp;    try {
+<b class="fc"><i>60</i>&nbsp;      if (parameter != null &amp;&amp; keyStatement != null &amp;&amp; keyStatement.getKeyProperties() != null) {</b>
+<b class="fc"><i>61</i>&nbsp;        String[] keyProperties = keyStatement.getKeyProperties();</b>
+<b class="fc"><i>62</i>&nbsp;        final Configuration configuration = ms.getConfiguration();</b>
+<b class="fc"><i>63</i>&nbsp;        final MetaObject metaParam = configuration.newMetaObject(parameter);</b>
+<b class="fc"><i>64</i>&nbsp;        if (keyProperties != null) {</b>
+<i>65</i>&nbsp;          // Do not close keyExecutor.
+<i>66</i>&nbsp;          // The transaction will be closed by parent executor.
+<b class="fc"><i>67</i>&nbsp;          Executor keyExecutor = configuration.newExecutor(executor.getTransaction(), ExecutorType.SIMPLE);</b>
+<b class="fc"><i>68</i>&nbsp;          List&lt;Object&gt; values = keyExecutor.query(keyStatement, parameter, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER);</b>
+<b class="fc"><i>69</i>&nbsp;          if (values.size() == 0) {</b>
+<b class="fc"><i>70</i>&nbsp;            throw new ExecutorException(&quot;SelectKey returned no data.&quot;);</b>
+<b class="fc"><i>71</i>&nbsp;          } else if (values.size() &gt; 1) {</b>
+<b class="fc"><i>72</i>&nbsp;            throw new ExecutorException(&quot;SelectKey returned more than one value.&quot;);</b>
+<i>73</i>&nbsp;          } else {
+<b class="fc"><i>74</i>&nbsp;            MetaObject metaResult = configuration.newMetaObject(values.get(0));</b>
+<b class="fc"><i>75</i>&nbsp;            if (keyProperties.length == 1) {</b>
+<b class="fc"><i>76</i>&nbsp;              if (metaResult.hasGetter(keyProperties[0])) {</b>
+<b class="fc"><i>77</i>&nbsp;                setValue(metaParam, keyProperties[0], metaResult.getValue(keyProperties[0]));</b>
+<i>78</i>&nbsp;              } else {
+<i>79</i>&nbsp;                // no getter for the property - maybe just a single value object
+<i>80</i>&nbsp;                // so try that
+<b class="fc"><i>81</i>&nbsp;                setValue(metaParam, keyProperties[0], values.get(0));</b>
+<i>82</i>&nbsp;              }
+<i>83</i>&nbsp;            } else {
+<b class="fc"><i>84</i>&nbsp;              handleMultipleProperties(keyProperties, metaParam, metaResult);</b>
+<i>85</i>&nbsp;            }
+<i>86</i>&nbsp;          }
+<i>87</i>&nbsp;        }
+<i>88</i>&nbsp;      }
+<b class="fc"><i>89</i>&nbsp;    } catch (ExecutorException e) {</b>
+<b class="fc"><i>90</i>&nbsp;      throw e;</b>
+<b class="fc"><i>91</i>&nbsp;    } catch (Exception e) {</b>
+<b class="fc"><i>92</i>&nbsp;      throw new ExecutorException(&quot;Error selecting key or setting result to parameter object. Cause: &quot; + e, e);</b>
+<b class="fc"><i>93</i>&nbsp;    }</b>
+<b class="fc"><i>94</i>&nbsp;  }</b>
+<i>95</i>&nbsp;
+<i>96</i>&nbsp;  private void handleMultipleProperties(String[] keyProperties,
+<i>97</i>&nbsp;      MetaObject metaParam, MetaObject metaResult) {
+<b class="fc"><i>98</i>&nbsp;    String[] keyColumns = keyStatement.getKeyColumns();</b>
+<i>99</i>&nbsp;
+<b class="fc"><i>100</i>&nbsp;    if (keyColumns == null || keyColumns.length == 0) {</b>
+<i>101</i>&nbsp;      // no key columns specified, just use the property names
+<b class="fc"><i>102</i>&nbsp;      for (String keyProperty : keyProperties) {</b>
+<b class="fc"><i>103</i>&nbsp;        setValue(metaParam, keyProperty, metaResult.getValue(keyProperty));</b>
+<i>104</i>&nbsp;      }
+<i>105</i>&nbsp;    } else {
+<b class="fc"><i>106</i>&nbsp;      if (keyColumns.length != keyProperties.length) {</b>
+<b class="nc"><i>107</i>&nbsp;        throw new ExecutorException(&quot;If SelectKey has key columns, the number must match the number of key properties.&quot;);</b>
+<i>108</i>&nbsp;      }
+<b class="fc"><i>109</i>&nbsp;      for (int i = 0; i &lt; keyProperties.length; i++) {</b>
+<b class="fc"><i>110</i>&nbsp;        setValue(metaParam, keyProperties[i], metaResult.getValue(keyColumns[i]));</b>
+<i>111</i>&nbsp;      }
+<i>112</i>&nbsp;    }
+<b class="fc"><i>113</i>&nbsp;  }</b>
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;  private void setValue(MetaObject metaParam, String property, Object value) {
+<b class="fc"><i>116</i>&nbsp;    if (metaParam.hasSetter(property)) {</b>
+<b class="fc"><i>117</i>&nbsp;      metaParam.setValue(property, value);</b>
+<i>118</i>&nbsp;    } else {
+<b class="fc"><i>119</i>&nbsp;      throw new ExecutorException(&quot;No setter found for the keyProperty &#39;&quot; + property + &quot;&#39; in &quot; + metaParam.getOriginalObject().getClass().getName() + &quot;.&quot;);</b>
+<i>120</i>&nbsp;    }
+<b class="fc"><i>121</i>&nbsp;  }</b>
+<i>122</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

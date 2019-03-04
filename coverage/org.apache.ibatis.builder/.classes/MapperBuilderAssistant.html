@@ -1,0 +1,576 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MapperBuilderAssistant</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.builder</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MapperBuilderAssistant (org.apache.ibatis.builder)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MapperBuilderAssistant</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (20/ 22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (199/ 205)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MapperBuilderAssistant$$EnhancerByMockitoWithCGLIB$$7c247a07</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (20/ 22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (199/ 205)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.builder;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.ArrayList;
+<i>19</i>&nbsp;import java.util.HashMap;
+<i>20</i>&nbsp;import java.util.HashSet;
+<i>21</i>&nbsp;import java.util.Iterator;
+<i>22</i>&nbsp;import java.util.List;
+<i>23</i>&nbsp;import java.util.Map;
+<i>24</i>&nbsp;import java.util.Properties;
+<i>25</i>&nbsp;import java.util.Set;
+<i>26</i>&nbsp;import java.util.StringTokenizer;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import org.apache.ibatis.cache.Cache;
+<i>29</i>&nbsp;import org.apache.ibatis.cache.decorators.LruCache;
+<i>30</i>&nbsp;import org.apache.ibatis.cache.impl.PerpetualCache;
+<i>31</i>&nbsp;import org.apache.ibatis.executor.ErrorContext;
+<i>32</i>&nbsp;import org.apache.ibatis.executor.keygen.KeyGenerator;
+<i>33</i>&nbsp;import org.apache.ibatis.mapping.CacheBuilder;
+<i>34</i>&nbsp;import org.apache.ibatis.mapping.Discriminator;
+<i>35</i>&nbsp;import org.apache.ibatis.mapping.MappedStatement;
+<i>36</i>&nbsp;import org.apache.ibatis.mapping.ParameterMap;
+<i>37</i>&nbsp;import org.apache.ibatis.mapping.ParameterMapping;
+<i>38</i>&nbsp;import org.apache.ibatis.mapping.ParameterMode;
+<i>39</i>&nbsp;import org.apache.ibatis.mapping.ResultFlag;
+<i>40</i>&nbsp;import org.apache.ibatis.mapping.ResultMap;
+<i>41</i>&nbsp;import org.apache.ibatis.mapping.ResultMapping;
+<i>42</i>&nbsp;import org.apache.ibatis.mapping.ResultSetType;
+<i>43</i>&nbsp;import org.apache.ibatis.mapping.SqlCommandType;
+<i>44</i>&nbsp;import org.apache.ibatis.mapping.SqlSource;
+<i>45</i>&nbsp;import org.apache.ibatis.mapping.StatementType;
+<i>46</i>&nbsp;import org.apache.ibatis.reflection.MetaClass;
+<i>47</i>&nbsp;import org.apache.ibatis.scripting.LanguageDriver;
+<i>48</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>49</i>&nbsp;import org.apache.ibatis.type.JdbcType;
+<i>50</i>&nbsp;import org.apache.ibatis.type.TypeHandler;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;/**
+<i>53</i>&nbsp; * @author Clinton Begin
+<i>54</i>&nbsp; */
+<i>55</i>&nbsp;public class MapperBuilderAssistant extends BaseBuilder {
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;  private String currentNamespace;
+<i>58</i>&nbsp;  private final String resource;
+<i>59</i>&nbsp;  private Cache currentCache;
+<i>60</i>&nbsp;  private boolean unresolvedCacheRef; // issue #676
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;  public MapperBuilderAssistant(Configuration configuration, String resource) {
+<b class="fc"><i>63</i>&nbsp;    super(configuration);</b>
+<b class="fc"><i>64</i>&nbsp;    ErrorContext.instance().resource(resource);</b>
+<b class="fc"><i>65</i>&nbsp;    this.resource = resource;</b>
+<b class="fc"><i>66</i>&nbsp;  }</b>
+<i>67</i>&nbsp;
+<i>68</i>&nbsp;  public String getCurrentNamespace() {
+<b class="fc"><i>69</i>&nbsp;    return currentNamespace;</b>
+<i>70</i>&nbsp;  }
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  public void setCurrentNamespace(String currentNamespace) {
+<b class="fc"><i>73</i>&nbsp;    if (currentNamespace == null) {</b>
+<b class="fc"><i>74</i>&nbsp;      throw new BuilderException(&quot;The mapper element requires a namespace attribute to be specified.&quot;);</b>
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<b class="fc"><i>77</i>&nbsp;    if (this.currentNamespace != null &amp;&amp; !this.currentNamespace.equals(currentNamespace)) {</b>
+<b class="fc"><i>78</i>&nbsp;      throw new BuilderException(&quot;Wrong namespace. Expected &#39;&quot;</b>
+<i>79</i>&nbsp;          + this.currentNamespace + &quot;&#39; but found &#39;&quot; + currentNamespace + &quot;&#39;.&quot;);
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;    this.currentNamespace = currentNamespace;</b>
+<b class="fc"><i>83</i>&nbsp;  }</b>
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;  public String applyCurrentNamespace(String base, boolean isReference) {
+<b class="fc"><i>86</i>&nbsp;    if (base == null) {</b>
+<b class="fc"><i>87</i>&nbsp;      return null;</b>
+<i>88</i>&nbsp;    }
+<b class="fc"><i>89</i>&nbsp;    if (isReference) {</b>
+<i>90</i>&nbsp;      // is it qualified with any namespace yet?
+<b class="fc"><i>91</i>&nbsp;      if (base.contains(&quot;.&quot;)) {</b>
+<b class="fc"><i>92</i>&nbsp;        return base;</b>
+<i>93</i>&nbsp;      }
+<i>94</i>&nbsp;    } else {
+<i>95</i>&nbsp;      // is it qualified with this namespace yet?
+<b class="fc"><i>96</i>&nbsp;      if (base.startsWith(currentNamespace + &quot;.&quot;)) {</b>
+<b class="fc"><i>97</i>&nbsp;        return base;</b>
+<i>98</i>&nbsp;      }
+<b class="fc"><i>99</i>&nbsp;      if (base.contains(&quot;.&quot;)) {</b>
+<b class="fc"><i>100</i>&nbsp;        throw new BuilderException(&quot;Dots are not allowed in element names, please remove it from &quot; + base);</b>
+<i>101</i>&nbsp;      }
+<i>102</i>&nbsp;    }
+<b class="fc"><i>103</i>&nbsp;    return currentNamespace + &quot;.&quot; + base;</b>
+<i>104</i>&nbsp;  }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;  public Cache useCacheRef(String namespace) {
+<b class="fc"><i>107</i>&nbsp;    if (namespace == null) {</b>
+<b class="fc"><i>108</i>&nbsp;      throw new BuilderException(&quot;cache-ref element requires a namespace attribute.&quot;);</b>
+<i>109</i>&nbsp;    }
+<i>110</i>&nbsp;    try {
+<b class="fc"><i>111</i>&nbsp;      unresolvedCacheRef = true;</b>
+<b class="fc"><i>112</i>&nbsp;      Cache cache = configuration.getCache(namespace);</b>
+<b class="fc"><i>113</i>&nbsp;      if (cache == null) {</b>
+<b class="nc"><i>114</i>&nbsp;        throw new IncompleteElementException(&quot;No cache for namespace &#39;&quot; + namespace + &quot;&#39; could be found.&quot;);</b>
+<i>115</i>&nbsp;      }
+<b class="fc"><i>116</i>&nbsp;      currentCache = cache;</b>
+<b class="fc"><i>117</i>&nbsp;      unresolvedCacheRef = false;</b>
+<b class="fc"><i>118</i>&nbsp;      return cache;</b>
+<b class="fc"><i>119</i>&nbsp;    } catch (IllegalArgumentException e) {</b>
+<b class="fc"><i>120</i>&nbsp;      throw new IncompleteElementException(&quot;No cache for namespace &#39;&quot; + namespace + &quot;&#39; could be found.&quot;, e);</b>
+<i>121</i>&nbsp;    }
+<i>122</i>&nbsp;  }
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;  public Cache useNewCache(Class&lt;? extends Cache&gt; typeClass,
+<i>125</i>&nbsp;      Class&lt;? extends Cache&gt; evictionClass,
+<i>126</i>&nbsp;      Long flushInterval,
+<i>127</i>&nbsp;      Integer size,
+<i>128</i>&nbsp;      boolean readWrite,
+<i>129</i>&nbsp;      boolean blocking,
+<i>130</i>&nbsp;      Properties props) {
+<b class="fc"><i>131</i>&nbsp;    Cache cache = new CacheBuilder(currentNamespace)</b>
+<b class="fc"><i>132</i>&nbsp;        .implementation(valueOrDefault(typeClass, PerpetualCache.class))</b>
+<b class="fc"><i>133</i>&nbsp;        .addDecorator(valueOrDefault(evictionClass, LruCache.class))</b>
+<b class="fc"><i>134</i>&nbsp;        .clearInterval(flushInterval)</b>
+<b class="fc"><i>135</i>&nbsp;        .size(size)</b>
+<b class="fc"><i>136</i>&nbsp;        .readWrite(readWrite)</b>
+<b class="fc"><i>137</i>&nbsp;        .blocking(blocking)</b>
+<b class="fc"><i>138</i>&nbsp;        .properties(props)</b>
+<b class="fc"><i>139</i>&nbsp;        .build();</b>
+<b class="fc"><i>140</i>&nbsp;    configuration.addCache(cache);</b>
+<b class="fc"><i>141</i>&nbsp;    currentCache = cache;</b>
+<b class="fc"><i>142</i>&nbsp;    return cache;</b>
+<i>143</i>&nbsp;  }
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;  public ParameterMap addParameterMap(String id, Class&lt;?&gt; parameterClass, List&lt;ParameterMapping&gt; parameterMappings) {
+<b class="fc"><i>146</i>&nbsp;    id = applyCurrentNamespace(id, false);</b>
+<b class="fc"><i>147</i>&nbsp;    ParameterMap parameterMap = new ParameterMap.Builder(configuration, id, parameterClass, parameterMappings).build();</b>
+<b class="fc"><i>148</i>&nbsp;    configuration.addParameterMap(parameterMap);</b>
+<b class="fc"><i>149</i>&nbsp;    return parameterMap;</b>
+<i>150</i>&nbsp;  }
+<i>151</i>&nbsp;
+<i>152</i>&nbsp;  public ParameterMapping buildParameterMapping(
+<i>153</i>&nbsp;      Class&lt;?&gt; parameterType,
+<i>154</i>&nbsp;      String property,
+<i>155</i>&nbsp;      Class&lt;?&gt; javaType,
+<i>156</i>&nbsp;      JdbcType jdbcType,
+<i>157</i>&nbsp;      String resultMap,
+<i>158</i>&nbsp;      ParameterMode parameterMode,
+<i>159</i>&nbsp;      Class&lt;? extends TypeHandler&lt;?&gt;&gt; typeHandler,
+<i>160</i>&nbsp;      Integer numericScale) {
+<b class="fc"><i>161</i>&nbsp;    resultMap = applyCurrentNamespace(resultMap, true);</b>
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;    // Class parameterType = parameterMapBuilder.type();
+<b class="fc"><i>164</i>&nbsp;    Class&lt;?&gt; javaTypeClass = resolveParameterJavaType(parameterType, property, javaType, jdbcType);</b>
+<b class="fc"><i>165</i>&nbsp;    TypeHandler&lt;?&gt; typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);</b>
+<i>166</i>&nbsp;
+<b class="fc"><i>167</i>&nbsp;    return new ParameterMapping.Builder(configuration, property, javaTypeClass)</b>
+<b class="fc"><i>168</i>&nbsp;        .jdbcType(jdbcType)</b>
+<b class="fc"><i>169</i>&nbsp;        .resultMapId(resultMap)</b>
+<b class="fc"><i>170</i>&nbsp;        .mode(parameterMode)</b>
+<b class="fc"><i>171</i>&nbsp;        .numericScale(numericScale)</b>
+<b class="fc"><i>172</i>&nbsp;        .typeHandler(typeHandlerInstance)</b>
+<b class="fc"><i>173</i>&nbsp;        .build();</b>
+<i>174</i>&nbsp;  }
+<i>175</i>&nbsp;
+<i>176</i>&nbsp;  public ResultMap addResultMap(
+<i>177</i>&nbsp;      String id,
+<i>178</i>&nbsp;      Class&lt;?&gt; type,
+<i>179</i>&nbsp;      String extend,
+<i>180</i>&nbsp;      Discriminator discriminator,
+<i>181</i>&nbsp;      List&lt;ResultMapping&gt; resultMappings,
+<i>182</i>&nbsp;      Boolean autoMapping) {
+<b class="fc"><i>183</i>&nbsp;    id = applyCurrentNamespace(id, false);</b>
+<b class="fc"><i>184</i>&nbsp;    extend = applyCurrentNamespace(extend, true);</b>
+<i>185</i>&nbsp;
+<b class="fc"><i>186</i>&nbsp;    if (extend != null) {</b>
+<b class="fc"><i>187</i>&nbsp;      if (!configuration.hasResultMap(extend)) {</b>
+<b class="fc"><i>188</i>&nbsp;        throw new IncompleteElementException(&quot;Could not find a parent resultmap with id &#39;&quot; + extend + &quot;&#39;&quot;);</b>
+<i>189</i>&nbsp;      }
+<b class="fc"><i>190</i>&nbsp;      ResultMap resultMap = configuration.getResultMap(extend);</b>
+<b class="fc"><i>191</i>&nbsp;      List&lt;ResultMapping&gt; extendedResultMappings = new ArrayList&lt;&gt;(resultMap.getResultMappings());</b>
+<b class="fc"><i>192</i>&nbsp;      extendedResultMappings.removeAll(resultMappings);</b>
+<i>193</i>&nbsp;      // Remove parent constructor if this resultMap declares a constructor.
+<b class="fc"><i>194</i>&nbsp;      boolean declaresConstructor = false;</b>
+<b class="fc"><i>195</i>&nbsp;      for (ResultMapping resultMapping : resultMappings) {</b>
+<b class="fc"><i>196</i>&nbsp;        if (resultMapping.getFlags().contains(ResultFlag.CONSTRUCTOR)) {</b>
+<b class="fc"><i>197</i>&nbsp;          declaresConstructor = true;</b>
+<b class="fc"><i>198</i>&nbsp;          break;</b>
+<i>199</i>&nbsp;        }
+<b class="fc"><i>200</i>&nbsp;      }</b>
+<b class="fc"><i>201</i>&nbsp;      if (declaresConstructor) {</b>
+<b class="fc"><i>202</i>&nbsp;        extendedResultMappings.removeIf(resultMapping -&gt; resultMapping.getFlags().contains(ResultFlag.CONSTRUCTOR));</b>
+<i>203</i>&nbsp;      }
+<b class="fc"><i>204</i>&nbsp;      resultMappings.addAll(extendedResultMappings);</b>
+<i>205</i>&nbsp;    }
+<b class="fc"><i>206</i>&nbsp;    ResultMap resultMap = new ResultMap.Builder(configuration, id, type, resultMappings, autoMapping)</b>
+<b class="fc"><i>207</i>&nbsp;        .discriminator(discriminator)</b>
+<b class="fc"><i>208</i>&nbsp;        .build();</b>
+<b class="fc"><i>209</i>&nbsp;    configuration.addResultMap(resultMap);</b>
+<b class="fc"><i>210</i>&nbsp;    return resultMap;</b>
+<i>211</i>&nbsp;  }
+<i>212</i>&nbsp;
+<i>213</i>&nbsp;  public Discriminator buildDiscriminator(
+<i>214</i>&nbsp;      Class&lt;?&gt; resultType,
+<i>215</i>&nbsp;      String column,
+<i>216</i>&nbsp;      Class&lt;?&gt; javaType,
+<i>217</i>&nbsp;      JdbcType jdbcType,
+<i>218</i>&nbsp;      Class&lt;? extends TypeHandler&lt;?&gt;&gt; typeHandler,
+<i>219</i>&nbsp;      Map&lt;String, String&gt; discriminatorMap) {
+<b class="fc"><i>220</i>&nbsp;    ResultMapping resultMapping = buildResultMapping(</b>
+<i>221</i>&nbsp;        resultType,
+<i>222</i>&nbsp;        null,
+<i>223</i>&nbsp;        column,
+<i>224</i>&nbsp;        javaType,
+<i>225</i>&nbsp;        jdbcType,
+<i>226</i>&nbsp;        null,
+<i>227</i>&nbsp;        null,
+<i>228</i>&nbsp;        null,
+<i>229</i>&nbsp;        null,
+<i>230</i>&nbsp;        typeHandler,
+<i>231</i>&nbsp;        new ArrayList&lt;&gt;(),
+<i>232</i>&nbsp;        null,
+<i>233</i>&nbsp;        null,
+<i>234</i>&nbsp;        false);
+<b class="fc"><i>235</i>&nbsp;    Map&lt;String, String&gt; namespaceDiscriminatorMap = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>236</i>&nbsp;    for (Map.Entry&lt;String, String&gt; e : discriminatorMap.entrySet()) {</b>
+<b class="fc"><i>237</i>&nbsp;      String resultMap = e.getValue();</b>
+<b class="fc"><i>238</i>&nbsp;      resultMap = applyCurrentNamespace(resultMap, true);</b>
+<b class="fc"><i>239</i>&nbsp;      namespaceDiscriminatorMap.put(e.getKey(), resultMap);</b>
+<b class="fc"><i>240</i>&nbsp;    }</b>
+<b class="fc"><i>241</i>&nbsp;    return new Discriminator.Builder(configuration, resultMapping, namespaceDiscriminatorMap).build();</b>
+<i>242</i>&nbsp;  }
+<i>243</i>&nbsp;
+<i>244</i>&nbsp;  public MappedStatement addMappedStatement(
+<i>245</i>&nbsp;      String id,
+<i>246</i>&nbsp;      SqlSource sqlSource,
+<i>247</i>&nbsp;      StatementType statementType,
+<i>248</i>&nbsp;      SqlCommandType sqlCommandType,
+<i>249</i>&nbsp;      Integer fetchSize,
+<i>250</i>&nbsp;      Integer timeout,
+<i>251</i>&nbsp;      String parameterMap,
+<i>252</i>&nbsp;      Class&lt;?&gt; parameterType,
+<i>253</i>&nbsp;      String resultMap,
+<i>254</i>&nbsp;      Class&lt;?&gt; resultType,
+<i>255</i>&nbsp;      ResultSetType resultSetType,
+<i>256</i>&nbsp;      boolean flushCache,
+<i>257</i>&nbsp;      boolean useCache,
+<i>258</i>&nbsp;      boolean resultOrdered,
+<i>259</i>&nbsp;      KeyGenerator keyGenerator,
+<i>260</i>&nbsp;      String keyProperty,
+<i>261</i>&nbsp;      String keyColumn,
+<i>262</i>&nbsp;      String databaseId,
+<i>263</i>&nbsp;      LanguageDriver lang,
+<i>264</i>&nbsp;      String resultSets) {
+<i>265</i>&nbsp;
+<b class="fc"><i>266</i>&nbsp;    if (unresolvedCacheRef) {</b>
+<b class="fc"><i>267</i>&nbsp;      throw new IncompleteElementException(&quot;Cache-ref not yet resolved&quot;);</b>
+<i>268</i>&nbsp;    }
+<i>269</i>&nbsp;
+<b class="fc"><i>270</i>&nbsp;    id = applyCurrentNamespace(id, false);</b>
+<b class="fc"><i>271</i>&nbsp;    boolean isSelect = sqlCommandType == SqlCommandType.SELECT;</b>
+<i>272</i>&nbsp;
+<b class="fc"><i>273</i>&nbsp;    MappedStatement.Builder statementBuilder = new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType)</b>
+<b class="fc"><i>274</i>&nbsp;        .resource(resource)</b>
+<b class="fc"><i>275</i>&nbsp;        .fetchSize(fetchSize)</b>
+<b class="fc"><i>276</i>&nbsp;        .timeout(timeout)</b>
+<b class="fc"><i>277</i>&nbsp;        .statementType(statementType)</b>
+<b class="fc"><i>278</i>&nbsp;        .keyGenerator(keyGenerator)</b>
+<b class="fc"><i>279</i>&nbsp;        .keyProperty(keyProperty)</b>
+<b class="fc"><i>280</i>&nbsp;        .keyColumn(keyColumn)</b>
+<b class="fc"><i>281</i>&nbsp;        .databaseId(databaseId)</b>
+<b class="fc"><i>282</i>&nbsp;        .lang(lang)</b>
+<b class="fc"><i>283</i>&nbsp;        .resultOrdered(resultOrdered)</b>
+<b class="fc"><i>284</i>&nbsp;        .resultSets(resultSets)</b>
+<b class="fc"><i>285</i>&nbsp;        .resultMaps(getStatementResultMaps(resultMap, resultType, id))</b>
+<b class="fc"><i>286</i>&nbsp;        .resultSetType(resultSetType)</b>
+<b class="fc"><i>287</i>&nbsp;        .flushCacheRequired(valueOrDefault(flushCache, !isSelect))</b>
+<b class="fc"><i>288</i>&nbsp;        .useCache(valueOrDefault(useCache, isSelect))</b>
+<b class="fc"><i>289</i>&nbsp;        .cache(currentCache);</b>
+<i>290</i>&nbsp;
+<b class="fc"><i>291</i>&nbsp;    ParameterMap statementParameterMap = getStatementParameterMap(parameterMap, parameterType, id);</b>
+<b class="fc"><i>292</i>&nbsp;    if (statementParameterMap != null) {</b>
+<b class="fc"><i>293</i>&nbsp;      statementBuilder.parameterMap(statementParameterMap);</b>
+<i>294</i>&nbsp;    }
+<i>295</i>&nbsp;
+<b class="fc"><i>296</i>&nbsp;    MappedStatement statement = statementBuilder.build();</b>
+<b class="fc"><i>297</i>&nbsp;    configuration.addMappedStatement(statement);</b>
+<b class="fc"><i>298</i>&nbsp;    return statement;</b>
+<i>299</i>&nbsp;  }
+<i>300</i>&nbsp;
+<i>301</i>&nbsp;  private &lt;T&gt; T valueOrDefault(T value, T defaultValue) {
+<b class="fc"><i>302</i>&nbsp;    return value == null ? defaultValue : value;</b>
+<i>303</i>&nbsp;  }
+<i>304</i>&nbsp;
+<i>305</i>&nbsp;  private ParameterMap getStatementParameterMap(
+<i>306</i>&nbsp;      String parameterMapName,
+<i>307</i>&nbsp;      Class&lt;?&gt; parameterTypeClass,
+<i>308</i>&nbsp;      String statementId) {
+<b class="fc"><i>309</i>&nbsp;    parameterMapName = applyCurrentNamespace(parameterMapName, true);</b>
+<b class="fc"><i>310</i>&nbsp;    ParameterMap parameterMap = null;</b>
+<b class="fc"><i>311</i>&nbsp;    if (parameterMapName != null) {</b>
+<i>312</i>&nbsp;      try {
+<b class="fc"><i>313</i>&nbsp;        parameterMap = configuration.getParameterMap(parameterMapName);</b>
+<b class="fc"><i>314</i>&nbsp;      } catch (IllegalArgumentException e) {</b>
+<b class="fc"><i>315</i>&nbsp;        throw new IncompleteElementException(&quot;Could not find parameter map &quot; + parameterMapName, e);</b>
+<b class="fc"><i>316</i>&nbsp;      }</b>
+<b class="fc"><i>317</i>&nbsp;    } else if (parameterTypeClass != null) {</b>
+<b class="fc"><i>318</i>&nbsp;      List&lt;ParameterMapping&gt; parameterMappings = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>319</i>&nbsp;      parameterMap = new ParameterMap.Builder(</b>
+<i>320</i>&nbsp;          configuration,
+<i>321</i>&nbsp;          statementId + &quot;-Inline&quot;,
+<i>322</i>&nbsp;          parameterTypeClass,
+<b class="fc"><i>323</i>&nbsp;          parameterMappings).build();</b>
+<i>324</i>&nbsp;    }
+<b class="fc"><i>325</i>&nbsp;    return parameterMap;</b>
+<i>326</i>&nbsp;  }
+<i>327</i>&nbsp;
+<i>328</i>&nbsp;  private List&lt;ResultMap&gt; getStatementResultMaps(
+<i>329</i>&nbsp;      String resultMap,
+<i>330</i>&nbsp;      Class&lt;?&gt; resultType,
+<i>331</i>&nbsp;      String statementId) {
+<b class="fc"><i>332</i>&nbsp;    resultMap = applyCurrentNamespace(resultMap, true);</b>
+<i>333</i>&nbsp;
+<b class="fc"><i>334</i>&nbsp;    List&lt;ResultMap&gt; resultMaps = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>335</i>&nbsp;    if (resultMap != null) {</b>
+<b class="fc"><i>336</i>&nbsp;      String[] resultMapNames = resultMap.split(&quot;,&quot;);</b>
+<b class="fc"><i>337</i>&nbsp;      for (String resultMapName : resultMapNames) {</b>
+<i>338</i>&nbsp;        try {
+<b class="fc"><i>339</i>&nbsp;          resultMaps.add(configuration.getResultMap(resultMapName.trim()));</b>
+<b class="fc"><i>340</i>&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="fc"><i>341</i>&nbsp;          throw new IncompleteElementException(&quot;Could not find result map &quot; + resultMapName, e);</b>
+<b class="fc"><i>342</i>&nbsp;        }</b>
+<i>343</i>&nbsp;      }
+<b class="fc"><i>344</i>&nbsp;    } else if (resultType != null) {</b>
+<b class="fc"><i>345</i>&nbsp;      ResultMap inlineResultMap = new ResultMap.Builder(</b>
+<i>346</i>&nbsp;          configuration,
+<i>347</i>&nbsp;          statementId + &quot;-Inline&quot;,
+<i>348</i>&nbsp;          resultType,
+<i>349</i>&nbsp;          new ArrayList&lt;&gt;(),
+<b class="fc"><i>350</i>&nbsp;          null).build();</b>
+<b class="fc"><i>351</i>&nbsp;      resultMaps.add(inlineResultMap);</b>
+<i>352</i>&nbsp;    }
+<b class="fc"><i>353</i>&nbsp;    return resultMaps;</b>
+<i>354</i>&nbsp;  }
+<i>355</i>&nbsp;
+<i>356</i>&nbsp;  public ResultMapping buildResultMapping(
+<i>357</i>&nbsp;      Class&lt;?&gt; resultType,
+<i>358</i>&nbsp;      String property,
+<i>359</i>&nbsp;      String column,
+<i>360</i>&nbsp;      Class&lt;?&gt; javaType,
+<i>361</i>&nbsp;      JdbcType jdbcType,
+<i>362</i>&nbsp;      String nestedSelect,
+<i>363</i>&nbsp;      String nestedResultMap,
+<i>364</i>&nbsp;      String notNullColumn,
+<i>365</i>&nbsp;      String columnPrefix,
+<i>366</i>&nbsp;      Class&lt;? extends TypeHandler&lt;?&gt;&gt; typeHandler,
+<i>367</i>&nbsp;      List&lt;ResultFlag&gt; flags,
+<i>368</i>&nbsp;      String resultSet,
+<i>369</i>&nbsp;      String foreignColumn,
+<i>370</i>&nbsp;      boolean lazy) {
+<b class="fc"><i>371</i>&nbsp;    Class&lt;?&gt; javaTypeClass = resolveResultJavaType(resultType, property, javaType);</b>
+<b class="fc"><i>372</i>&nbsp;    TypeHandler&lt;?&gt; typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);</b>
+<b class="fc"><i>373</i>&nbsp;    List&lt;ResultMapping&gt; composites = parseCompositeColumnName(column);</b>
+<b class="fc"><i>374</i>&nbsp;    return new ResultMapping.Builder(configuration, property, column, javaTypeClass)</b>
+<b class="fc"><i>375</i>&nbsp;        .jdbcType(jdbcType)</b>
+<b class="fc"><i>376</i>&nbsp;        .nestedQueryId(applyCurrentNamespace(nestedSelect, true))</b>
+<b class="fc"><i>377</i>&nbsp;        .nestedResultMapId(applyCurrentNamespace(nestedResultMap, true))</b>
+<b class="fc"><i>378</i>&nbsp;        .resultSet(resultSet)</b>
+<b class="fc"><i>379</i>&nbsp;        .typeHandler(typeHandlerInstance)</b>
+<b class="fc"><i>380</i>&nbsp;        .flags(flags == null ? new ArrayList&lt;&gt;() : flags)</b>
+<b class="fc"><i>381</i>&nbsp;        .composites(composites)</b>
+<b class="fc"><i>382</i>&nbsp;        .notNullColumns(parseMultipleColumnNames(notNullColumn))</b>
+<b class="fc"><i>383</i>&nbsp;        .columnPrefix(columnPrefix)</b>
+<b class="fc"><i>384</i>&nbsp;        .foreignColumn(foreignColumn)</b>
+<b class="fc"><i>385</i>&nbsp;        .lazy(lazy)</b>
+<b class="fc"><i>386</i>&nbsp;        .build();</b>
+<i>387</i>&nbsp;  }
+<i>388</i>&nbsp;
+<i>389</i>&nbsp;  private Set&lt;String&gt; parseMultipleColumnNames(String columnName) {
+<b class="fc"><i>390</i>&nbsp;    Set&lt;String&gt; columns = new HashSet&lt;&gt;();</b>
+<b class="fc"><i>391</i>&nbsp;    if (columnName != null) {</b>
+<b class="fc"><i>392</i>&nbsp;      if (columnName.indexOf(&#39;,&#39;) &gt; -1) {</b>
+<b class="fc"><i>393</i>&nbsp;        StringTokenizer parser = new StringTokenizer(columnName, &quot;{}, &quot;, false);</b>
+<b class="fc"><i>394</i>&nbsp;        while (parser.hasMoreTokens()) {</b>
+<b class="fc"><i>395</i>&nbsp;          String column = parser.nextToken();</b>
+<b class="fc"><i>396</i>&nbsp;          columns.add(column);</b>
+<b class="fc"><i>397</i>&nbsp;        }</b>
+<b class="fc"><i>398</i>&nbsp;      } else {</b>
+<b class="fc"><i>399</i>&nbsp;        columns.add(columnName);</b>
+<i>400</i>&nbsp;      }
+<i>401</i>&nbsp;    }
+<b class="fc"><i>402</i>&nbsp;    return columns;</b>
+<i>403</i>&nbsp;  }
+<i>404</i>&nbsp;
+<i>405</i>&nbsp;  private List&lt;ResultMapping&gt; parseCompositeColumnName(String columnName) {
+<b class="fc"><i>406</i>&nbsp;    List&lt;ResultMapping&gt; composites = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>407</i>&nbsp;    if (columnName != null &amp;&amp; (columnName.indexOf(&#39;=&#39;) &gt; -1 || columnName.indexOf(&#39;,&#39;) &gt; -1)) {</b>
+<b class="fc"><i>408</i>&nbsp;      StringTokenizer parser = new StringTokenizer(columnName, &quot;{}=, &quot;, false);</b>
+<b class="fc"><i>409</i>&nbsp;      while (parser.hasMoreTokens()) {</b>
+<b class="fc"><i>410</i>&nbsp;        String property = parser.nextToken();</b>
+<b class="fc"><i>411</i>&nbsp;        String column = parser.nextToken();</b>
+<b class="fc"><i>412</i>&nbsp;        ResultMapping complexResultMapping = new ResultMapping.Builder(</b>
+<b class="fc"><i>413</i>&nbsp;            configuration, property, column, configuration.getTypeHandlerRegistry().getUnknownTypeHandler()).build();</b>
+<b class="fc"><i>414</i>&nbsp;        composites.add(complexResultMapping);</b>
+<b class="fc"><i>415</i>&nbsp;      }</b>
+<i>416</i>&nbsp;    }
+<b class="fc"><i>417</i>&nbsp;    return composites;</b>
+<i>418</i>&nbsp;  }
+<i>419</i>&nbsp;
+<i>420</i>&nbsp;  private Class&lt;?&gt; resolveResultJavaType(Class&lt;?&gt; resultType, String property, Class&lt;?&gt; javaType) {
+<b class="fc"><i>421</i>&nbsp;    if (javaType == null &amp;&amp; property != null) {</b>
+<i>422</i>&nbsp;      try {
+<b class="fc"><i>423</i>&nbsp;        MetaClass metaResultType = MetaClass.forClass(resultType, configuration.getReflectorFactory());</b>
+<b class="fc"><i>424</i>&nbsp;        javaType = metaResultType.getSetterType(property);</b>
+<b class="fc"><i>425</i>&nbsp;      } catch (Exception e) {</b>
+<i>426</i>&nbsp;        //ignore, following null check statement will deal with the situation
+<b class="fc"><i>427</i>&nbsp;      }</b>
+<i>428</i>&nbsp;    }
+<b class="fc"><i>429</i>&nbsp;    if (javaType == null) {</b>
+<b class="fc"><i>430</i>&nbsp;      javaType = Object.class;</b>
+<i>431</i>&nbsp;    }
+<b class="fc"><i>432</i>&nbsp;    return javaType;</b>
+<i>433</i>&nbsp;  }
+<i>434</i>&nbsp;
+<i>435</i>&nbsp;  private Class&lt;?&gt; resolveParameterJavaType(Class&lt;?&gt; resultType, String property, Class&lt;?&gt; javaType, JdbcType jdbcType) {
+<b class="fc"><i>436</i>&nbsp;    if (javaType == null) {</b>
+<b class="fc"><i>437</i>&nbsp;      if (JdbcType.CURSOR.equals(jdbcType)) {</b>
+<b class="nc"><i>438</i>&nbsp;        javaType = java.sql.ResultSet.class;</b>
+<b class="fc"><i>439</i>&nbsp;      } else if (Map.class.isAssignableFrom(resultType)) {</b>
+<b class="fc"><i>440</i>&nbsp;        javaType = Object.class;</b>
+<i>441</i>&nbsp;      } else {
+<b class="fc"><i>442</i>&nbsp;        MetaClass metaResultType = MetaClass.forClass(resultType, configuration.getReflectorFactory());</b>
+<b class="fc"><i>443</i>&nbsp;        javaType = metaResultType.getGetterType(property);</b>
+<i>444</i>&nbsp;      }
+<i>445</i>&nbsp;    }
+<b class="fc"><i>446</i>&nbsp;    if (javaType == null) {</b>
+<b class="nc"><i>447</i>&nbsp;      javaType = Object.class;</b>
+<i>448</i>&nbsp;    }
+<b class="fc"><i>449</i>&nbsp;    return javaType;</b>
+<i>450</i>&nbsp;  }
+<i>451</i>&nbsp;
+<i>452</i>&nbsp;  /** Backward compatibility signature. */
+<i>453</i>&nbsp;  public ResultMapping buildResultMapping(Class&lt;?&gt; resultType, String property, String column, Class&lt;?&gt; javaType,
+<i>454</i>&nbsp;      JdbcType jdbcType, String nestedSelect, String nestedResultMap, String notNullColumn, String columnPrefix,
+<i>455</i>&nbsp;      Class&lt;? extends TypeHandler&lt;?&gt;&gt; typeHandler, List&lt;ResultFlag&gt; flags) {
+<b class="nc"><i>456</i>&nbsp;    return buildResultMapping(</b>
+<i>457</i>&nbsp;      resultType, property, column, javaType, jdbcType, nestedSelect,
+<b class="nc"><i>458</i>&nbsp;      nestedResultMap, notNullColumn, columnPrefix, typeHandler, flags, null, null, configuration.isLazyLoadingEnabled());</b>
+<i>459</i>&nbsp;  }
+<i>460</i>&nbsp;
+<i>461</i>&nbsp;  public LanguageDriver getLanguageDriver(Class&lt;? extends LanguageDriver&gt; langClass) {
+<b class="fc"><i>462</i>&nbsp;    if (langClass != null) {</b>
+<b class="fc"><i>463</i>&nbsp;      configuration.getLanguageRegistry().register(langClass);</b>
+<i>464</i>&nbsp;    } else {
+<b class="fc"><i>465</i>&nbsp;      langClass = configuration.getLanguageRegistry().getDefaultDriverClass();</b>
+<i>466</i>&nbsp;    }
+<b class="fc"><i>467</i>&nbsp;    return configuration.getLanguageRegistry().getDriver(langClass);</b>
+<i>468</i>&nbsp;  }
+<i>469</i>&nbsp;
+<i>470</i>&nbsp;  /** Backward compatibility signature. */
+<i>471</i>&nbsp;  public MappedStatement addMappedStatement(String id, SqlSource sqlSource, StatementType statementType,
+<i>472</i>&nbsp;      SqlCommandType sqlCommandType, Integer fetchSize, Integer timeout, String parameterMap, Class&lt;?&gt; parameterType,
+<i>473</i>&nbsp;      String resultMap, Class&lt;?&gt; resultType, ResultSetType resultSetType, boolean flushCache, boolean useCache,
+<i>474</i>&nbsp;      boolean resultOrdered, KeyGenerator keyGenerator, String keyProperty, String keyColumn, String databaseId,
+<i>475</i>&nbsp;      LanguageDriver lang) {
+<b class="nc"><i>476</i>&nbsp;    return addMappedStatement(</b>
+<i>477</i>&nbsp;      id, sqlSource, statementType, sqlCommandType, fetchSize, timeout,
+<i>478</i>&nbsp;      parameterMap, parameterType, resultMap, resultType, resultSetType,
+<i>479</i>&nbsp;      flushCache, useCache, resultOrdered, keyGenerator, keyProperty,
+<i>480</i>&nbsp;      keyColumn, databaseId, lang, null);
+<i>481</i>&nbsp;  }
+<i>482</i>&nbsp;
+<i>483</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

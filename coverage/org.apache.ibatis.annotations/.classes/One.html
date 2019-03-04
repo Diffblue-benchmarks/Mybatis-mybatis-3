@@ -1,0 +1,83 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: One</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.annotations</a> ]
+</div>
+
+<h1>Coverage Summary for Class: One (org.apache.ibatis.annotations)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">One</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2016 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.annotations;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.annotation.Documented;
+<i>19</i>&nbsp;import java.lang.annotation.Retention;
+<i>20</i>&nbsp;import java.lang.annotation.RetentionPolicy;
+<i>21</i>&nbsp;import java.lang.annotation.Target;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;import org.apache.ibatis.mapping.FetchType;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;/**
+<i>26</i>&nbsp; * @author Clinton Begin
+<i>27</i>&nbsp; */
+<i>28</i>&nbsp;@Documented
+<i>29</i>&nbsp;@Retention(RetentionPolicy.RUNTIME)
+<i>30</i>&nbsp;@Target({})
+<i>31</i>&nbsp;public @interface One {
+<i>32</i>&nbsp;  String select() default &quot;&quot;;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;  FetchType fetchType() default FetchType.DEFAULT;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

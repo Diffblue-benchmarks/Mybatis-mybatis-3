@@ -1,0 +1,116 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ObjectFactory</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.reflection.factory</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ObjectFactory (org.apache.ibatis.reflection.factory)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">ObjectFactory$MockitoMock$1029671019</td>
+  </tr>
+  <tr>
+    <td class="name">ObjectFactory$MockitoMock$1029671019$auxiliary$9eFkJTzz</td>
+  </tr>
+  <tr>
+    <td class="name">ObjectFactory$MockitoMock$1029671019$auxiliary$zHAyWuRp</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.reflection.factory;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.List;
+<i>19</i>&nbsp;import java.util.Properties;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;/**
+<i>22</i>&nbsp; * MyBatis uses an ObjectFactory to create all needed new Objects.
+<i>23</i>&nbsp; *
+<i>24</i>&nbsp; * @author Clinton Begin
+<i>25</i>&nbsp; */
+<i>26</i>&nbsp;public interface ObjectFactory {
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;  /**
+<i>29</i>&nbsp;   * Sets configuration properties.
+<i>30</i>&nbsp;   * @param properties configuration properties
+<i>31</i>&nbsp;   */
+<i>32</i>&nbsp;  void setProperties(Properties properties);
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;  /**
+<i>35</i>&nbsp;   * Creates a new object with default constructor.
+<i>36</i>&nbsp;   * @param type Object type
+<i>37</i>&nbsp;   * @return
+<i>38</i>&nbsp;   */
+<i>39</i>&nbsp;  &lt;T&gt; T create(Class&lt;T&gt; type);
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;  /**
+<i>42</i>&nbsp;   * Creates a new object with the specified constructor and params.
+<i>43</i>&nbsp;   * @param type Object type
+<i>44</i>&nbsp;   * @param constructorArgTypes Constructor argument types
+<i>45</i>&nbsp;   * @param constructorArgs Constructor argument values
+<i>46</i>&nbsp;   * @return
+<i>47</i>&nbsp;   */
+<i>48</i>&nbsp;  &lt;T&gt; T create(Class&lt;T&gt; type, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs);
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;  /**
+<i>51</i>&nbsp;   * Returns true if this object can have a set of other objects.
+<i>52</i>&nbsp;   * It&#39;s main purpose is to support non-java.util.Collection objects like Scala collections.
+<i>53</i>&nbsp;   *
+<i>54</i>&nbsp;   * @param type Object type
+<i>55</i>&nbsp;   * @return whether it is a collection or not
+<i>56</i>&nbsp;   * @since 3.1.0
+<i>57</i>&nbsp;   */
+<i>58</i>&nbsp;  &lt;T&gt; boolean isCollection(Class&lt;T&gt; type);
+<i>59</i>&nbsp;
+<i>60</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

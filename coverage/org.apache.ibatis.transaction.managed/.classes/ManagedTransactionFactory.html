@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ManagedTransactionFactory</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.transaction.managed</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ManagedTransactionFactory (org.apache.ibatis.transaction.managed)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ManagedTransactionFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/ 9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2016 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.transaction.managed;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.Connection;
+<i>19</i>&nbsp;import java.util.Properties;
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;import javax.sql.DataSource;
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;import org.apache.ibatis.session.TransactionIsolationLevel;
+<i>24</i>&nbsp;import org.apache.ibatis.transaction.Transaction;
+<i>25</i>&nbsp;import org.apache.ibatis.transaction.TransactionFactory;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;/**
+<i>28</i>&nbsp; * Creates {@link ManagedTransaction} instances.
+<i>29</i>&nbsp; *
+<i>30</i>&nbsp; * @author Clinton Begin
+<i>31</i>&nbsp; *
+<i>32</i>&nbsp; * @see ManagedTransaction
+<i>33</i>&nbsp; */
+<b class="fc"><i>34</i>&nbsp;public class ManagedTransactionFactory implements TransactionFactory {</b>
+<i>35</i>&nbsp;
+<b class="fc"><i>36</i>&nbsp;  private boolean closeConnection = true;</b>
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;  @Override
+<i>39</i>&nbsp;  public void setProperties(Properties props) {
+<b class="fc"><i>40</i>&nbsp;    if (props != null) {</b>
+<b class="fc"><i>41</i>&nbsp;      String closeConnectionProperty = props.getProperty(&quot;closeConnection&quot;);</b>
+<b class="fc"><i>42</i>&nbsp;      if (closeConnectionProperty != null) {</b>
+<b class="fc"><i>43</i>&nbsp;        closeConnection = Boolean.valueOf(closeConnectionProperty);</b>
+<i>44</i>&nbsp;      }
+<i>45</i>&nbsp;    }
+<b class="fc"><i>46</i>&nbsp;  }</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;  @Override
+<i>49</i>&nbsp;  public Transaction newTransaction(Connection conn) {
+<b class="fc"><i>50</i>&nbsp;    return new ManagedTransaction(conn, closeConnection);</b>
+<i>51</i>&nbsp;  }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;  @Override
+<i>54</i>&nbsp;  public Transaction newTransaction(DataSource ds, TransactionIsolationLevel level, boolean autoCommit) {
+<i>55</i>&nbsp;    // Silently ignores autocommit and isolation level, as managed transactions are entirely
+<i>56</i>&nbsp;    // controlled by an external manager.  It&#39;s silently ignored so that
+<i>57</i>&nbsp;    // code remains portable between managed and unmanaged configurations.
+<b class="nc"><i>58</i>&nbsp;    return new ManagedTransaction(ds, level, closeConnection);</b>
+<i>59</i>&nbsp;  }
+<i>60</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

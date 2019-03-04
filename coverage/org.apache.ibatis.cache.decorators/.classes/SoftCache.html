@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SoftCache</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.cache.decorators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SoftCache (org.apache.ibatis.cache.decorators)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SoftCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.8%
+  </span>
+  <span class="absValue">
+    (33/ 38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SoftCache$SoftEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/ 12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.1%
+  </span>
+  <span class="absValue">
+    (37/ 42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.cache.decorators;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.ref.ReferenceQueue;
+<i>19</i>&nbsp;import java.lang.ref.SoftReference;
+<i>20</i>&nbsp;import java.util.Deque;
+<i>21</i>&nbsp;import java.util.LinkedList;
+<i>22</i>&nbsp;import java.util.concurrent.locks.ReadWriteLock;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import org.apache.ibatis.cache.Cache;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;/**
+<i>27</i>&nbsp; * Soft Reference cache decorator
+<i>28</i>&nbsp; * Thanks to Dr. Heinz Kabutz for his guidance here.
+<i>29</i>&nbsp; *
+<i>30</i>&nbsp; * @author Clinton Begin
+<i>31</i>&nbsp; */
+<i>32</i>&nbsp;public class SoftCache implements Cache {
+<i>33</i>&nbsp;  private final Deque&lt;Object&gt; hardLinksToAvoidGarbageCollection;
+<i>34</i>&nbsp;  private final ReferenceQueue&lt;Object&gt; queueOfGarbageCollectedEntries;
+<i>35</i>&nbsp;  private final Cache delegate;
+<i>36</i>&nbsp;  private int numberOfHardLinks;
+<i>37</i>&nbsp;
+<b class="fc"><i>38</i>&nbsp;  public SoftCache(Cache delegate) {</b>
+<b class="fc"><i>39</i>&nbsp;    this.delegate = delegate;</b>
+<b class="fc"><i>40</i>&nbsp;    this.numberOfHardLinks = 256;</b>
+<b class="fc"><i>41</i>&nbsp;    this.hardLinksToAvoidGarbageCollection = new LinkedList&lt;&gt;();</b>
+<b class="fc"><i>42</i>&nbsp;    this.queueOfGarbageCollectedEntries = new ReferenceQueue&lt;&gt;();</b>
+<b class="fc"><i>43</i>&nbsp;  }</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;  @Override
+<i>46</i>&nbsp;  public String getId() {
+<b class="nc"><i>47</i>&nbsp;    return delegate.getId();</b>
+<i>48</i>&nbsp;  }
+<i>49</i>&nbsp;
+<i>50</i>&nbsp;  @Override
+<i>51</i>&nbsp;  public int getSize() {
+<b class="fc"><i>52</i>&nbsp;    removeGarbageCollectedItems();</b>
+<b class="fc"><i>53</i>&nbsp;    return delegate.getSize();</b>
+<i>54</i>&nbsp;  }
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;  public void setSize(int size) {
+<b class="nc"><i>58</i>&nbsp;    this.numberOfHardLinks = size;</b>
+<b class="nc"><i>59</i>&nbsp;  }</b>
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;  @Override
+<i>62</i>&nbsp;  public void putObject(Object key, Object value) {
+<b class="fc"><i>63</i>&nbsp;    removeGarbageCollectedItems();</b>
+<b class="fc"><i>64</i>&nbsp;    delegate.putObject(key, new SoftEntry(key, value, queueOfGarbageCollectedEntries));</b>
+<b class="fc"><i>65</i>&nbsp;  }</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;  @Override
+<i>68</i>&nbsp;  public Object getObject(Object key) {
+<b class="fc"><i>69</i>&nbsp;    Object result = null;</b>
+<i>70</i>&nbsp;    @SuppressWarnings(&quot;unchecked&quot;) // assumed delegate cache is totally managed by this cache
+<b class="fc"><i>71</i>&nbsp;    SoftReference&lt;Object&gt; softReference = (SoftReference&lt;Object&gt;) delegate.getObject(key);</b>
+<b class="fc"><i>72</i>&nbsp;    if (softReference != null) {</b>
+<b class="fc"><i>73</i>&nbsp;      result = softReference.get();</b>
+<b class="fc"><i>74</i>&nbsp;      if (result == null) {</b>
+<b class="nc"><i>75</i>&nbsp;        delegate.removeObject(key);</b>
+<i>76</i>&nbsp;      } else {
+<i>77</i>&nbsp;        // See #586 (and #335) modifications need more than a read lock
+<b class="fc"><i>78</i>&nbsp;        synchronized (hardLinksToAvoidGarbageCollection) {</b>
+<b class="fc"><i>79</i>&nbsp;          hardLinksToAvoidGarbageCollection.addFirst(result);</b>
+<b class="fc"><i>80</i>&nbsp;          if (hardLinksToAvoidGarbageCollection.size() &gt; numberOfHardLinks) {</b>
+<b class="fc"><i>81</i>&nbsp;            hardLinksToAvoidGarbageCollection.removeLast();</b>
+<i>82</i>&nbsp;          }
+<b class="fc"><i>83</i>&nbsp;        }</b>
+<i>84</i>&nbsp;      }
+<i>85</i>&nbsp;    }
+<b class="fc"><i>86</i>&nbsp;    return result;</b>
+<i>87</i>&nbsp;  }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;  @Override
+<i>90</i>&nbsp;  public Object removeObject(Object key) {
+<b class="fc"><i>91</i>&nbsp;    removeGarbageCollectedItems();</b>
+<b class="fc"><i>92</i>&nbsp;    return delegate.removeObject(key);</b>
+<i>93</i>&nbsp;  }
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;  @Override
+<i>96</i>&nbsp;  public void clear() {
+<b class="fc"><i>97</i>&nbsp;    synchronized (hardLinksToAvoidGarbageCollection) {</b>
+<b class="fc"><i>98</i>&nbsp;      hardLinksToAvoidGarbageCollection.clear();</b>
+<b class="fc"><i>99</i>&nbsp;    }</b>
+<b class="fc"><i>100</i>&nbsp;    removeGarbageCollectedItems();</b>
+<b class="fc"><i>101</i>&nbsp;    delegate.clear();</b>
+<b class="fc"><i>102</i>&nbsp;  }</b>
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;  @Override
+<i>105</i>&nbsp;  public ReadWriteLock getReadWriteLock() {
+<b class="nc"><i>106</i>&nbsp;    return null;</b>
+<i>107</i>&nbsp;  }
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;  private void removeGarbageCollectedItems() {
+<i>110</i>&nbsp;    SoftEntry sv;
+<b class="fc"><i>111</i>&nbsp;    while ((sv = (SoftEntry) queueOfGarbageCollectedEntries.poll()) != null) {</b>
+<b class="fc"><i>112</i>&nbsp;      delegate.removeObject(sv.key);</b>
+<i>113</i>&nbsp;    }
+<b class="fc"><i>114</i>&nbsp;  }</b>
+<i>115</i>&nbsp;
+<b class="fc"><i>116</i>&nbsp;  private static class SoftEntry extends SoftReference&lt;Object&gt; {</b>
+<i>117</i>&nbsp;    private final Object key;
+<i>118</i>&nbsp;
+<i>119</i>&nbsp;    SoftEntry(Object key, Object value, ReferenceQueue&lt;Object&gt; garbageCollectionQueue) {
+<b class="fc"><i>120</i>&nbsp;      super(value, garbageCollectionQueue);</b>
+<b class="fc"><i>121</i>&nbsp;      this.key = key;</b>
+<b class="fc"><i>122</i>&nbsp;    }</b>
+<i>123</i>&nbsp;  }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

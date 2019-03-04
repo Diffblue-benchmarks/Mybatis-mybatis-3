@@ -1,0 +1,142 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DefaultMapResultHandler</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.executor.result</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DefaultMapResultHandler (org.apache.ibatis.executor.result)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultMapResultHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/ 13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2015 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.executor.result;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.Map;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import org.apache.ibatis.reflection.MetaObject;
+<i>21</i>&nbsp;import org.apache.ibatis.reflection.ReflectorFactory;
+<i>22</i>&nbsp;import org.apache.ibatis.reflection.factory.ObjectFactory;
+<i>23</i>&nbsp;import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
+<i>24</i>&nbsp;import org.apache.ibatis.session.ResultContext;
+<i>25</i>&nbsp;import org.apache.ibatis.session.ResultHandler;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;/**
+<i>28</i>&nbsp; * @author Clinton Begin
+<i>29</i>&nbsp; */
+<i>30</i>&nbsp;public class DefaultMapResultHandler&lt;K, V&gt; implements ResultHandler&lt;V&gt; {
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;  private final Map&lt;K, V&gt; mappedResults;
+<i>33</i>&nbsp;  private final String mapKey;
+<i>34</i>&nbsp;  private final ObjectFactory objectFactory;
+<i>35</i>&nbsp;  private final ObjectWrapperFactory objectWrapperFactory;
+<i>36</i>&nbsp;  private final ReflectorFactory reflectorFactory;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;  @SuppressWarnings(&quot;unchecked&quot;)
+<b class="fc"><i>39</i>&nbsp;  public DefaultMapResultHandler(String mapKey, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {</b>
+<b class="fc"><i>40</i>&nbsp;    this.objectFactory = objectFactory;</b>
+<b class="fc"><i>41</i>&nbsp;    this.objectWrapperFactory = objectWrapperFactory;</b>
+<b class="fc"><i>42</i>&nbsp;    this.reflectorFactory = reflectorFactory;</b>
+<b class="fc"><i>43</i>&nbsp;    this.mappedResults = objectFactory.create(Map.class);</b>
+<b class="fc"><i>44</i>&nbsp;    this.mapKey = mapKey;</b>
+<b class="fc"><i>45</i>&nbsp;  }</b>
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;  @Override
+<i>48</i>&nbsp;  public void handleResult(ResultContext&lt;? extends V&gt; context) {
+<b class="fc"><i>49</i>&nbsp;    final V value = context.getResultObject();</b>
+<b class="fc"><i>50</i>&nbsp;    final MetaObject mo = MetaObject.forObject(value, objectFactory, objectWrapperFactory, reflectorFactory);</b>
+<i>51</i>&nbsp;    // TODO is that assignment always true?
+<b class="fc"><i>52</i>&nbsp;    final K key = (K) mo.getValue(mapKey);</b>
+<b class="fc"><i>53</i>&nbsp;    mappedResults.put(key, value);</b>
+<b class="fc"><i>54</i>&nbsp;  }</b>
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;  public Map&lt;K, V&gt; getMappedResults() {
+<b class="fc"><i>57</i>&nbsp;    return mappedResults;</b>
+<i>58</i>&nbsp;  }
+<i>59</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

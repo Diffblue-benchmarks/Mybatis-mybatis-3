@@ -1,0 +1,350 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: JavassistProxyFactory</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.executor.loader.javassist</a> ]
+</div>
+
+<h1>Coverage Summary for Class: JavassistProxyFactory (org.apache.ibatis.executor.loader.javassist)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavassistProxyFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.1%
+  </span>
+  <span class="absValue">
+    (19/ 26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JavassistProxyFactory$EnhancedDeserializationProxyImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/ 10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JavassistProxyFactory$EnhancedResultObjectProxyImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.7%
+  </span>
+  <span class="absValue">
+    (36/ 38)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JavassistProxyFactory$LogHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/ 14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (67/ 76)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.executor.loader.javassist;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.lang.reflect.Method;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;import java.util.Map;
+<i>21</i>&nbsp;import java.util.Properties;
+<i>22</i>&nbsp;import java.util.Set;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;import javassist.util.proxy.MethodHandler;
+<i>25</i>&nbsp;import javassist.util.proxy.Proxy;
+<i>26</i>&nbsp;import javassist.util.proxy.ProxyFactory;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import org.apache.ibatis.executor.ExecutorException;
+<i>29</i>&nbsp;import org.apache.ibatis.executor.loader.AbstractEnhancedDeserializationProxy;
+<i>30</i>&nbsp;import org.apache.ibatis.executor.loader.AbstractSerialStateHolder;
+<i>31</i>&nbsp;import org.apache.ibatis.executor.loader.ResultLoaderMap;
+<i>32</i>&nbsp;import org.apache.ibatis.executor.loader.WriteReplaceInterface;
+<i>33</i>&nbsp;import org.apache.ibatis.io.Resources;
+<i>34</i>&nbsp;import org.apache.ibatis.logging.Log;
+<i>35</i>&nbsp;import org.apache.ibatis.logging.LogFactory;
+<i>36</i>&nbsp;import org.apache.ibatis.reflection.ExceptionUtil;
+<i>37</i>&nbsp;import org.apache.ibatis.reflection.factory.ObjectFactory;
+<i>38</i>&nbsp;import org.apache.ibatis.reflection.property.PropertyCopier;
+<i>39</i>&nbsp;import org.apache.ibatis.reflection.property.PropertyNamer;
+<i>40</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;/**
+<i>43</i>&nbsp; * @author Eduardo Macarron
+<i>44</i>&nbsp; */
+<i>45</i>&nbsp;public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.ProxyFactory {
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;  private static final String FINALIZE_METHOD = &quot;finalize&quot;;
+<i>48</i>&nbsp;  private static final String WRITE_REPLACE_METHOD = &quot;writeReplace&quot;;
+<i>49</i>&nbsp;
+<b class="fc"><i>50</i>&nbsp;  public JavassistProxyFactory() {</b>
+<i>51</i>&nbsp;    try {
+<b class="fc"><i>52</i>&nbsp;      Resources.classForName(&quot;javassist.util.proxy.ProxyFactory&quot;);</b>
+<b class="nc"><i>53</i>&nbsp;    } catch (Throwable e) {</b>
+<b class="nc"><i>54</i>&nbsp;      throw new IllegalStateException(&quot;Cannot enable lazy loading because Javassist is not available. Add Javassist to your classpath.&quot;, e);</b>
+<b class="fc"><i>55</i>&nbsp;    }</b>
+<b class="fc"><i>56</i>&nbsp;  }</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;  @Override
+<i>59</i>&nbsp;  public Object createProxy(Object target, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<b class="fc"><i>60</i>&nbsp;    return EnhancedResultObjectProxyImpl.createProxy(target, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);</b>
+<i>61</i>&nbsp;  }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;  public Object createDeserializationProxy(Object target, Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties, ObjectFactory objectFactory, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<b class="fc"><i>64</i>&nbsp;    return EnhancedDeserializationProxyImpl.createProxy(target, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);</b>
+<i>65</i>&nbsp;  }
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;  @Override
+<i>68</i>&nbsp;  public void setProperties(Properties properties) {
+<i>69</i>&nbsp;      // Not Implemented
+<b class="nc"><i>70</i>&nbsp;  }</b>
+<i>71</i>&nbsp;
+<i>72</i>&nbsp;  static Object crateProxy(Class&lt;?&gt; type, MethodHandler callback, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<i>73</i>&nbsp;
+<b class="fc"><i>74</i>&nbsp;    ProxyFactory enhancer = new ProxyFactory();</b>
+<b class="fc"><i>75</i>&nbsp;    enhancer.setSuperclass(type);</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    try {
+<b class="fc"><i>78</i>&nbsp;      type.getDeclaredMethod(WRITE_REPLACE_METHOD);</b>
+<i>79</i>&nbsp;      // ObjectOutputStream will call writeReplace of objects returned by writeReplace
+<b class="fc"><i>80</i>&nbsp;      if (LogHolder.log.isDebugEnabled()) {</b>
+<b class="nc"><i>81</i>&nbsp;        LogHolder.log.debug(WRITE_REPLACE_METHOD + &quot; method was found on bean &quot; + type + &quot;, make sure it returns this&quot;);</b>
+<i>82</i>&nbsp;      }
+<b class="fc"><i>83</i>&nbsp;    } catch (NoSuchMethodException e) {</b>
+<b class="fc"><i>84</i>&nbsp;      enhancer.setInterfaces(new Class[]{WriteReplaceInterface.class});</b>
+<b class="nc"><i>85</i>&nbsp;    } catch (SecurityException e) {</b>
+<i>86</i>&nbsp;      // nothing to do here
+<b class="fc"><i>87</i>&nbsp;    }</b>
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;    Object enhanced;
+<b class="fc"><i>90</i>&nbsp;    Class&lt;?&gt;[] typesArray = constructorArgTypes.toArray(new Class[constructorArgTypes.size()]);</b>
+<b class="fc"><i>91</i>&nbsp;    Object[] valuesArray = constructorArgs.toArray(new Object[constructorArgs.size()]);</b>
+<i>92</i>&nbsp;    try {
+<b class="fc"><i>93</i>&nbsp;      enhanced = enhancer.create(typesArray, valuesArray);</b>
+<b class="nc"><i>94</i>&nbsp;    } catch (Exception e) {</b>
+<b class="nc"><i>95</i>&nbsp;      throw new ExecutorException(&quot;Error creating lazy proxy.  Cause: &quot; + e, e);</b>
+<b class="fc"><i>96</i>&nbsp;    }</b>
+<b class="fc"><i>97</i>&nbsp;    ((Proxy) enhanced).setHandler(callback);</b>
+<b class="fc"><i>98</i>&nbsp;    return enhanced;</b>
+<i>99</i>&nbsp;  }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;  private static class EnhancedResultObjectProxyImpl implements MethodHandler {
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    private final Class&lt;?&gt; type;
+<i>104</i>&nbsp;    private final ResultLoaderMap lazyLoader;
+<i>105</i>&nbsp;    private final boolean aggressive;
+<i>106</i>&nbsp;    private final Set&lt;String&gt; lazyLoadTriggerMethods;
+<i>107</i>&nbsp;    private final ObjectFactory objectFactory;
+<i>108</i>&nbsp;    private final List&lt;Class&lt;?&gt;&gt; constructorArgTypes;
+<i>109</i>&nbsp;    private final List&lt;Object&gt; constructorArgs;
+<i>110</i>&nbsp;
+<b class="fc"><i>111</i>&nbsp;    private EnhancedResultObjectProxyImpl(Class&lt;?&gt; type, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {</b>
+<b class="fc"><i>112</i>&nbsp;      this.type = type;</b>
+<b class="fc"><i>113</i>&nbsp;      this.lazyLoader = lazyLoader;</b>
+<b class="fc"><i>114</i>&nbsp;      this.aggressive = configuration.isAggressiveLazyLoading();</b>
+<b class="fc"><i>115</i>&nbsp;      this.lazyLoadTriggerMethods = configuration.getLazyLoadTriggerMethods();</b>
+<b class="fc"><i>116</i>&nbsp;      this.objectFactory = objectFactory;</b>
+<b class="fc"><i>117</i>&nbsp;      this.constructorArgTypes = constructorArgTypes;</b>
+<b class="fc"><i>118</i>&nbsp;      this.constructorArgs = constructorArgs;</b>
+<b class="fc"><i>119</i>&nbsp;    }</b>
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    public static Object createProxy(Object target, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<b class="fc"><i>122</i>&nbsp;      final Class&lt;?&gt; type = target.getClass();</b>
+<b class="fc"><i>123</i>&nbsp;      EnhancedResultObjectProxyImpl callback = new EnhancedResultObjectProxyImpl(type, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);</b>
+<b class="fc"><i>124</i>&nbsp;      Object enhanced = crateProxy(type, callback, constructorArgTypes, constructorArgs);</b>
+<b class="fc"><i>125</i>&nbsp;      PropertyCopier.copyBeanProperties(type, target, enhanced);</b>
+<b class="fc"><i>126</i>&nbsp;      return enhanced;</b>
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    @Override
+<i>130</i>&nbsp;    public Object invoke(Object enhanced, Method method, Method methodProxy, Object[] args) throws Throwable {
+<b class="fc"><i>131</i>&nbsp;      final String methodName = method.getName();</b>
+<i>132</i>&nbsp;      try {
+<b class="fc"><i>133</i>&nbsp;        synchronized (lazyLoader) {</b>
+<b class="fc"><i>134</i>&nbsp;          if (WRITE_REPLACE_METHOD.equals(methodName)) {</b>
+<i>135</i>&nbsp;            Object original;
+<b class="fc"><i>136</i>&nbsp;            if (constructorArgTypes.isEmpty()) {</b>
+<b class="fc"><i>137</i>&nbsp;              original = objectFactory.create(type);</b>
+<i>138</i>&nbsp;            } else {
+<b class="fc"><i>139</i>&nbsp;              original = objectFactory.create(type, constructorArgTypes, constructorArgs);</b>
+<i>140</i>&nbsp;            }
+<b class="fc"><i>141</i>&nbsp;            PropertyCopier.copyBeanProperties(type, enhanced, original);</b>
+<b class="fc"><i>142</i>&nbsp;            if (lazyLoader.size() &gt; 0) {</b>
+<b class="fc"><i>143</i>&nbsp;              return new JavassistSerialStateHolder(original, lazyLoader.getProperties(), objectFactory, constructorArgTypes, constructorArgs);</b>
+<i>144</i>&nbsp;            } else {
+<b class="fc"><i>145</i>&nbsp;              return original;</b>
+<i>146</i>&nbsp;            }
+<i>147</i>&nbsp;          } else {
+<b class="fc"><i>148</i>&nbsp;            if (lazyLoader.size() &gt; 0 &amp;&amp; !FINALIZE_METHOD.equals(methodName)) {</b>
+<b class="fc"><i>149</i>&nbsp;              if (aggressive || lazyLoadTriggerMethods.contains(methodName)) {</b>
+<b class="fc"><i>150</i>&nbsp;                lazyLoader.loadAll();</b>
+<b class="fc"><i>151</i>&nbsp;              } else if (PropertyNamer.isSetter(methodName)) {</b>
+<b class="fc"><i>152</i>&nbsp;                final String property = PropertyNamer.methodToProperty(methodName);</b>
+<b class="fc"><i>153</i>&nbsp;                lazyLoader.remove(property);</b>
+<b class="fc"><i>154</i>&nbsp;              } else if (PropertyNamer.isGetter(methodName)) {</b>
+<b class="fc"><i>155</i>&nbsp;                final String property = PropertyNamer.methodToProperty(methodName);</b>
+<b class="fc"><i>156</i>&nbsp;                if (lazyLoader.hasLoader(property)) {</b>
+<b class="fc"><i>157</i>&nbsp;                  lazyLoader.load(property);</b>
+<i>158</i>&nbsp;                }
+<i>159</i>&nbsp;              }
+<i>160</i>&nbsp;            }
+<i>161</i>&nbsp;          }
+<b class="fc"><i>162</i>&nbsp;        }</b>
+<b class="fc"><i>163</i>&nbsp;        return methodProxy.invoke(enhanced, args);</b>
+<b class="nc"><i>164</i>&nbsp;      } catch (Throwable t) {</b>
+<b class="nc"><i>165</i>&nbsp;        throw ExceptionUtil.unwrapThrowable(t);</b>
+<i>166</i>&nbsp;      }
+<i>167</i>&nbsp;    }
+<i>168</i>&nbsp;  }
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;  private static class EnhancedDeserializationProxyImpl extends AbstractEnhancedDeserializationProxy implements MethodHandler {
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;    private EnhancedDeserializationProxyImpl(Class&lt;?&gt; type, Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties, ObjectFactory objectFactory,
+<i>173</i>&nbsp;            List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<b class="fc"><i>174</i>&nbsp;      super(type, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);</b>
+<b class="fc"><i>175</i>&nbsp;    }</b>
+<i>176</i>&nbsp;
+<i>177</i>&nbsp;    public static Object createProxy(Object target, Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties, ObjectFactory objectFactory,
+<i>178</i>&nbsp;            List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<b class="fc"><i>179</i>&nbsp;      final Class&lt;?&gt; type = target.getClass();</b>
+<b class="fc"><i>180</i>&nbsp;      EnhancedDeserializationProxyImpl callback = new EnhancedDeserializationProxyImpl(type, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);</b>
+<b class="fc"><i>181</i>&nbsp;      Object enhanced = crateProxy(type, callback, constructorArgTypes, constructorArgs);</b>
+<b class="fc"><i>182</i>&nbsp;      PropertyCopier.copyBeanProperties(type, target, enhanced);</b>
+<b class="fc"><i>183</i>&nbsp;      return enhanced;</b>
+<i>184</i>&nbsp;    }
+<i>185</i>&nbsp;
+<i>186</i>&nbsp;    @Override
+<i>187</i>&nbsp;    public Object invoke(Object enhanced, Method method, Method methodProxy, Object[] args) throws Throwable {
+<b class="fc"><i>188</i>&nbsp;      final Object o = super.invoke(enhanced, method, args);</b>
+<b class="fc"><i>189</i>&nbsp;      return o instanceof AbstractSerialStateHolder ? o : methodProxy.invoke(o, args);</b>
+<i>190</i>&nbsp;    }
+<i>191</i>&nbsp;
+<i>192</i>&nbsp;    @Override
+<i>193</i>&nbsp;    protected AbstractSerialStateHolder newSerialStateHolder(Object userBean, Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties, ObjectFactory objectFactory,
+<i>194</i>&nbsp;            List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs) {
+<b class="fc"><i>195</i>&nbsp;      return new JavassistSerialStateHolder(userBean, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);</b>
+<i>196</i>&nbsp;    }
+<i>197</i>&nbsp;  }
+<i>198</i>&nbsp;
+<b class="fc"><i>199</i>&nbsp;  private static class LogHolder {</b>
+<b class="fc"><i>200</i>&nbsp;    private static final Log log = LogFactory.getLog(JavassistProxyFactory.class);</b>
+<i>201</i>&nbsp;  }
+<i>202</i>&nbsp;
+<i>203</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

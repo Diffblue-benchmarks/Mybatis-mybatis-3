@@ -1,0 +1,498 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: BaseExecutor</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.executor</a> ]
+</div>
+
+<h1>Coverage Summary for Class: BaseExecutor (org.apache.ibatis.executor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BaseExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/ 23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.1%
+  </span>
+  <span class="absValue">
+    (135/ 145)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BaseExecutor$DeferredLoad</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/ 14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/ 26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.7%
+  </span>
+  <span class="absValue">
+    (149/ 159)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.executor;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import static org.apache.ibatis.executor.ExecutionPlaceholder.EXECUTION_PLACEHOLDER;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import java.sql.Connection;
+<i>21</i>&nbsp;import java.sql.SQLException;
+<i>22</i>&nbsp;import java.sql.Statement;
+<i>23</i>&nbsp;import java.util.List;
+<i>24</i>&nbsp;import java.util.concurrent.ConcurrentLinkedQueue;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;import org.apache.ibatis.cache.CacheKey;
+<i>27</i>&nbsp;import org.apache.ibatis.cache.impl.PerpetualCache;
+<i>28</i>&nbsp;import org.apache.ibatis.cursor.Cursor;
+<i>29</i>&nbsp;import org.apache.ibatis.executor.statement.StatementUtil;
+<i>30</i>&nbsp;import org.apache.ibatis.logging.Log;
+<i>31</i>&nbsp;import org.apache.ibatis.logging.LogFactory;
+<i>32</i>&nbsp;import org.apache.ibatis.logging.jdbc.ConnectionLogger;
+<i>33</i>&nbsp;import org.apache.ibatis.mapping.BoundSql;
+<i>34</i>&nbsp;import org.apache.ibatis.mapping.MappedStatement;
+<i>35</i>&nbsp;import org.apache.ibatis.mapping.ParameterMapping;
+<i>36</i>&nbsp;import org.apache.ibatis.mapping.ParameterMode;
+<i>37</i>&nbsp;import org.apache.ibatis.mapping.StatementType;
+<i>38</i>&nbsp;import org.apache.ibatis.reflection.MetaObject;
+<i>39</i>&nbsp;import org.apache.ibatis.reflection.factory.ObjectFactory;
+<i>40</i>&nbsp;import org.apache.ibatis.session.Configuration;
+<i>41</i>&nbsp;import org.apache.ibatis.session.LocalCacheScope;
+<i>42</i>&nbsp;import org.apache.ibatis.session.ResultHandler;
+<i>43</i>&nbsp;import org.apache.ibatis.session.RowBounds;
+<i>44</i>&nbsp;import org.apache.ibatis.transaction.Transaction;
+<i>45</i>&nbsp;import org.apache.ibatis.type.TypeHandlerRegistry;
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;/**
+<i>48</i>&nbsp; * @author Clinton Begin
+<i>49</i>&nbsp; */
+<i>50</i>&nbsp;public abstract class BaseExecutor implements Executor {
+<i>51</i>&nbsp;
+<b class="fc"><i>52</i>&nbsp;  private static final Log log = LogFactory.getLog(BaseExecutor.class);</b>
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;  protected Transaction transaction;
+<i>55</i>&nbsp;  protected Executor wrapper;
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;  protected ConcurrentLinkedQueue&lt;DeferredLoad&gt; deferredLoads;
+<i>58</i>&nbsp;  protected PerpetualCache localCache;
+<i>59</i>&nbsp;  protected PerpetualCache localOutputParameterCache;
+<i>60</i>&nbsp;  protected Configuration configuration;
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;  protected int queryStack;
+<i>63</i>&nbsp;  private boolean closed;
+<i>64</i>&nbsp;
+<b class="fc"><i>65</i>&nbsp;  protected BaseExecutor(Configuration configuration, Transaction transaction) {</b>
+<b class="fc"><i>66</i>&nbsp;    this.transaction = transaction;</b>
+<b class="fc"><i>67</i>&nbsp;    this.deferredLoads = new ConcurrentLinkedQueue&lt;&gt;();</b>
+<b class="fc"><i>68</i>&nbsp;    this.localCache = new PerpetualCache(&quot;LocalCache&quot;);</b>
+<b class="fc"><i>69</i>&nbsp;    this.localOutputParameterCache = new PerpetualCache(&quot;LocalOutputParameterCache&quot;);</b>
+<b class="fc"><i>70</i>&nbsp;    this.closed = false;</b>
+<b class="fc"><i>71</i>&nbsp;    this.configuration = configuration;</b>
+<b class="fc"><i>72</i>&nbsp;    this.wrapper = this;</b>
+<b class="fc"><i>73</i>&nbsp;  }</b>
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;  @Override
+<i>76</i>&nbsp;  public Transaction getTransaction() {
+<b class="fc"><i>77</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>78</i>&nbsp;      throw new ExecutorException(&quot;Executor was closed.&quot;);</b>
+<i>79</i>&nbsp;    }
+<b class="fc"><i>80</i>&nbsp;    return transaction;</b>
+<i>81</i>&nbsp;  }
+<i>82</i>&nbsp;
+<i>83</i>&nbsp;  @Override
+<i>84</i>&nbsp;  public void close(boolean forceRollback) {
+<i>85</i>&nbsp;    try {
+<i>86</i>&nbsp;      try {
+<b class="fc"><i>87</i>&nbsp;        rollback(forceRollback);</b>
+<i>88</i>&nbsp;      } finally {
+<b class="fc"><i>89</i>&nbsp;        if (transaction != null) {</b>
+<b class="fc"><i>90</i>&nbsp;          transaction.close();</b>
+<i>91</i>&nbsp;        }
+<b class="fc"><i>92</i>&nbsp;      }</b>
+<b class="fc"><i>93</i>&nbsp;    } catch (SQLException e) {</b>
+<i>94</i>&nbsp;      // Ignore.  There&#39;s nothing that can be done at this point.
+<b class="fc"><i>95</i>&nbsp;      log.warn(&quot;Unexpected exception on closing transaction.  Cause: &quot; + e);</b>
+<i>96</i>&nbsp;    } finally {
+<b class="fc"><i>97</i>&nbsp;      transaction = null;</b>
+<b class="fc"><i>98</i>&nbsp;      deferredLoads = null;</b>
+<b class="fc"><i>99</i>&nbsp;      localCache = null;</b>
+<b class="fc"><i>100</i>&nbsp;      localOutputParameterCache = null;</b>
+<b class="fc"><i>101</i>&nbsp;      closed = true;</b>
+<b class="fc"><i>102</i>&nbsp;    }</b>
+<b class="fc"><i>103</i>&nbsp;  }</b>
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;  @Override
+<i>106</i>&nbsp;  public boolean isClosed() {
+<b class="fc"><i>107</i>&nbsp;    return closed;</b>
+<i>108</i>&nbsp;  }
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;  @Override
+<i>111</i>&nbsp;  public int update(MappedStatement ms, Object parameter) throws SQLException {
+<b class="fc"><i>112</i>&nbsp;    ErrorContext.instance().resource(ms.getResource()).activity(&quot;executing an update&quot;).object(ms.getId());</b>
+<b class="fc"><i>113</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>114</i>&nbsp;      throw new ExecutorException(&quot;Executor was closed.&quot;);</b>
+<i>115</i>&nbsp;    }
+<b class="fc"><i>116</i>&nbsp;    clearLocalCache();</b>
+<b class="fc"><i>117</i>&nbsp;    return doUpdate(ms, parameter);</b>
+<i>118</i>&nbsp;  }
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;  @Override
+<i>121</i>&nbsp;  public List&lt;BatchResult&gt; flushStatements() throws SQLException {
+<b class="fc"><i>122</i>&nbsp;    return flushStatements(false);</b>
+<i>123</i>&nbsp;  }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;  public List&lt;BatchResult&gt; flushStatements(boolean isRollBack) throws SQLException {
+<b class="fc"><i>126</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>127</i>&nbsp;      throw new ExecutorException(&quot;Executor was closed.&quot;);</b>
+<i>128</i>&nbsp;    }
+<b class="fc"><i>129</i>&nbsp;    return doFlushStatements(isRollBack);</b>
+<i>130</i>&nbsp;  }
+<i>131</i>&nbsp;
+<i>132</i>&nbsp;  @Override
+<i>133</i>&nbsp;  public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+<b class="fc"><i>134</i>&nbsp;    BoundSql boundSql = ms.getBoundSql(parameter);</b>
+<b class="fc"><i>135</i>&nbsp;    CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);</b>
+<b class="fc"><i>136</i>&nbsp;    return query(ms, parameter, rowBounds, resultHandler, key, boundSql);</b>
+<i>137</i>&nbsp;  }
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;  @SuppressWarnings(&quot;unchecked&quot;)
+<i>140</i>&nbsp;  @Override
+<i>141</i>&nbsp;  public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+<b class="fc"><i>142</i>&nbsp;    ErrorContext.instance().resource(ms.getResource()).activity(&quot;executing a query&quot;).object(ms.getId());</b>
+<b class="fc"><i>143</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>144</i>&nbsp;      throw new ExecutorException(&quot;Executor was closed.&quot;);</b>
+<i>145</i>&nbsp;    }
+<b class="fc"><i>146</i>&nbsp;    if (queryStack == 0 &amp;&amp; ms.isFlushCacheRequired()) {</b>
+<b class="fc"><i>147</i>&nbsp;      clearLocalCache();</b>
+<i>148</i>&nbsp;    }
+<i>149</i>&nbsp;    List&lt;E&gt; list;
+<i>150</i>&nbsp;    try {
+<b class="fc"><i>151</i>&nbsp;      queryStack++;</b>
+<b class="fc"><i>152</i>&nbsp;      list = resultHandler == null ? (List&lt;E&gt;) localCache.getObject(key) : null;</b>
+<b class="fc"><i>153</i>&nbsp;      if (list != null) {</b>
+<b class="fc"><i>154</i>&nbsp;        handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);</b>
+<i>155</i>&nbsp;      } else {
+<b class="fc"><i>156</i>&nbsp;        list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);</b>
+<i>157</i>&nbsp;      }
+<i>158</i>&nbsp;    } finally {
+<b class="fc"><i>159</i>&nbsp;      queryStack--;</b>
+<b class="fc"><i>160</i>&nbsp;    }</b>
+<b class="fc"><i>161</i>&nbsp;    if (queryStack == 0) {</b>
+<b class="fc"><i>162</i>&nbsp;      for (DeferredLoad deferredLoad : deferredLoads) {</b>
+<b class="fc"><i>163</i>&nbsp;        deferredLoad.load();</b>
+<b class="fc"><i>164</i>&nbsp;      }</b>
+<i>165</i>&nbsp;      // issue #601
+<b class="fc"><i>166</i>&nbsp;      deferredLoads.clear();</b>
+<b class="fc"><i>167</i>&nbsp;      if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {</b>
+<i>168</i>&nbsp;        // issue #482
+<b class="fc"><i>169</i>&nbsp;        clearLocalCache();</b>
+<i>170</i>&nbsp;      }
+<i>171</i>&nbsp;    }
+<b class="fc"><i>172</i>&nbsp;    return list;</b>
+<i>173</i>&nbsp;  }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;  @Override
+<i>176</i>&nbsp;  public &lt;E&gt; Cursor&lt;E&gt; queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException {
+<b class="fc"><i>177</i>&nbsp;    BoundSql boundSql = ms.getBoundSql(parameter);</b>
+<b class="fc"><i>178</i>&nbsp;    return doQueryCursor(ms, parameter, rowBounds, boundSql);</b>
+<i>179</i>&nbsp;  }
+<i>180</i>&nbsp;
+<i>181</i>&nbsp;  @Override
+<i>182</i>&nbsp;  public void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class&lt;?&gt; targetType) {
+<b class="fc"><i>183</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>184</i>&nbsp;      throw new ExecutorException(&quot;Executor was closed.&quot;);</b>
+<i>185</i>&nbsp;    }
+<b class="fc"><i>186</i>&nbsp;    DeferredLoad deferredLoad = new DeferredLoad(resultObject, property, key, localCache, configuration, targetType);</b>
+<b class="fc"><i>187</i>&nbsp;    if (deferredLoad.canLoad()) {</b>
+<b class="fc"><i>188</i>&nbsp;      deferredLoad.load();</b>
+<i>189</i>&nbsp;    } else {
+<b class="fc"><i>190</i>&nbsp;      deferredLoads.add(new DeferredLoad(resultObject, property, key, localCache, configuration, targetType));</b>
+<i>191</i>&nbsp;    }
+<b class="fc"><i>192</i>&nbsp;  }</b>
+<i>193</i>&nbsp;
+<i>194</i>&nbsp;  @Override
+<i>195</i>&nbsp;  public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
+<b class="fc"><i>196</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>197</i>&nbsp;      throw new ExecutorException(&quot;Executor was closed.&quot;);</b>
+<i>198</i>&nbsp;    }
+<b class="fc"><i>199</i>&nbsp;    CacheKey cacheKey = new CacheKey();</b>
+<b class="fc"><i>200</i>&nbsp;    cacheKey.update(ms.getId());</b>
+<b class="fc"><i>201</i>&nbsp;    cacheKey.update(rowBounds.getOffset());</b>
+<b class="fc"><i>202</i>&nbsp;    cacheKey.update(rowBounds.getLimit());</b>
+<b class="fc"><i>203</i>&nbsp;    cacheKey.update(boundSql.getSql());</b>
+<b class="fc"><i>204</i>&nbsp;    List&lt;ParameterMapping&gt; parameterMappings = boundSql.getParameterMappings();</b>
+<b class="fc"><i>205</i>&nbsp;    TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();</b>
+<i>206</i>&nbsp;    // mimic DefaultParameterHandler logic
+<b class="fc"><i>207</i>&nbsp;    for (ParameterMapping parameterMapping : parameterMappings) {</b>
+<b class="fc"><i>208</i>&nbsp;      if (parameterMapping.getMode() != ParameterMode.OUT) {</b>
+<i>209</i>&nbsp;        Object value;
+<b class="fc"><i>210</i>&nbsp;        String propertyName = parameterMapping.getProperty();</b>
+<b class="fc"><i>211</i>&nbsp;        if (boundSql.hasAdditionalParameter(propertyName)) {</b>
+<b class="fc"><i>212</i>&nbsp;          value = boundSql.getAdditionalParameter(propertyName);</b>
+<b class="fc"><i>213</i>&nbsp;        } else if (parameterObject == null) {</b>
+<b class="fc"><i>214</i>&nbsp;          value = null;</b>
+<b class="fc"><i>215</i>&nbsp;        } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {</b>
+<b class="fc"><i>216</i>&nbsp;          value = parameterObject;</b>
+<i>217</i>&nbsp;        } else {
+<b class="fc"><i>218</i>&nbsp;          MetaObject metaObject = configuration.newMetaObject(parameterObject);</b>
+<b class="fc"><i>219</i>&nbsp;          value = metaObject.getValue(propertyName);</b>
+<i>220</i>&nbsp;        }
+<b class="fc"><i>221</i>&nbsp;        cacheKey.update(value);</b>
+<i>222</i>&nbsp;      }
+<b class="fc"><i>223</i>&nbsp;    }</b>
+<b class="fc"><i>224</i>&nbsp;    if (configuration.getEnvironment() != null) {</b>
+<i>225</i>&nbsp;      // issue #176
+<b class="fc"><i>226</i>&nbsp;      cacheKey.update(configuration.getEnvironment().getId());</b>
+<i>227</i>&nbsp;    }
+<b class="fc"><i>228</i>&nbsp;    return cacheKey;</b>
+<i>229</i>&nbsp;  }
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;  @Override
+<i>232</i>&nbsp;  public boolean isCached(MappedStatement ms, CacheKey key) {
+<b class="fc"><i>233</i>&nbsp;    return localCache.getObject(key) != null;</b>
+<i>234</i>&nbsp;  }
+<i>235</i>&nbsp;
+<i>236</i>&nbsp;  @Override
+<i>237</i>&nbsp;  public void commit(boolean required) throws SQLException {
+<b class="fc"><i>238</i>&nbsp;    if (closed) {</b>
+<b class="nc"><i>239</i>&nbsp;      throw new ExecutorException(&quot;Cannot commit, transaction is already closed&quot;);</b>
+<i>240</i>&nbsp;    }
+<b class="fc"><i>241</i>&nbsp;    clearLocalCache();</b>
+<b class="fc"><i>242</i>&nbsp;    flushStatements();</b>
+<b class="fc"><i>243</i>&nbsp;    if (required) {</b>
+<b class="fc"><i>244</i>&nbsp;      transaction.commit();</b>
+<i>245</i>&nbsp;    }
+<b class="fc"><i>246</i>&nbsp;  }</b>
+<i>247</i>&nbsp;
+<i>248</i>&nbsp;  @Override
+<i>249</i>&nbsp;  public void rollback(boolean required) throws SQLException {
+<b class="fc"><i>250</i>&nbsp;    if (!closed) {</b>
+<i>251</i>&nbsp;      try {
+<b class="fc"><i>252</i>&nbsp;        clearLocalCache();</b>
+<b class="fc"><i>253</i>&nbsp;        flushStatements(true);</b>
+<i>254</i>&nbsp;      } finally {
+<b class="fc"><i>255</i>&nbsp;        if (required) {</b>
+<b class="fc"><i>256</i>&nbsp;          transaction.rollback();</b>
+<i>257</i>&nbsp;        }
+<b class="nc"><i>258</i>&nbsp;      }</b>
+<i>259</i>&nbsp;    }
+<b class="fc"><i>260</i>&nbsp;  }</b>
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;  @Override
+<i>263</i>&nbsp;  public void clearLocalCache() {
+<b class="fc"><i>264</i>&nbsp;    if (!closed) {</b>
+<b class="fc"><i>265</i>&nbsp;      localCache.clear();</b>
+<b class="fc"><i>266</i>&nbsp;      localOutputParameterCache.clear();</b>
+<i>267</i>&nbsp;    }
+<b class="fc"><i>268</i>&nbsp;  }</b>
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;  protected abstract int doUpdate(MappedStatement ms, Object parameter)
+<i>271</i>&nbsp;      throws SQLException;
+<i>272</i>&nbsp;
+<i>273</i>&nbsp;  protected abstract List&lt;BatchResult&gt; doFlushStatements(boolean isRollback)
+<i>274</i>&nbsp;      throws SQLException;
+<i>275</i>&nbsp;
+<i>276</i>&nbsp;  protected abstract &lt;E&gt; List&lt;E&gt; doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
+<i>277</i>&nbsp;      throws SQLException;
+<i>278</i>&nbsp;
+<i>279</i>&nbsp;  protected abstract &lt;E&gt; Cursor&lt;E&gt; doQueryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds, BoundSql boundSql)
+<i>280</i>&nbsp;      throws SQLException;
+<i>281</i>&nbsp;
+<i>282</i>&nbsp;  protected void closeStatement(Statement statement) {
+<b class="fc"><i>283</i>&nbsp;    if (statement != null) {</b>
+<i>284</i>&nbsp;      try {
+<b class="fc"><i>285</i>&nbsp;        statement.close();</b>
+<b class="nc"><i>286</i>&nbsp;      } catch (SQLException e) {</b>
+<i>287</i>&nbsp;        // ignore
+<b class="fc"><i>288</i>&nbsp;      }</b>
+<i>289</i>&nbsp;    }
+<b class="fc"><i>290</i>&nbsp;  }</b>
+<i>291</i>&nbsp;
+<i>292</i>&nbsp;  /**
+<i>293</i>&nbsp;   * Apply a transaction timeout.
+<i>294</i>&nbsp;   * @param statement a current statement
+<i>295</i>&nbsp;   * @throws SQLException if a database access error occurs, this method is called on a closed &lt;code&gt;Statement&lt;/code&gt;
+<i>296</i>&nbsp;   * @since 3.4.0
+<i>297</i>&nbsp;   * @see StatementUtil#applyTransactionTimeout(Statement, Integer, Integer)
+<i>298</i>&nbsp;   */
+<i>299</i>&nbsp;  protected void applyTransactionTimeout(Statement statement) throws SQLException {
+<b class="fc"><i>300</i>&nbsp;    StatementUtil.applyTransactionTimeout(statement, statement.getQueryTimeout(), transaction.getTimeout());</b>
+<b class="fc"><i>301</i>&nbsp;  }</b>
+<i>302</i>&nbsp;
+<i>303</i>&nbsp;  private void handleLocallyCachedOutputParameters(MappedStatement ms, CacheKey key, Object parameter, BoundSql boundSql) {
+<b class="fc"><i>304</i>&nbsp;    if (ms.getStatementType() == StatementType.CALLABLE) {</b>
+<b class="fc"><i>305</i>&nbsp;      final Object cachedParameter = localOutputParameterCache.getObject(key);</b>
+<b class="fc"><i>306</i>&nbsp;      if (cachedParameter != null &amp;&amp; parameter != null) {</b>
+<b class="fc"><i>307</i>&nbsp;        final MetaObject metaCachedParameter = configuration.newMetaObject(cachedParameter);</b>
+<b class="fc"><i>308</i>&nbsp;        final MetaObject metaParameter = configuration.newMetaObject(parameter);</b>
+<b class="fc"><i>309</i>&nbsp;        for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {</b>
+<b class="fc"><i>310</i>&nbsp;          if (parameterMapping.getMode() != ParameterMode.IN) {</b>
+<b class="fc"><i>311</i>&nbsp;            final String parameterName = parameterMapping.getProperty();</b>
+<b class="fc"><i>312</i>&nbsp;            final Object cachedValue = metaCachedParameter.getValue(parameterName);</b>
+<b class="fc"><i>313</i>&nbsp;            metaParameter.setValue(parameterName, cachedValue);</b>
+<i>314</i>&nbsp;          }
+<b class="fc"><i>315</i>&nbsp;        }</b>
+<i>316</i>&nbsp;      }
+<i>317</i>&nbsp;    }
+<b class="fc"><i>318</i>&nbsp;  }</b>
+<i>319</i>&nbsp;
+<i>320</i>&nbsp;  private &lt;E&gt; List&lt;E&gt; queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+<i>321</i>&nbsp;    List&lt;E&gt; list;
+<b class="fc"><i>322</i>&nbsp;    localCache.putObject(key, EXECUTION_PLACEHOLDER);</b>
+<i>323</i>&nbsp;    try {
+<b class="fc"><i>324</i>&nbsp;      list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);</b>
+<i>325</i>&nbsp;    } finally {
+<b class="fc"><i>326</i>&nbsp;      localCache.removeObject(key);</b>
+<b class="fc"><i>327</i>&nbsp;    }</b>
+<b class="fc"><i>328</i>&nbsp;    localCache.putObject(key, list);</b>
+<b class="fc"><i>329</i>&nbsp;    if (ms.getStatementType() == StatementType.CALLABLE) {</b>
+<b class="fc"><i>330</i>&nbsp;      localOutputParameterCache.putObject(key, parameter);</b>
+<i>331</i>&nbsp;    }
+<b class="fc"><i>332</i>&nbsp;    return list;</b>
+<i>333</i>&nbsp;  }
+<i>334</i>&nbsp;
+<i>335</i>&nbsp;  protected Connection getConnection(Log statementLog) throws SQLException {
+<b class="fc"><i>336</i>&nbsp;    Connection connection = transaction.getConnection();</b>
+<b class="fc"><i>337</i>&nbsp;    if (statementLog.isDebugEnabled()) {</b>
+<b class="nc"><i>338</i>&nbsp;      return ConnectionLogger.newInstance(connection, statementLog, queryStack);</b>
+<i>339</i>&nbsp;    } else {
+<b class="fc"><i>340</i>&nbsp;      return connection;</b>
+<i>341</i>&nbsp;    }
+<i>342</i>&nbsp;  }
+<i>343</i>&nbsp;
+<i>344</i>&nbsp;  @Override
+<i>345</i>&nbsp;  public void setExecutorWrapper(Executor wrapper) {
+<b class="fc"><i>346</i>&nbsp;    this.wrapper = wrapper;</b>
+<b class="fc"><i>347</i>&nbsp;  }</b>
+<i>348</i>&nbsp;
+<i>349</i>&nbsp;  private static class DeferredLoad {
+<i>350</i>&nbsp;
+<i>351</i>&nbsp;    private final MetaObject resultObject;
+<i>352</i>&nbsp;    private final String property;
+<i>353</i>&nbsp;    private final Class&lt;?&gt; targetType;
+<i>354</i>&nbsp;    private final CacheKey key;
+<i>355</i>&nbsp;    private final PerpetualCache localCache;
+<i>356</i>&nbsp;    private final ObjectFactory objectFactory;
+<i>357</i>&nbsp;    private final ResultExtractor resultExtractor;
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;    // issue #781
+<i>360</i>&nbsp;    public DeferredLoad(MetaObject resultObject,
+<i>361</i>&nbsp;                        String property,
+<i>362</i>&nbsp;                        CacheKey key,
+<i>363</i>&nbsp;                        PerpetualCache localCache,
+<i>364</i>&nbsp;                        Configuration configuration,
+<b class="fc"><i>365</i>&nbsp;                        Class&lt;?&gt; targetType) {</b>
+<b class="fc"><i>366</i>&nbsp;      this.resultObject = resultObject;</b>
+<b class="fc"><i>367</i>&nbsp;      this.property = property;</b>
+<b class="fc"><i>368</i>&nbsp;      this.key = key;</b>
+<b class="fc"><i>369</i>&nbsp;      this.localCache = localCache;</b>
+<b class="fc"><i>370</i>&nbsp;      this.objectFactory = configuration.getObjectFactory();</b>
+<b class="fc"><i>371</i>&nbsp;      this.resultExtractor = new ResultExtractor(configuration, objectFactory);</b>
+<b class="fc"><i>372</i>&nbsp;      this.targetType = targetType;</b>
+<b class="fc"><i>373</i>&nbsp;    }</b>
+<i>374</i>&nbsp;
+<i>375</i>&nbsp;    public boolean canLoad() {
+<b class="fc"><i>376</i>&nbsp;      return localCache.getObject(key) != null &amp;&amp; localCache.getObject(key) != EXECUTION_PLACEHOLDER;</b>
+<i>377</i>&nbsp;    }
+<i>378</i>&nbsp;
+<i>379</i>&nbsp;    public void load() {
+<i>380</i>&nbsp;      @SuppressWarnings(&quot;unchecked&quot;)
+<i>381</i>&nbsp;      // we suppose we get back a List
+<b class="fc"><i>382</i>&nbsp;      List&lt;Object&gt; list = (List&lt;Object&gt;) localCache.getObject(key);</b>
+<b class="fc"><i>383</i>&nbsp;      Object value = resultExtractor.extractObjectFromList(list, targetType);</b>
+<b class="fc"><i>384</i>&nbsp;      resultObject.setValue(property, value);</b>
+<b class="fc"><i>385</i>&nbsp;    }</b>
+<i>386</i>&nbsp;
+<i>387</i>&nbsp;  }
+<i>388</i>&nbsp;
+<i>389</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,271 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: AbstractSerialStateHolder</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.executor.loader</a> ]
+</div>
+
+<h1>Coverage Summary for Class: AbstractSerialStateHolder (org.apache.ibatis.executor.loader)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractSerialStateHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94%
+  </span>
+  <span class="absValue">
+    (47/ 50)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractSerialStateHolder$LookAheadObjectInputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/ 7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93%
+  </span>
+  <span class="absValue">
+    (53/ 57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2018 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.executor.loader;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.io.ByteArrayInputStream;
+<i>19</i>&nbsp;import java.io.ByteArrayOutputStream;
+<i>20</i>&nbsp;import java.io.Externalizable;
+<i>21</i>&nbsp;import java.io.IOException;
+<i>22</i>&nbsp;import java.io.InputStream;
+<i>23</i>&nbsp;import java.io.InvalidClassException;
+<i>24</i>&nbsp;import java.io.ObjectInput;
+<i>25</i>&nbsp;import java.io.ObjectInputStream;
+<i>26</i>&nbsp;import java.io.ObjectOutput;
+<i>27</i>&nbsp;import java.io.ObjectOutputStream;
+<i>28</i>&nbsp;import java.io.ObjectStreamClass;
+<i>29</i>&nbsp;import java.io.ObjectStreamException;
+<i>30</i>&nbsp;import java.io.StreamCorruptedException;
+<i>31</i>&nbsp;import java.util.Arrays;
+<i>32</i>&nbsp;import java.util.HashMap;
+<i>33</i>&nbsp;import java.util.List;
+<i>34</i>&nbsp;import java.util.Map;
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;import org.apache.ibatis.reflection.factory.ObjectFactory;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;/**
+<i>39</i>&nbsp; * @author Eduardo Macarron
+<i>40</i>&nbsp; * @author Franta Mejta
+<i>41</i>&nbsp; */
+<i>42</i>&nbsp;public abstract class AbstractSerialStateHolder implements Externalizable {
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;  private static final long serialVersionUID = 8940388717901644661L;
+<b class="fc"><i>45</i>&nbsp;  private static final ThreadLocal&lt;ObjectOutputStream&gt; stream = new ThreadLocal&lt;&gt;();</b>
+<b class="fc"><i>46</i>&nbsp;  private byte[] userBeanBytes = new byte[0];</b>
+<i>47</i>&nbsp;  private Object userBean;
+<i>48</i>&nbsp;  private Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties;
+<i>49</i>&nbsp;  private ObjectFactory objectFactory;
+<i>50</i>&nbsp;  private Class&lt;?&gt;[] constructorArgTypes;
+<i>51</i>&nbsp;  private Object[] constructorArgs;
+<i>52</i>&nbsp;
+<b class="fc"><i>53</i>&nbsp;  public AbstractSerialStateHolder() {</b>
+<b class="fc"><i>54</i>&nbsp;  }</b>
+<i>55</i>&nbsp;
+<i>56</i>&nbsp;  public AbstractSerialStateHolder(
+<i>57</i>&nbsp;          final Object userBean,
+<i>58</i>&nbsp;          final Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties,
+<i>59</i>&nbsp;          final ObjectFactory objectFactory,
+<i>60</i>&nbsp;          List&lt;Class&lt;?&gt;&gt; constructorArgTypes,
+<b class="fc"><i>61</i>&nbsp;          List&lt;Object&gt; constructorArgs) {</b>
+<b class="fc"><i>62</i>&nbsp;    this.userBean = userBean;</b>
+<b class="fc"><i>63</i>&nbsp;    this.unloadedProperties = new HashMap&lt;&gt;(unloadedProperties);</b>
+<b class="fc"><i>64</i>&nbsp;    this.objectFactory = objectFactory;</b>
+<b class="fc"><i>65</i>&nbsp;    this.constructorArgTypes = constructorArgTypes.toArray(new Class&lt;?&gt;[constructorArgTypes.size()]);</b>
+<b class="fc"><i>66</i>&nbsp;    this.constructorArgs = constructorArgs.toArray(new Object[constructorArgs.size()]);</b>
+<b class="fc"><i>67</i>&nbsp;  }</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;  @Override
+<i>70</i>&nbsp;  public final void writeExternal(final ObjectOutput out) throws IOException {
+<b class="fc"><i>71</i>&nbsp;    boolean firstRound = false;</b>
+<b class="fc"><i>72</i>&nbsp;    final ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="fc"><i>73</i>&nbsp;    ObjectOutputStream os = stream.get();</b>
+<b class="fc"><i>74</i>&nbsp;    if (os == null) {</b>
+<b class="fc"><i>75</i>&nbsp;      os = new ObjectOutputStream(baos);</b>
+<b class="fc"><i>76</i>&nbsp;      firstRound = true;</b>
+<b class="fc"><i>77</i>&nbsp;      stream.set(os);</b>
+<i>78</i>&nbsp;    }
+<i>79</i>&nbsp;
+<b class="fc"><i>80</i>&nbsp;    os.writeObject(this.userBean);</b>
+<b class="fc"><i>81</i>&nbsp;    os.writeObject(this.unloadedProperties);</b>
+<b class="fc"><i>82</i>&nbsp;    os.writeObject(this.objectFactory);</b>
+<b class="fc"><i>83</i>&nbsp;    os.writeObject(this.constructorArgTypes);</b>
+<b class="fc"><i>84</i>&nbsp;    os.writeObject(this.constructorArgs);</b>
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;    final byte[] bytes = baos.toByteArray();</b>
+<b class="fc"><i>87</i>&nbsp;    out.writeObject(bytes);</b>
+<i>88</i>&nbsp;
+<b class="fc"><i>89</i>&nbsp;    if (firstRound) {</b>
+<b class="fc"><i>90</i>&nbsp;      stream.remove();</b>
+<i>91</i>&nbsp;    }
+<b class="fc"><i>92</i>&nbsp;  }</b>
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;  @Override
+<i>95</i>&nbsp;  public final void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+<b class="fc"><i>96</i>&nbsp;    final Object data = in.readObject();</b>
+<b class="fc"><i>97</i>&nbsp;    if (data.getClass().isArray()) {</b>
+<b class="fc"><i>98</i>&nbsp;      this.userBeanBytes = (byte[]) data;</b>
+<i>99</i>&nbsp;    } else {
+<b class="fc"><i>100</i>&nbsp;      this.userBean = data;</b>
+<i>101</i>&nbsp;    }
+<b class="fc"><i>102</i>&nbsp;  }</b>
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;  @SuppressWarnings(&quot;unchecked&quot;)
+<i>105</i>&nbsp;  protected final Object readResolve() throws ObjectStreamException {
+<i>106</i>&nbsp;    /* Second run */
+<b class="fc"><i>107</i>&nbsp;    if (this.userBean != null &amp;&amp; this.userBeanBytes.length == 0) {</b>
+<b class="fc"><i>108</i>&nbsp;      return this.userBean;</b>
+<i>109</i>&nbsp;    }
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;    /* First run */
+<b class="fc"><i>112</i>&nbsp;    try (ObjectInputStream in = new LookAheadObjectInputStream(new ByteArrayInputStream(this.userBeanBytes))) {</b>
+<b class="fc"><i>113</i>&nbsp;      this.userBean = in.readObject();</b>
+<b class="fc"><i>114</i>&nbsp;      this.unloadedProperties = (Map&lt;String, ResultLoaderMap.LoadPair&gt;) in.readObject();</b>
+<b class="fc"><i>115</i>&nbsp;      this.objectFactory = (ObjectFactory) in.readObject();</b>
+<b class="fc"><i>116</i>&nbsp;      this.constructorArgTypes = (Class&lt;?&gt;[]) in.readObject();</b>
+<b class="fc"><i>117</i>&nbsp;      this.constructorArgs = (Object[]) in.readObject();</b>
+<b class="fc"><i>118</i>&nbsp;    } catch (final IOException ex) {</b>
+<b class="nc"><i>119</i>&nbsp;      throw (ObjectStreamException) new StreamCorruptedException().initCause(ex);</b>
+<b class="nc"><i>120</i>&nbsp;    } catch (final ClassNotFoundException ex) {</b>
+<b class="nc"><i>121</i>&nbsp;      throw (ObjectStreamException) new InvalidClassException(ex.getLocalizedMessage()).initCause(ex);</b>
+<b class="fc"><i>122</i>&nbsp;    }</b>
+<i>123</i>&nbsp;
+<b class="fc"><i>124</i>&nbsp;    final Map&lt;String, ResultLoaderMap.LoadPair&gt; arrayProps = new HashMap&lt;&gt;(this.unloadedProperties);</b>
+<b class="fc"><i>125</i>&nbsp;    final List&lt;Class&lt;?&gt;&gt; arrayTypes = Arrays.asList(this.constructorArgTypes);</b>
+<b class="fc"><i>126</i>&nbsp;    final List&lt;Object&gt; arrayValues = Arrays.asList(this.constructorArgs);</b>
+<i>127</i>&nbsp;
+<b class="fc"><i>128</i>&nbsp;    return this.createDeserializationProxy(userBean, arrayProps, objectFactory, arrayTypes, arrayValues);</b>
+<i>129</i>&nbsp;  }
+<i>130</i>&nbsp;
+<i>131</i>&nbsp;  protected abstract Object createDeserializationProxy(Object target, Map&lt;String, ResultLoaderMap.LoadPair&gt; unloadedProperties, ObjectFactory objectFactory,
+<i>132</i>&nbsp;          List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs);
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;  private static class LookAheadObjectInputStream extends ObjectInputStream {
+<b class="fc"><i>135</i>&nbsp;    private static final List&lt;String&gt; blacklist = Arrays.asList(</b>
+<i>136</i>&nbsp;        &quot;org.apache.commons.beanutils.BeanComparator&quot;,
+<i>137</i>&nbsp;        &quot;org.apache.commons.collections.functors.InvokerTransformer&quot;,
+<i>138</i>&nbsp;        &quot;org.apache.commons.collections.functors.InstantiateTransformer&quot;,
+<i>139</i>&nbsp;        &quot;org.apache.commons.collections4.functors.InvokerTransformer&quot;,
+<i>140</i>&nbsp;        &quot;org.apache.commons.collections4.functors.InstantiateTransformer&quot;,
+<i>141</i>&nbsp;        &quot;org.codehaus.groovy.runtime.ConvertedClosure&quot;,
+<i>142</i>&nbsp;        &quot;org.codehaus.groovy.runtime.MethodClosure&quot;,
+<i>143</i>&nbsp;        &quot;org.springframework.beans.factory.ObjectFactory&quot;,
+<i>144</i>&nbsp;        &quot;org.springframework.transaction.jta.JtaTransactionManager&quot;,
+<i>145</i>&nbsp;        &quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;);
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;    public LookAheadObjectInputStream(InputStream in) throws IOException {
+<b class="fc"><i>148</i>&nbsp;      super(in);</b>
+<b class="fc"><i>149</i>&nbsp;    }</b>
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;    @Override
+<i>152</i>&nbsp;    protected Class&lt;?&gt; resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+<b class="fc"><i>153</i>&nbsp;      String className = desc.getName();</b>
+<b class="fc"><i>154</i>&nbsp;      if (blacklist.contains(className)) {</b>
+<b class="nc"><i>155</i>&nbsp;        throw new InvalidClassException(className, &quot;Deserialization is not allowed for security reasons. &quot;</b>
+<i>156</i>&nbsp;            + &quot;It is strongly recommended to configure the deserialization filter provided by JDK. &quot;
+<i>157</i>&nbsp;            + &quot;See http://openjdk.java.net/jeps/290 for the details.&quot;);
+<i>158</i>&nbsp;      }
+<b class="fc"><i>159</i>&nbsp;      return super.resolveClass(desc);</b>
+<i>160</i>&nbsp;    }
+<i>161</i>&nbsp;  }
+<i>162</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>

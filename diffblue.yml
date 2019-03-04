@@ -1,107 +1,159 @@
 # Tested on Deeptest release 1.12.0
 cbmcArguments:
   java-generate-no-comments: true
+  do-not-test-methods-with-access: [ private ]
+  cover-function-only: false
 units:
+  # Target Coverage: 39.3%
   - target:
-    - dir: target/classes
-      file: org/apache/ibatis/io/DefaultVFS.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/io/DefaultVFS.java
-    # Child of DefaultVFS.class
-    - dir: target/classes
-      file: org/apache/ibatis/logging/Log.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/logging/Log.java
-    # Child of DefaultVFS.class
-    - dir: target/classes
-      file: org/apache/ibatis/logging/LogFactory.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/logging/LogFactory.java
+      - dir: target/classes
+        file: org/apache/ibatis/io/DefaultVFS.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/io/DefaultVFS.java
+      # Child of DefaultVFS.class
+      # Child Coverage: 82.4%
+      - dir: target/classes
+        file: org/apache/ibatis/logging/Log.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/logging/Log.java
+      # Child of DefaultVFS.class
+      # Child Coverage: 83.7%
+      - dir: target/classes
+        file: org/apache/ibatis/logging/LogFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/logging/LogFactory.java
+  # Target Coverage: 33.9%
   - target:
-    - dir: target/classes
-      file: org/apache/ibatis/datasource/pooled/PooledDataSource.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/datasource/pooled/PooledDataSource.java
-    # Child of PooledDataSource.class
-    - dir: target/classes
-      file: org/apache/ibatis/datasource/unpooled/UnpooledDataSource.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/datasource/unpooled/UnpooledDataSource.java
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/wrapper/BaseWrapper.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/wrapper/BaseWrapper.java
+      # Child of BaseWrapper.class
+      # Child Coverage: 96.4%
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/MetaObject.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/MetaObject.java
+      # Child of BaseWrapper.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/ReflectionException.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/ReflectionException.java
+      # Child of BaseWrapper.class
+      # Child Coverage: 90.0%
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/property/PropertyTokenizer.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/property/PropertyTokenizer.java
+  # Target Coverage: 43.9%
   - target:
-    - dir: target/classes
-      file: org/apache/ibatis/executor/loader/ResultLoaderMap.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/executor/loader/ResultLoaderMap.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/cursor/Cursor.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/cursor/Cursor.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/executor/BaseExecutor.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/executor/BaseExecutor.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/executor/BatchResult.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/executor/BatchResult.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/mapping/BoundSql.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/mapping/BoundSql.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/mapping/MappedStatement.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/mapping/MappedStatement.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/reflection/MetaObject.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/reflection/MetaObject.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/session/Configuration.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/session/Configuration.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/session/ResultHandler.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/session/ResultHandler.java
-    # Child of ResultLoaderMap.class
-    - dir: target/classes
-      file: org/apache/ibatis/session/RowBounds.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/session/RowBounds.java
+      - dir: target/classes
+        file: org/apache/ibatis/io/JBoss6VFS.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/io/JBoss6VFS.java
+  # Target Coverage: 40.9%
   - target:
-    - dir: target/classes
-      file: org/apache/ibatis/annotations/ResultMap.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/annotations/ResultMap.java
+      - dir: target/classes
+        file: org/apache/ibatis/session/defaults/DefaultSqlSessionFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/defaults/DefaultSqlSessionFactory.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 33.3%
+      - dir: target/classes
+        file: org/apache/ibatis/exceptions/ExceptionFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/exceptions/ExceptionFactory.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/executor/ErrorContext.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/executor/ErrorContext.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 93.7%
+      - dir: target/classes
+        file: org/apache/ibatis/executor/Executor.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/executor/Executor.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 82.6%
+      - dir: target/classes
+        file: org/apache/ibatis/mapping/Environment.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/mapping/Environment.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 92.3%
+      - dir: target/classes
+        file: org/apache/ibatis/session/Configuration.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/Configuration.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/session/ExecutorType.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/ExecutorType.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 84.8%
+      - dir: target/classes
+        file: org/apache/ibatis/session/SqlSession.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/SqlSession.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 40.9%
+      - dir: target/classes
+        file: org/apache/ibatis/session/SqlSessionFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/SqlSessionFactory.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/session/TransactionIsolationLevel.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/TransactionIsolationLevel.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/transaction/Transaction.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/transaction/Transaction.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 88.9%
+      - dir: target/classes
+        file: org/apache/ibatis/transaction/TransactionFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/transaction/TransactionFactory.java
+      # Child of DefaultSqlSessionFactory.class
+      # Child Coverage: 88.9%
+      - dir: target/classes
+        file: org/apache/ibatis/transaction/managed/ManagedTransactionFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/transaction/managed/ManagedTransactionFactory.java
+  # Target Coverage: 35.3%
   - target:
-    - dir: target/classes
-      file: org/apache/ibatis/parsing/XNode.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/parsing/XNode.java
-  - target:
-    - dir: target/classes
-      file: org/apache/ibatis/io/JBoss6VFS.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/io/JBoss6VFS.java
-    # Child of JBoss6VFS.class
-    - dir: target/classes
-      file: org/apache/ibatis/logging/Log.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/logging/Log.java
-    # Child of JBoss6VFS.class
-    - dir: target/classes
-      file: org/apache/ibatis/logging/LogFactory.class
-      sourceDir: src/main/java
-      sourceFile: org/apache/ibatis/logging/LogFactory.java
+      - dir: target/classes
+        file: org/apache/ibatis/session/SqlSessionManager.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/session/SqlSessionManager.java
+      # Child of SqlSessionManager.class
+      # Child Coverage: 94.5%
+      - dir: target/classes
+        file: org/apache/ibatis/cursor/Cursor.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/cursor/Cursor.java
+      # Child of SqlSessionManager.class
+      # Child Coverage: 88.2%
+      - dir: target/classes
+        file: org/apache/ibatis/executor/BatchResult.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/executor/BatchResult.java
+      # Child of SqlSessionManager.class
+      # Child Coverage: 75.0%
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/ExceptionUtil.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/ExceptionUtil.java
 phases:
   -
     #0
@@ -155,7 +207,7 @@ phases:
       depth: 1500
       java-assume-inputs-non-null: true
       java-max-vla-length: 48
-      load-containing-class-only: true
+#      load-containing-class-only: true
       max-nondet-array-length: 10
       max-nondet-string-length: 10
       string-printable: true
@@ -169,7 +221,7 @@ phases:
       depth: 3000
       java-assume-inputs-non-null: false
       java-max-vla-length:  192
-      load-containing-class-only: true
+#      load-containing-class-only: true
       max-nondet-array-length: 30
       max-nondet-string-length: 100
       string-printable: false

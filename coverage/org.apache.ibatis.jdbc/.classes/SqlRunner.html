@@ -1,0 +1,342 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SqlRunner</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">org.apache.ibatis.jdbc</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SqlRunner (org.apache.ibatis.jdbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SqlRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/ 11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.7%
+  </span>
+  <span class="absValue">
+    (73/ 99)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;/**
+<i>2</i>&nbsp; *    Copyright 2009-2019 the original author or authors.
+<i>3</i>&nbsp; *
+<i>4</i>&nbsp; *    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<i>5</i>&nbsp; *    you may not use this file except in compliance with the License.
+<i>6</i>&nbsp; *    You may obtain a copy of the License at
+<i>7</i>&nbsp; *
+<i>8</i>&nbsp; *       http://www.apache.org/licenses/LICENSE-2.0
+<i>9</i>&nbsp; *
+<i>10</i>&nbsp; *    Unless required by applicable law or agreed to in writing, software
+<i>11</i>&nbsp; *    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<i>12</i>&nbsp; *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<i>13</i>&nbsp; *    See the License for the specific language governing permissions and
+<i>14</i>&nbsp; *    limitations under the License.
+<i>15</i>&nbsp; */
+<i>16</i>&nbsp;package org.apache.ibatis.jdbc;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.sql.Connection;
+<i>19</i>&nbsp;import java.sql.PreparedStatement;
+<i>20</i>&nbsp;import java.sql.ResultSet;
+<i>21</i>&nbsp;import java.sql.ResultSetMetaData;
+<i>22</i>&nbsp;import java.sql.SQLException;
+<i>23</i>&nbsp;import java.sql.Statement;
+<i>24</i>&nbsp;import java.util.ArrayList;
+<i>25</i>&nbsp;import java.util.HashMap;
+<i>26</i>&nbsp;import java.util.Iterator;
+<i>27</i>&nbsp;import java.util.List;
+<i>28</i>&nbsp;import java.util.Locale;
+<i>29</i>&nbsp;import java.util.Map;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;import org.apache.ibatis.io.Resources;
+<i>32</i>&nbsp;import org.apache.ibatis.type.TypeHandler;
+<i>33</i>&nbsp;import org.apache.ibatis.type.TypeHandlerRegistry;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;/**
+<i>36</i>&nbsp; * @author Clinton Begin
+<i>37</i>&nbsp; */
+<i>38</i>&nbsp;public class SqlRunner {
+<i>39</i>&nbsp;
+<i>40</i>&nbsp;  public static final int NO_GENERATED_KEY = Integer.MIN_VALUE + 1001;
+<i>41</i>&nbsp;
+<i>42</i>&nbsp;  private final Connection connection;
+<i>43</i>&nbsp;  private final TypeHandlerRegistry typeHandlerRegistry;
+<i>44</i>&nbsp;  private boolean useGeneratedKeySupport;
+<i>45</i>&nbsp;
+<b class="fc"><i>46</i>&nbsp;  public SqlRunner(Connection connection) {</b>
+<b class="fc"><i>47</i>&nbsp;    this.connection = connection;</b>
+<b class="fc"><i>48</i>&nbsp;    this.typeHandlerRegistry = new TypeHandlerRegistry();</b>
+<b class="fc"><i>49</i>&nbsp;  }</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;  public void setUseGeneratedKeySupport(boolean useGeneratedKeySupport) {
+<b class="fc"><i>52</i>&nbsp;    this.useGeneratedKeySupport = useGeneratedKeySupport;</b>
+<b class="fc"><i>53</i>&nbsp;  }</b>
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;  /**
+<i>56</i>&nbsp;   * Executes a SELECT statement that returns one row.
+<i>57</i>&nbsp;   *
+<i>58</i>&nbsp;   * @param sql  The SQL
+<i>59</i>&nbsp;   * @param args The arguments to be set on the statement.
+<i>60</i>&nbsp;   * @return The row expected.
+<i>61</i>&nbsp;   * @throws SQLException If less or more than one row is returned
+<i>62</i>&nbsp;   */
+<i>63</i>&nbsp;  public Map&lt;String, Object&gt; selectOne(String sql, Object... args) throws SQLException {
+<b class="fc"><i>64</i>&nbsp;    List&lt;Map&lt;String, Object&gt;&gt; results = selectAll(sql, args);</b>
+<b class="fc"><i>65</i>&nbsp;    if (results.size() != 1) {</b>
+<b class="nc"><i>66</i>&nbsp;      throw new SQLException(&quot;Statement returned &quot; + results.size() + &quot; results where exactly one (1) was expected.&quot;);</b>
+<i>67</i>&nbsp;    }
+<b class="fc"><i>68</i>&nbsp;    return results.get(0);</b>
+<i>69</i>&nbsp;  }
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;  /**
+<i>72</i>&nbsp;   * Executes a SELECT statement that returns multiple rows.
+<i>73</i>&nbsp;   *
+<i>74</i>&nbsp;   * @param sql  The SQL
+<i>75</i>&nbsp;   * @param args The arguments to be set on the statement.
+<i>76</i>&nbsp;   * @return The list of rows expected.
+<i>77</i>&nbsp;   * @throws SQLException If statement preparation or execution fails
+<i>78</i>&nbsp;   */
+<i>79</i>&nbsp;  public List&lt;Map&lt;String, Object&gt;&gt; selectAll(String sql, Object... args) throws SQLException {
+<b class="fc"><i>80</i>&nbsp;    PreparedStatement ps = connection.prepareStatement(sql);</b>
+<i>81</i>&nbsp;    try {
+<b class="fc"><i>82</i>&nbsp;      setParameters(ps, args);</b>
+<b class="fc"><i>83</i>&nbsp;      ResultSet rs = ps.executeQuery();</b>
+<b class="fc"><i>84</i>&nbsp;      return getResults(rs);</b>
+<i>85</i>&nbsp;    } finally {
+<b class="nc"><i>86</i>&nbsp;      try {</b>
+<b class="fc"><i>87</i>&nbsp;        ps.close();</b>
+<b class="nc"><i>88</i>&nbsp;      } catch (SQLException e) {</b>
+<i>89</i>&nbsp;        //ignore
+<b class="fc"><i>90</i>&nbsp;      }</b>
+<b class="nc"><i>91</i>&nbsp;    }</b>
+<i>92</i>&nbsp;  }
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;  /**
+<i>95</i>&nbsp;   * Executes an INSERT statement.
+<i>96</i>&nbsp;   *
+<i>97</i>&nbsp;   * @param sql  The SQL
+<i>98</i>&nbsp;   * @param args The arguments to be set on the statement.
+<i>99</i>&nbsp;   * @return The number of rows impacted or BATCHED_RESULTS if the statements are being batched.
+<i>100</i>&nbsp;   * @throws SQLException If statement preparation or execution fails
+<i>101</i>&nbsp;   */
+<i>102</i>&nbsp;  public int insert(String sql, Object... args) throws SQLException {
+<i>103</i>&nbsp;    PreparedStatement ps;
+<b class="fc"><i>104</i>&nbsp;    if (useGeneratedKeySupport) {</b>
+<b class="fc"><i>105</i>&nbsp;      ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);</b>
+<i>106</i>&nbsp;    } else {
+<b class="nc"><i>107</i>&nbsp;      ps = connection.prepareStatement(sql);</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;    try {
+<b class="fc"><i>111</i>&nbsp;      setParameters(ps, args);</b>
+<b class="fc"><i>112</i>&nbsp;      ps.executeUpdate();</b>
+<b class="fc"><i>113</i>&nbsp;      if (useGeneratedKeySupport) {</b>
+<b class="fc"><i>114</i>&nbsp;        List&lt;Map&lt;String, Object&gt;&gt; keys = getResults(ps.getGeneratedKeys());</b>
+<b class="fc"><i>115</i>&nbsp;        if (keys.size() == 1) {</b>
+<b class="fc"><i>116</i>&nbsp;          Map&lt;String, Object&gt; key = keys.get(0);</b>
+<b class="fc"><i>117</i>&nbsp;          Iterator&lt;Object&gt; i = key.values().iterator();</b>
+<b class="fc"><i>118</i>&nbsp;          if (i.hasNext()) {</b>
+<b class="fc"><i>119</i>&nbsp;            Object genkey = i.next();</b>
+<b class="fc"><i>120</i>&nbsp;            if (genkey != null) {</b>
+<i>121</i>&nbsp;              try {
+<b class="fc"><i>122</i>&nbsp;                return Integer.parseInt(genkey.toString());</b>
+<b class="nc"><i>123</i>&nbsp;              } catch (NumberFormatException e) {</b>
+<i>124</i>&nbsp;                //ignore, no numeric key support
+<i>125</i>&nbsp;              }
+<i>126</i>&nbsp;            }
+<i>127</i>&nbsp;          }
+<i>128</i>&nbsp;        }
+<i>129</i>&nbsp;      }
+<b class="nc"><i>130</i>&nbsp;      return NO_GENERATED_KEY;</b>
+<i>131</i>&nbsp;    } finally {
+<b class="nc"><i>132</i>&nbsp;      try {</b>
+<b class="fc"><i>133</i>&nbsp;        ps.close();</b>
+<b class="nc"><i>134</i>&nbsp;      } catch (SQLException e) {</b>
+<i>135</i>&nbsp;        //ignore
+<b class="fc"><i>136</i>&nbsp;      }</b>
+<b class="nc"><i>137</i>&nbsp;    }</b>
+<i>138</i>&nbsp;  }
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;  /**
+<i>141</i>&nbsp;   * Executes an UPDATE statement.
+<i>142</i>&nbsp;   *
+<i>143</i>&nbsp;   * @param sql  The SQL
+<i>144</i>&nbsp;   * @param args The arguments to be set on the statement.
+<i>145</i>&nbsp;   * @return The number of rows impacted or BATCHED_RESULTS if the statements are being batched.
+<i>146</i>&nbsp;   * @throws SQLException If statement preparation or execution fails
+<i>147</i>&nbsp;   */
+<i>148</i>&nbsp;  public int update(String sql, Object... args) throws SQLException {
+<b class="fc"><i>149</i>&nbsp;    PreparedStatement ps = connection.prepareStatement(sql);</b>
+<i>150</i>&nbsp;    try {
+<b class="fc"><i>151</i>&nbsp;      setParameters(ps, args);</b>
+<b class="fc"><i>152</i>&nbsp;      return ps.executeUpdate();</b>
+<i>153</i>&nbsp;    } finally {
+<b class="nc"><i>154</i>&nbsp;      try {</b>
+<b class="fc"><i>155</i>&nbsp;        ps.close();</b>
+<b class="nc"><i>156</i>&nbsp;      } catch (SQLException e) {</b>
+<i>157</i>&nbsp;        //ignore
+<b class="fc"><i>158</i>&nbsp;      }</b>
+<b class="nc"><i>159</i>&nbsp;    }</b>
+<i>160</i>&nbsp;  }
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;  /**
+<i>163</i>&nbsp;   * Executes a DELETE statement.
+<i>164</i>&nbsp;   *
+<i>165</i>&nbsp;   * @param sql  The SQL
+<i>166</i>&nbsp;   * @param args The arguments to be set on the statement.
+<i>167</i>&nbsp;   * @return The number of rows impacted or BATCHED_RESULTS if the statements are being batched.
+<i>168</i>&nbsp;   * @throws SQLException If statement preparation or execution fails
+<i>169</i>&nbsp;   */
+<i>170</i>&nbsp;  public int delete(String sql, Object... args) throws SQLException {
+<b class="fc"><i>171</i>&nbsp;    return update(sql, args);</b>
+<i>172</i>&nbsp;  }
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;  /**
+<i>175</i>&nbsp;   * Executes any string as a JDBC Statement.
+<i>176</i>&nbsp;   * Good for DDL
+<i>177</i>&nbsp;   *
+<i>178</i>&nbsp;   * @param sql The SQL
+<i>179</i>&nbsp;   * @throws SQLException If statement preparation or execution fails
+<i>180</i>&nbsp;   */
+<i>181</i>&nbsp;  public void run(String sql) throws SQLException {
+<b class="fc"><i>182</i>&nbsp;    Statement stmt = connection.createStatement();</b>
+<i>183</i>&nbsp;    try {
+<b class="fc"><i>184</i>&nbsp;      stmt.execute(sql);</b>
+<i>185</i>&nbsp;    } finally {
+<b class="nc"><i>186</i>&nbsp;      try {</b>
+<b class="fc"><i>187</i>&nbsp;        stmt.close();</b>
+<b class="nc"><i>188</i>&nbsp;      } catch (SQLException e) {</b>
+<i>189</i>&nbsp;        //ignore
+<b class="fc"><i>190</i>&nbsp;      }</b>
+<b class="nc"><i>191</i>&nbsp;    }</b>
+<b class="fc"><i>192</i>&nbsp;  }</b>
+<i>193</i>&nbsp;
+<i>194</i>&nbsp;  public void closeConnection() {
+<i>195</i>&nbsp;    try {
+<b class="nc"><i>196</i>&nbsp;      connection.close();</b>
+<b class="nc"><i>197</i>&nbsp;    } catch (SQLException e) {</b>
+<i>198</i>&nbsp;      //ignore
+<b class="nc"><i>199</i>&nbsp;    }</b>
+<b class="nc"><i>200</i>&nbsp;  }</b>
+<i>201</i>&nbsp;
+<i>202</i>&nbsp;  private void setParameters(PreparedStatement ps, Object... args) throws SQLException {
+<b class="fc"><i>203</i>&nbsp;    for (int i = 0, n = args.length; i &lt; n; i++) {</b>
+<b class="fc"><i>204</i>&nbsp;      if (args[i] == null) {</b>
+<b class="nc"><i>205</i>&nbsp;        throw new SQLException(&quot;SqlRunner requires an instance of Null to represent typed null values for JDBC compatibility&quot;);</b>
+<b class="fc"><i>206</i>&nbsp;      } else if (args[i] instanceof Null) {</b>
+<b class="fc"><i>207</i>&nbsp;        ((Null) args[i]).getTypeHandler().setParameter(ps, i + 1, null, ((Null) args[i]).getJdbcType());</b>
+<i>208</i>&nbsp;      } else {
+<b class="fc"><i>209</i>&nbsp;        TypeHandler typeHandler = typeHandlerRegistry.getTypeHandler(args[i].getClass());</b>
+<b class="fc"><i>210</i>&nbsp;        if (typeHandler == null) {</b>
+<b class="nc"><i>211</i>&nbsp;          throw new SQLException(&quot;SqlRunner could not find a TypeHandler instance for &quot; + args[i].getClass());</b>
+<i>212</i>&nbsp;        } else {
+<b class="fc"><i>213</i>&nbsp;          typeHandler.setParameter(ps, i + 1, args[i], null);</b>
+<i>214</i>&nbsp;        }
+<i>215</i>&nbsp;      }
+<i>216</i>&nbsp;    }
+<b class="fc"><i>217</i>&nbsp;  }</b>
+<i>218</i>&nbsp;
+<i>219</i>&nbsp;  private List&lt;Map&lt;String, Object&gt;&gt; getResults(ResultSet rs) throws SQLException {
+<i>220</i>&nbsp;    try {
+<b class="fc"><i>221</i>&nbsp;      List&lt;Map&lt;String, Object&gt;&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>222</i>&nbsp;      List&lt;String&gt; columns = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>223</i>&nbsp;      List&lt;TypeHandler&lt;?&gt;&gt; typeHandlers = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>224</i>&nbsp;      ResultSetMetaData rsmd = rs.getMetaData();</b>
+<b class="fc"><i>225</i>&nbsp;      for (int i = 0, n = rsmd.getColumnCount(); i &lt; n; i++) {</b>
+<b class="fc"><i>226</i>&nbsp;        columns.add(rsmd.getColumnLabel(i + 1));</b>
+<i>227</i>&nbsp;        try {
+<b class="fc"><i>228</i>&nbsp;          Class&lt;?&gt; type = Resources.classForName(rsmd.getColumnClassName(i + 1));</b>
+<b class="fc"><i>229</i>&nbsp;          TypeHandler&lt;?&gt; typeHandler = typeHandlerRegistry.getTypeHandler(type);</b>
+<b class="fc"><i>230</i>&nbsp;          if (typeHandler == null) {</b>
+<b class="fc"><i>231</i>&nbsp;            typeHandler = typeHandlerRegistry.getTypeHandler(Object.class);</b>
+<i>232</i>&nbsp;          }
+<b class="fc"><i>233</i>&nbsp;          typeHandlers.add(typeHandler);</b>
+<b class="nc"><i>234</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>235</i>&nbsp;          typeHandlers.add(typeHandlerRegistry.getTypeHandler(Object.class));</b>
+<b class="fc"><i>236</i>&nbsp;        }</b>
+<i>237</i>&nbsp;      }
+<b class="fc"><i>238</i>&nbsp;      while (rs.next()) {</b>
+<b class="fc"><i>239</i>&nbsp;        Map&lt;String, Object&gt; row = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>240</i>&nbsp;        for (int i = 0, n = columns.size(); i &lt; n; i++) {</b>
+<b class="fc"><i>241</i>&nbsp;          String name = columns.get(i);</b>
+<b class="fc"><i>242</i>&nbsp;          TypeHandler&lt;?&gt; handler = typeHandlers.get(i);</b>
+<b class="fc"><i>243</i>&nbsp;          row.put(name.toUpperCase(Locale.ENGLISH), handler.getResult(rs, name));</b>
+<i>244</i>&nbsp;        }
+<b class="fc"><i>245</i>&nbsp;        list.add(row);</b>
+<b class="fc"><i>246</i>&nbsp;      }</b>
+<b class="fc"><i>247</i>&nbsp;      return list;</b>
+<i>248</i>&nbsp;    } finally {
+<b class="fc"><i>249</i>&nbsp;      if (rs != null) {</b>
+<i>250</i>&nbsp;        try {
+<b class="fc"><i>251</i>&nbsp;          rs.close();</b>
+<b class="nc"><i>252</i>&nbsp;        } catch (Exception e) {</b>
+<i>253</i>&nbsp;          // ignore
+<b class="fc"><i>254</i>&nbsp;        }</b>
+<i>255</i>&nbsp;      }
+<b class="nc"><i>256</i>&nbsp;    }</b>
+<i>257</i>&nbsp;  }
+<i>258</i>&nbsp;
+<i>259</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2019-03-04 09:14</div>
+</div>
+</body>
+</html>
