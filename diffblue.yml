@@ -11,7 +11,7 @@ units:
         sourceDir: src/main/java
         sourceFile: org/apache/ibatis/io/DefaultVFS.java
       # Child of DefaultVFS.class
-      # Child Coverage: 82.4%
+      # Child Coverage: 87.5%
       - dir: target/classes
         file: org/apache/ibatis/logging/Log.class
         sourceDir: src/main/java
@@ -46,90 +46,6 @@ units:
         file: org/apache/ibatis/reflection/property/PropertyTokenizer.class
         sourceDir: src/main/java
         sourceFile: org/apache/ibatis/reflection/property/PropertyTokenizer.java
-  # Target Coverage: 43.9%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/io/JBoss6VFS.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/io/JBoss6VFS.java
-  # Target Coverage: 40.9%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/session/defaults/DefaultSqlSessionFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/defaults/DefaultSqlSessionFactory.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 33.3%
-      - dir: target/classes
-        file: org/apache/ibatis/exceptions/ExceptionFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/exceptions/ExceptionFactory.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/executor/ErrorContext.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/executor/ErrorContext.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 93.7%
-      - dir: target/classes
-        file: org/apache/ibatis/executor/Executor.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/executor/Executor.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 82.6%
-      - dir: target/classes
-        file: org/apache/ibatis/mapping/Environment.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/mapping/Environment.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 92.3%
-      - dir: target/classes
-        file: org/apache/ibatis/session/Configuration.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/Configuration.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/session/ExecutorType.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/ExecutorType.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 84.8%
-      - dir: target/classes
-        file: org/apache/ibatis/session/SqlSession.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/SqlSession.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 40.9%
-      - dir: target/classes
-        file: org/apache/ibatis/session/SqlSessionFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/SqlSessionFactory.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/session/TransactionIsolationLevel.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/TransactionIsolationLevel.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/transaction/Transaction.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/transaction/Transaction.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 88.9%
-      - dir: target/classes
-        file: org/apache/ibatis/transaction/TransactionFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/transaction/TransactionFactory.java
-      # Child of DefaultSqlSessionFactory.class
-      # Child Coverage: 88.9%
-      - dir: target/classes
-        file: org/apache/ibatis/transaction/managed/ManagedTransactionFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/transaction/managed/ManagedTransactionFactory.java
   # Target Coverage: 35.3%
   - target:
       - dir: target/classes
@@ -154,6 +70,48 @@ units:
         file: org/apache/ibatis/reflection/ExceptionUtil.class
         sourceDir: src/main/java
         sourceFile: org/apache/ibatis/reflection/ExceptionUtil.java
+  # Target Coverage: 38.9%
+  - target:
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/wrapper/CollectionWrapper.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/wrapper/CollectionWrapper.java
+      # Child of CollectionWrapper.class
+      # Child Coverage: 94.6%
+      - dir: target/classes
+        file: org/apache/ibatis/reflection/factory/ObjectFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/reflection/factory/ObjectFactory.java
+  # Target Coverage: 25.0%
+  - target:
+      - dir: target/classes
+        file: org/apache/ibatis/exceptions/TooManyResultsException.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/exceptions/TooManyResultsException.java
+  # Target Coverage: 25.0%
+  - target:
+      - dir: target/classes
+        file: org/apache/ibatis/executor/result/ResultMapException.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/executor/result/ResultMapException.java
+      # Child of ResultMapException.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/exceptions/PersistenceException.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/exceptions/PersistenceException.java
+  # Target Coverage: 33.3%
+  - target:
+      - dir: target/classes
+        file: org/apache/ibatis/exceptions/ExceptionFactory.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/exceptions/ExceptionFactory.java
+      # Child of ExceptionFactory.class
+      # Child Coverage: 100.0%
+      - dir: target/classes
+        file: org/apache/ibatis/executor/ErrorContext.class
+        sourceDir: src/main/java
+        sourceFile: org/apache/ibatis/executor/ErrorContext.java
 phases:
   -
     #0
