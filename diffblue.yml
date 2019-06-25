@@ -1,215 +1,181 @@
-# Tested on Deeptest release 1.12.0
+buildCmd: mvn -e -X -Dmaven.enforcer.skip=true -Denforcer.skip=true -Dair.check.skip-all=true -Dmaven.test.skip=true compile
+testCmd: true
+skipVerification: true
 cbmcArguments:
+  # Do not generate coverage comments on generated tests.
   java-generate-no-comments: true
-  do-not-test-methods-with-access: [ private ]
-  cover-function-only: false
-units:
-  # Target Coverage: 39.3%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/io/DefaultVFS.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/io/DefaultVFS.java
-      # Child of DefaultVFS.class
-      # Child Coverage: 87.5%
-      - dir: target/classes
-        file: org/apache/ibatis/logging/Log.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/logging/Log.java
-      # Child of DefaultVFS.class
-      # Child Coverage: 83.7%
-      - dir: target/classes
-        file: org/apache/ibatis/logging/LogFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/logging/LogFactory.java
-  # Target Coverage: 33.9%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/wrapper/BaseWrapper.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/wrapper/BaseWrapper.java
-      # Child of BaseWrapper.class
-      # Child Coverage: 96.4%
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/MetaObject.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/MetaObject.java
-      # Child of BaseWrapper.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/ReflectionException.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/ReflectionException.java
-      # Child of BaseWrapper.class
-      # Child Coverage: 90.0%
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/property/PropertyTokenizer.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/property/PropertyTokenizer.java
-  # Target Coverage: 35.3%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/session/SqlSessionManager.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/session/SqlSessionManager.java
-      # Child of SqlSessionManager.class
-      # Child Coverage: 94.5%
-      - dir: target/classes
-        file: org/apache/ibatis/cursor/Cursor.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/cursor/Cursor.java
-      # Child of SqlSessionManager.class
-      # Child Coverage: 88.2%
-      - dir: target/classes
-        file: org/apache/ibatis/executor/BatchResult.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/executor/BatchResult.java
-      # Child of SqlSessionManager.class
-      # Child Coverage: 75.0%
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/ExceptionUtil.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/ExceptionUtil.java
-  # Target Coverage: 38.9%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/wrapper/CollectionWrapper.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/wrapper/CollectionWrapper.java
-      # Child of CollectionWrapper.class
-      # Child Coverage: 94.6%
-      - dir: target/classes
-        file: org/apache/ibatis/reflection/factory/ObjectFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/reflection/factory/ObjectFactory.java
-  # Target Coverage: 25.0%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/exceptions/TooManyResultsException.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/exceptions/TooManyResultsException.java
-  # Target Coverage: 25.0%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/executor/result/ResultMapException.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/executor/result/ResultMapException.java
-      # Child of ResultMapException.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/exceptions/PersistenceException.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/exceptions/PersistenceException.java
-  # Target Coverage: 33.3%
-  - target:
-      - dir: target/classes
-        file: org/apache/ibatis/exceptions/ExceptionFactory.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/exceptions/ExceptionFactory.java
-      # Child of ExceptionFactory.class
-      # Child Coverage: 100.0%
-      - dir: target/classes
-        file: org/apache/ibatis/executor/ErrorContext.class
-        sourceDir: src/main/java
-        sourceFile: org/apache/ibatis/executor/ErrorContext.java
+  # Constrain the size of arrays created in the analyzed code.
+  java-max-vla-length: 100000
 phases:
   -
-    #0
-    timeout: 300
+    # Phase 0 PRETTY, SIMPLE and SMART - pretty tests, do not test private methods directly, Smart-Harness
+    timeout: 180
     cbmcArguments:
+      # Use simple models first containers (ArrayList, HashMap, HashSet,...) will have a maximum size of one.
       classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
       depth: 1500
-      java-assume-inputs-non-null: true
-      java-max-vla-length: 48
+      # Maximum allowed length for an array passed as test input.
       max-nondet-array-length: 10
+      # Bound the length of input strings.
       max-nondet-string-length: 10
+      # Add constraint that strings are printable
       string-printable: true
+      # Make implicit runtime exceptions explicit.
       throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
       unwind: 1
-    nextPhase:
-      not_analyzed: null
-      time_out: 3
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [private]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # Instrument the file as opposed to the function only
+      cover-only: file
+      # Set string input value
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "1a 2b 3c", "A1B2C3", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c", ",", "/", "'"]
+      # Instantiate classes using the simplest constructor strategy
+      smart-harness: simplest-constructor-and-nondet
   -
-    #1
-    timeout: 300
+    # Phase 1 PRETTY AND COMPLEX - standard models only, pretty tests, do not test private methods directly, input factory
+    timeout: 180
     cbmcArguments:
-      classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
-      depth: 1500
-      java-assume-inputs-non-null: false
-      java-max-vla-length:  96
-      max-nondet-array-length: 20
-      max-nondet-string-length: 50
+      # Use the standard models library
+      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: false
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: true
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 10
+      # Bound the length of input strings.
+      max-nondet-string-length: 10
+      # Add constraint that strings are printable
       string-printable: true
+      # Set string input value
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "1a 2b 3c", "A1B2C3", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c", ",", "/", "'"]
+      # Make implicit runtime exceptions explicit.
       throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
       unwind: 2
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [private]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # instrument the file as opposed to the function only
+      cover-only: file
+      # Limit input factory recursive depth (default 0 = no recursion allowed)
+      java-test-input-factory-bmc-recursion-limit: 4
+  -
+    # Phase 2 FIFO Strategy - pretty tests, do not test private methods directly, fifo
+    timeout: 100
+    cbmcArguments:
+      # Use the standard models library
+      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: false
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: true
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 30
+      # Add constraint that strings are printable
+      max-nondet-string-length: 100
+      # Explores the program tree breadth-first.
+      paths: fifo
+      # Set string input value
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "1a 2b 3c", "A1B2C3", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c", ",", "/", "'"]
+      # Add constraint that strings are printable
+      string-printable: true
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: false
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [private]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # instrument the file as opposed to the function only
+      cover-only: file
+  -
+    # Phase 3 Exceptions - do not test private methods directly
+    timeout: 180
+    cbmcArguments:
+      # Use simple models containers first (ArrayList, HashMap, HashSet,...) will have a maximum size of one.
+      classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: false
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 30
+      # Bound the length of input strings.
+      max-nondet-string-length: 30
+      # Add constraint that strings are printable
+      string-printable: false
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: true
+      # Set an upper bound on loop unwinding.
+      unwind: 3
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [private]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # instrument the file as opposed to the function only
+      cover-only: file
+  -
+    # Phase 4 Direct testing - test private methods directly, increased reflection
+    timeout: 180
+    cbmcArguments:
+      # Use simple models containers first (ArrayList, HashMap, HashSet,...) will have a maximum size of one.
+      classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
+      depth: 1500
+      # never initialize reference-typed parameter to the entry point with null
+      java-assume-inputs-non-null: true
+      # Maximum allowed length for an array passed as test input.
+      max-nondet-array-length: 10
+      # Bound the length of input strings.
+      max-nondet-string-length: 10
+      # Add constraint that strings are printable
+      string-printable: true
+      # Make implicit runtime exceptions explicit.
+      throw-runtime-exceptions: false
+      # Set an upper bound on loop unwinding.
+      unwind: 1
+      # Set string input value
+      string-input-value: ["foo", "Bar", "BAZ", "1234", "1a 2b 3c", "A1B2C3", "a,b,c", "1", "2", "3", "a/b/c", "a'b'c", ",", "/", "'"]
+      # If the logs contain output of the following then proceed to phase X
     nextPhase:
-      time_out: 3
+      # If the function is not analysable then do not pass onto the next phase
+      not_analyzed: null
   -
-    #2
-    timeout: 300
+    # PHASE 5 Mocking - aggressive mocking, do not test private methods directly
+    timeout: 180
     cbmcArguments:
-      classpath: '/tools/cbmc/models.jar:.'
-      depth: 3000
-      java-assume-inputs-non-null: false
-      java-max-vla-length:  192
-      max-nondet-array-length: 30
-      max-nondet-string-length: 100
-      string-printable: false
-      throw-runtime-exceptions: true
-      unwind: 3
-  -
-    #3
-    timeout: 300
-    cbmcArguments:
+      # Use simple models containers first (ArrayList, HashMap, HashSet,...) will have a maximum size of one.
       classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
-      depth: 1500
-      java-assume-inputs-non-null: true
-      java-max-vla-length: 48
-#      load-containing-class-only: true
-      max-nondet-array-length: 10
-      max-nondet-string-length: 10
-      string-printable: true
-      throw-runtime-exceptions: false
-      unwind: 1
-  -
-    #4
-    timeout: 300
-    cbmcArguments:
-      classpath: '/tools/cbmc/models.jar:.'
+      # Set a limit on the number of instructions that can be generated as part of a test trace.
       depth: 3000
-      java-assume-inputs-non-null: false
-      java-max-vla-length:  192
-#      load-containing-class-only: true
-      max-nondet-array-length: 30
-      max-nondet-string-length: 100
-      string-printable: false
-      throw-runtime-exceptions: true
-      unwind: 3
-  -
-    #5
-    timeout: 300
-    cbmcArguments:
-      classpath: '/tools/cbmc/models-simple-overlay.jar:/tools/cbmc/models.jar:.'
-      depth: 1500
+      # never initialize reference-typed parameter to the entry point with null
       java-assume-inputs-non-null: true
-      java-max-vla-length: 48
-      max-nondet-array-length: 10
-      max-nondet-string-length: 10
-      single-function-only: true
-      string-printable: true
-      throw-runtime-exceptions: false
-      unwind: 1
-  -
-    #6
-    timeout: 300
-    cbmcArguments:
-      classpath: '/tools/cbmc/models.jar:.'
-      depth: 3000
-      java-assume-inputs-non-null: false
-      java-max-vla-length:  192
+      # Only load the class (and related inner/outer classes) containing the method under test,
+      load-containing-class-only: true
+      # Maximum allowed length for an array passed as test input.
       max-nondet-array-length: 30
+      # Bound the length of input strings.
       max-nondet-string-length: 100
-      single-function-only: true
+      # Add constraint that strings are printable
       string-printable: false
+      # Make implicit runtime exceptions explicit.
       throw-runtime-exceptions: true
+      # Set an upper bound on loop unwinding.
       unwind: 3
+      # Do not test any methods that have the specified access level.
+      do-not-test-methods-with-access: [private]
+      # Instrument the entry point function only.
+      cover-function-only: false
+      # instrument the file as opposed to the function only
+      cover-only: file
+units:
+ - target:
+   - dir: target/classes
+     file: org/apache/ibatis/type/ByteArrayUtils.class
+     sourceDir: src/main/java
+     sourceFile: org/apache/ibatis/type/ByteArrayUtils.java
